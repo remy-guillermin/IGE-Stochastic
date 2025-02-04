@@ -1,0 +1,13 @@
+# Semaine du Lundi 3 Fevrier
+
+Première semaine de stage ! 
+
+## Lundi
+Aujourd'hui c'était journée administrative: Le matin réunion nouveaux arrivants et l'après midi RDV avec l'administration pour récupérer les clés. 
+
+Lisa et Jean-Michel m'ont donné 3 articles comme base de travail: 
+- [Article sur les simulations stochastiques](../bibliography/Brankart%20et%20al.%20-%202015%20-%20A%20generic%20approach%20to%20explicit%20simulation%20of%20uncer.pdf): *Une description de la méthode probabiliste et ensembliste sur laquelle se base la méthodologie de ton stage. On souhaite appliquer cette méthode à notre modèle régional afin de quantifier les incertitudes associées à la circulation de surface du sud-ouest de l'Océan Indien.*
+- [Article sur les processus océaniques Indien](../bibliography/gmd-16-1163-2023.pdf) *Une review décrivant le contexte physique des processus océaniques de l'Océan Indien. A partir de cette review, il serait intéressant de dégager les processus affectant la circulation dans la partie Sud-Ouest de l'océan Indien et les questions scientifiques qui en découlent (étendue de notre zone d'étude en pj).*
+- [Article sur une configuration similaire de Croco](../bibliography/os-17-1677-2021.pdf) *Une description d'une configuration régionale du modèle d'océan CROCO sur le Sud-Ouest de l'océan Indien, qui est construite d'une façon analogue à celle que tu utiliseras dans ton stage, associée à une analyse climatologique des sorties de modèle.*
+
+On a aussi fait la demande d'accès à [Adastra](https://dci.dci-gitlab.cines.fr/webextranet/)
