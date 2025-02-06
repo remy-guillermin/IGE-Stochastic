@@ -22,15 +22,19 @@ Aujourd'hui pas grand chose, j'ai commencé à travailler en profondeur l'[artic
 
 ## Mercredi
 ### Questions sur l'article de Jean-Michel
-> À quoi sert la *correlation timescale* ? 
+> **À quoi sert la *correlation timescale* ?**
 >
-> Est ce que les modèles *state-of-art* dynamique de l'océanographie sont toujours deterministes ?
+> Il s'agit de l'échelle de temps de corrélation, par exemple une Gaussienne plutôt plate qui décrit combien de temps une mesure en un point va être correlée à un autre mesure en ce même point à un temps différents.
+
+
+> **Pourquoi résoudre une équation elliptique pour faire un filtre spatial ?**
+> 
+> Un équation elliptique est une PDE de la forme $L^2 \Delta \psi = w$ avec $w$ un bruit blanc, donc non-corrélé spatiallement. Quand on résoud cette équation on va obtenir une fonction $\psi$ qui sera corrélée dans l'espace.
+
+
+> **Pourquoi est-on intéressé par l'évolution de la biodiversité marine dans les modèles numériques physiques ?**
 >
-> Qu'est ce que l'*interranual variability* ? 
->
-> Pourquoi résoudre une équation elliptique pour faire un filtre spatial ?
->
-> Pourquoi est-on intéressé par l'évolution de la biodiversité marine dans les modèles numériques physiques ?
+> L'importance n'est pas les incertitudes causées par la biodiversité marine mais les incertitudes **sur** la biodiversité marine. Par exemple dans l'article de Jean-Michel uniquement les deux plus petites échelles de biodiversité sont résolues.
 
 ## Jeudi
-Normalement j'ai accès à ADASTRA, à vérifier avec Jean-Michel
+Aujourd'hui on a finalisé la configuration de l'accès à Adastra, je peux donc me connecter à Adastra et utiliser Python.
