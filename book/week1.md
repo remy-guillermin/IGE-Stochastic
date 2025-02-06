@@ -11,3 +11,26 @@ Lisa et Jean-Michel m'ont donné 3 articles comme base de travail:
 - [Article sur une configuration similaire de Croco](../bibliography/os-17-1677-2021.pdf) *Une description d'une configuration régionale du modèle d'océan CROCO sur le Sud-Ouest de l'océan Indien, qui est construite d'une façon analogue à celle que tu utiliseras dans ton stage, associée à une analyse climatologique des sorties de modèle.*
 
 On a aussi fait la demande d'accès à [Adastra](https://dci.dci-gitlab.cines.fr/webextranet/)
+
+## Mardi
+Aujourd'hui pas grand chose, j'ai commencé à travailler en profondeur l'[article sur les simulations stochastiques](../bibliography/Brankart%20et%20al.%20-%202015%20-%20A%20generic%20approach%20to%20explicit%20simulation%20of%20uncer.pdf).
+
+> [!IMPORTANT]
+> NEMO a une résolution verticale fixe et est donc moins précis sur les zones a faible bathymétrie (relief marin).
+> 
+> CROCO lui a une résolution verticale qui suit la bathymétrie ce qui permet d'être mieux résolu sur les côtes notamment.
+
+## Mercredi
+### Questions sur l'article de Jean-Michel
+> À quoi sert la *correlation timescale* ? 
+>
+> Est ce que les modèles *state-of-art* dynamique de l'océanographie sont toujours deterministes ?
+>
+> Qu'est ce que l'*interranual variability* ? 
+>
+> Pourquoi résoudre une équation elliptique pour faire un filtre spatial ?
+>
+> Pourquoi est-on intéressé par l'évolution de la biodiversité marine dans les modèles numériques physiques ?
+
+## Jeudi
+Normalement j'ai accès à ADASTRA, à vérifier avec Jean-Michel

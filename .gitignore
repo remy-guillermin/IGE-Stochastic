@@ -1,2 +1,35 @@
-.DS_Store
+# System files (macOS)
+*.DS_Store
 Icon?
+
+# Archives & Compressed files
+*.tar.gz
+
+# Documents
+*.pdf
+!bibliography/*.pdf
+
+# Figures
+*.png
+*.jpg
+*.jpeg
+
+# Tree files
+*project.tree 
+
+# LaTeX output files
+*.aux 
+*.fdb_latexmk 
+*.fls 
+*.log 
+*.bak* 
+*.bbl 
+*.blg 
+*.out 
+*Notes.bib 
+*blx.bib 
+*.run.xml 
+*.toc 
+*.spl 
+*.nav 
+*.snm
