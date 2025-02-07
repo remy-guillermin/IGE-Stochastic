@@ -8,7 +8,7 @@ import sys
 import cartopy.crs as ccrs
 from metpy.units import units
 
-data = '/lus/work/CT1/c1601279/lweiss/CROCO/RUN/SWIOSE/OUTPUT/'
+data = '/lus/work/CT1/c1601279/lweiss/CROCO/RUN/SWIOSE/RUN_CROCO/'
 work = '/lus/work/CT1/c1601279/lweiss/CROCO/'
 path_fig = '/lus/home/CT1/c1601279/lweiss/PYTHON/FIGURES/'
 
@@ -61,7 +61,7 @@ print('wind stress: ', wind_stress.shape)
 # sys.exit()
 
 # Tracer la figure représentant la moyenne temporelle
-fig = plt.figure(figsize=(5, 5))
+fig = plt.figure(figsize=(10, 10))
 ax = fig.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
 ax.set_title(f"Wind Stress SWIO {start_time}", size=9) # from {start_time} to {end_time}
 
@@ -85,7 +85,22 @@ gl.top_labels = False
 gl.right_labels = False
 gl.xlabel_style = {'size': 8, 'color': 'k'}
 gl.ylabel_style = {'size': 8, 'color': 'k'}
-
+fill_value = 9.96921e+36
+u = u.where((u != fill_value), np.nan)
+v = v.where((v != fill_value), np.nan)
+# dx = dx.where(msk == 1, np.nan)
+# dy = dy.where(msk == 1, np.nan)
+print('u,v: ', u.shape, v.shape)
+# Moyenne temporelle
+u_mean = u.mean(dim='time')
+v_mean = v.mean(dim='time')
+# Transformation des composantes de vent (grille déformée -> grille géographique)
+u_geo = u_mean[:-1,:].data * np.cos(angle[:-1,:-1]) - v_mean[:,:-1].data * np.sin(angle[:-1,:-1])
+v_geo = u_mean[:-1,:].data * np.sin(angle[:-1,:-1]) + v_mean[:,:-1].data * np.cos(angle[:-1,:-1])
+print('u,v: ', u_geo.shape, v_geo.shape)
+# Calcul de l'intensité du stress du vent
+wind_stress = np.sqrt(u_geo**2 + v_geo**2)
+print('wind stress: ', wind_stress.shape)
 ### colorbar
 # plt.colorbar(pcm, ax=ax, orientation='vertical', label='Wind Stress (N/m²)')
 cb = fig.colorbar(pcm, ax=ax, label='wind stress (N/m²)')
@@ -97,5 +112,5 @@ cb.ax.set_yticklabels(np.round(np.linspace(a, b, c),2), fontsize=8)
 cb.ax.yaxis.label.set_font_properties(mpl.font_manager.FontProperties(size=8))
 
 ### SAVE
-plt.savefig(path_fig + simu + f'/wind_stress_{simu}_{start_time}.png', dpi=300, bbox_inches='tight')
-plt.close()
+#plt.savefig(path_fig + simu + f'/wind_stress_{simu}_{start_time}.png', dpi=300, bbox_inches='tight')
+plt.show()
