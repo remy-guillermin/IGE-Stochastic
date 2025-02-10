@@ -80,7 +80,7 @@ python3 -m pip install --upgrade pip
 
 Je peux donc activer mon environnement en me connecter et en executant
 ```bash
-source $WORKDIR/python_environment/bin/activate
+source ./python_environment/bin/activate
 ```
 
 
@@ -100,4 +100,16 @@ ncdump -h swio_avg.nc
 Et aussi d'afficher les données avec
 ```bash
 ncview swio_avg.nc
+```
+
+### Copie de données
+Pour transférer les données d'Adastra (ici les scripts de Lisa enregistrés dans [ce dossier](../scripts/lweiss_scripts/)) sur mon ordi je fais dois faire
+```bash
+(python_environment) [c1601279] rguillermin@login3:~$ tar -czvf lweiss_scripts.tar.gz ../lweiss/PYTHON/scripts/*/*.py
+(python_environment) [c1601279] rguillermin@login3:~$ exit
+remyguillermin@eduroam-049197 % ssh ige-ssh
+guilremy@ige-ssh:~$ scp rguillermin@adastra.cines.fr:/lus/home/CT1/c1601279/rguillermin/lweiss_scripts.tar.gz .
+guilremy@ige-ssh:~$ exit
+(main) remyguillermin@eduroam-049197 % scp -i ~/.ssh/ige_ssh guilremy@ige-ssh.u-ga.fr:lweiss_scripts.tar.gz .
+(main) remyguillermin@eduroam-049197 % tar -xzvf lweiss_scripts.tar.gz
 ```

@@ -13,7 +13,6 @@ ssh adastra
 
 Puis je rentre mon mot de passe d'Adastra et je peux activer mon environnement python
 ```bash
-cd $WORKDIR
 source ./python_environment/bin/activate
 ```  
 
