@@ -8,64 +8,57 @@ import sys
 import cartopy.crs as ccrs
 from metpy.units import units
 
-data = '/lus/work/CT1/c1601279/lweiss/CROCO/RUN/SWIOSE/RUN_CROCO/'
-work = '/lus/work/CT1/c1601279/lweiss/CROCO/'
+data = '/lus/store/CT1/c1601279/lweiss/RUN_CROCO/'
+simu = 'run_swio2_deter_2017_2023/'
+grid = '/lus/store/CT1/c1601279/lweiss/GRID/croco_grid_swio2.nc'
 
-simu = 'run_swio_stogen_1mth_diff_100p_10jo1ud12'
-
-g = xr.open_dataset(data + simu + '_0001/swiose_grid.nc')
-lon = g['lon_rho'][:, :]
-lat = g['lat_rho'][:, :]
-msk = g['mask_rho'][:, :]
+g = xr.open_dataset(grid)
+lon = g['lon_rho'][:, :] # Longitude
+lat = g['lat_rho'][:, :] # Latitude
+angle = g['angle'][:, :] # Deformation
+msk = g['mask_rho'][:, :] # Mask
 msk_inv = np.where(msk == 0, msk, np.nan)
-# dx = 1 / g['pm'] * units.meter
-# dy = 1 / g['pn'] * units.meter
-angle = g['angle'][:, :]
-#sys.exit()
 g.close()
 
-ds = xr.open_dataset(data + simu + '_0001/001swiose_his.nc')  # , engine='h5netcdf')
-u = ds['sustr'][:, :, :]
-v = ds['svstr'][:, :, :] 
-ds.close()
+d = xr.open_dataset(data + simu + 'swio_avg.nc')
+u = d['sustr'][:, :, :] # Vitesse surface u
+v = d['svstr'][:, :, :] # Vitesse surface v
+d.close()
 
-start_time = '2017-01-31' # '2019-01-01T12:00:00'
+start_time = '2017-01-31'
 end_time = '2017-01-31'
+
 u = u.sel(time=slice(start_time, end_time))
 v = v.sel(time=slice(start_time, end_time))
-# dx = units.Quantity(dx.data, "m")
-# dy = units.Quantity(dy.data, "m")
 print('u,v: ', u.shape, v.shape)
+
 # Remplacer les valeurs hors domaine par NaN
 fill_value = 9.96921e+36
 u = u.where((u != fill_value), np.nan)
 v = v.where((v != fill_value), np.nan)
-# dx = dx.where(msk == 1, np.nan)
-# dy = dy.where(msk == 1, np.nan)
-print('u,v: ', u.shape, v.shape)
-# Moyenne temporelle
+
+# Moyenne sur start - end
 u_mean = u.mean(dim='time')
 v_mean = v.mean(dim='time')
+
 # Transformation des composantes de vent (grille déformée -> grille géographique)
 u_geo = u_mean[:-1,:].data * np.cos(angle[:-1,:-1]) - v_mean[:,:-1].data * np.sin(angle[:-1,:-1])
 v_geo = u_mean[:-1,:].data * np.sin(angle[:-1,:-1]) + v_mean[:,:-1].data * np.cos(angle[:-1,:-1])
+
 print('u,v: ', u_geo.shape, v_geo.shape)
 # Calcul de l'intensité du stress du vent
 wind_stress = np.sqrt(u_geo**2 + v_geo**2)
 print('wind stress: ', wind_stress.shape)
 
-# sys.exit()
-
-# Tracer la figure représentant la moyenne temporelle
-fig = plt.figure(figsize=(10, 10))
+fig = plt.figure(figsize=(8, 8))
 ax = fig.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
 ax.set_title(f"Wind Stress SWIO {start_time}", size=9) 
 
-cmap = cmcrameri.cm.batlow #roma_r #batlowW #  plt.cm.seismic
+cmap = cmcrameri.cm.batlow
 a = 0
 b = 0.2
 c = 5
-levels = np.linspace(a, b, c * 4 - 3)  ### amplitude de la colorbar à ajuster ici
+levels = np.linspace(a, b, c * 4 - 3) 
 norm = mpl.colors.BoundaryNorm(levels, cmap.N)
 
 pcm = ax.pcolormesh(lon[:-1,:-1], lat[:-1,:-1], wind_stress, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
