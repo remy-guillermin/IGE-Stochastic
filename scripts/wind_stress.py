@@ -10,12 +10,13 @@ from metpy.units import units
 
 data = '/lus/store/CT1/c1601279/lweiss/RUN_CROCO/'
 simu = 'run_swio2_deter_2017_2023/'
+grid = '/lus/store/CT1/c1601279/lweiss/GRID/croco_grid_swio2.nc'
 
-g = xr.open_dataset(data + simu + 'swiose_grid.nc')
+g = xr.open_dataset(grid)
 lon = g['lon_rho'][:, :] # Longitude
 lat = g['lat_rho'][:, :] # Latitude
-angle = d['angle'][:, :] # Deformation
-msk = d['mask_rho'][:, :] # Mask
+angle = g['angle'][:, :] # Deformation
+msk = g['mask_rho'][:, :] # Mask
 msk_inv = np.where(msk == 0, msk, np.nan)
 g.close()
 
@@ -25,7 +26,7 @@ v = d['svstr'][:, :, :] # Vitesse surface v
 d.close()
 
 start_time = '2017-01-31'
-end_time = '2017-03-31'
+end_time = '2017-01-31'
 
 u = u.sel(time=slice(start_time, end_time))
 v = v.sel(time=slice(start_time, end_time))
