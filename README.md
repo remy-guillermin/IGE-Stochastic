@@ -4,6 +4,10 @@ Repo pour mon stage à l'IGE sur l'étude des sources d'incertitudes associées 
 ## Structure du repo
 - [bibliography](bibliography/) contient les documents de bilbiographie.
 - [book](book/) contient des rapports journaliers et résumés hebdomadaires de mes avancées.
+- [documentation](documentation/) contient divers notes de codes.
+- [report](report/) contient le nécessaire pour écrire le rapport.
+- [scripts](scripts/) contient les scripts python utilisés.
+- [slides](slides/) contient le nécessaire pour produire les slides.
 
 ## Connexion à Adastra
 Pour me connecter à Adastra je fais 
