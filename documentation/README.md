@@ -113,3 +113,21 @@ guilremy@ige-ssh:~$ exit
 (main) remyguillermin@eduroam-049197 % scp -i ~/.ssh/ige_ssh guilremy@ige-ssh.u-ga.fr:lweiss_scripts.tar.gz .
 (main) remyguillermin@eduroam-049197 % tar -xzvf lweiss_scripts.tar.gz
 ```
+
+## Packages `croco_plot`
+Je développe un package python pour me faciliter la tâches afin d'afficher les cartes dont j'aurais besoin.
+
+### Installation
+Pour une installation locale, il faut se situer à la racine du projet et exécuter 
+```bash
+pip install -e modules/
+```
+
+### Commande `croco-ipy-load`
+Il est possible d'utiliser le script [croco-ipy-load](../scripts/croco-ipy-load.py) afin de directement lancer `iPython` en exécutant la commande `croco-ipy-load`. Pour cela il faut copier le script dans le`/bin/` de l'environnement.
+```bash
+mkdir -p $VIRTUAL_ENV/bin 
+cp scripts/croco-ipy-load.py $VIRTUAL_ENV/bin/croco-ipy-load
+chmod +x $VIRTUAL_ENV/bin/croco-ipy-load
+source ./python_environment/bin/activate
+```
