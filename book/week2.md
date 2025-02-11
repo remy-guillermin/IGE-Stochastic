@@ -28,3 +28,5 @@ Adastra est en panne aujourd'hui donc je fais de la lecture. J'ai lu et annoté 
 
 ![](indian_ocean_circulation.png)
 *Figure 1: Vue schématique des phénomènes clés dans l'Océan Indien. https://doi.org/10.5194/os-17-1677-2021*
+
+J'ai commencé à plot différentes cartes, pour le moment carte de vent et cartes de bathymétrie. Demain je vais essayer de faire une carte d'EKE et travailler sur les zones de Lisa qui sont dans [ce script](../scripts/lweiss_mod/KE/eke_avg_croco.py).
