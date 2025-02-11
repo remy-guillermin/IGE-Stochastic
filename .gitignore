@@ -11,6 +11,8 @@ Icon?
 
 # Figures
 *.png
+!bibliography/*.png
+!book/*.png
 *.jpg
 *.jpeg
 
@@ -33,3 +35,9 @@ Icon?
 *.spl 
 *.nav 
 *.snm
+
+# Modules files
+#modules/*egg-info/*
+#modules/*/__pycache__/*
+modules/*
+scripts/croco-ipy-load.py

@@ -38,3 +38,11 @@ Aujourd'hui pas grand chose, j'ai commencé à travailler en profondeur l'[artic
 
 ## Jeudi
 Aujourd'hui on a finalisé la configuration de l'accès à Adastra, je peux donc me connecter à Adastra et utiliser Python.
+
+## Vendredi
+Aujourd'hui je me focalise sur la compréhension des codes de Lisa, j'arrive à les exécuter. Je dois maintenant arriver a refaire ces plots par moi même.
+
+
+## À faire pour lundi 
+- Lire un des deux autres articles et l'annoter.
+- Vérifier l'article de Jean-Michel si j'ai d'autres questions.
