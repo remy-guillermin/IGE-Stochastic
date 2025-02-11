@@ -22,7 +22,6 @@ source ./python_environment/bin/activate
 
 ## Makefile
 - `make` va créer les rendus (slides et rapport).
-- `make tree` va créer le fichier `project.tree` représentant l'arborescence du projet.
 - `make file.pdf` va compiler le fichier `.tex` associé (report.pdf et slide.pdf disponible).
 - `make cleanpdf` va supprimer tous les fichiers pdf compilés.
 - `make cleanaux` va supprimer tous les fichiers auxiliaires de compilation.

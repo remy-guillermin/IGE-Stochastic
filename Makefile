@@ -8,9 +8,6 @@ report.pdf:
 slides.pdf:
 	cd slides && latexmk -halt-on-error -f -shell-escape -pdf -quiet slides.tex && rsync slides.pdf ../slides.pdf 
 
-tree:
-	tree -o project.tree 
-
 cleanpdf:
 	rm -f report.pdf slides.pdf report/report.pdf slides/slides.pdf
 
