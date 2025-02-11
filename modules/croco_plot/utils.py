@@ -1,4 +1,10 @@
-# utils.py
+"""
+Module utils pour croco_plot.
+
+Ce module contient des fonctions utilitaires pour le traitement et l'affichage
+des données CROCO.
+"""
+
 import numpy as np
 import xarray as xr
 
