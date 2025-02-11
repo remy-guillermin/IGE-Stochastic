@@ -37,3 +37,32 @@ def load_grid(path):
     #sys.exit()
     g.close()
     return lon, lat, msk, msk_inv, angle
+
+def calc_depth(s, Cs, hc, h):
+    """
+    Compute the depth of the mask using the S-coordinate transformation.
+
+    Parameters
+    ----------
+    s : array-like
+        S-coordinate at RHO-points, typically ranging from -1 (surface) to 0 (bottom).
+    Cs : array-like
+        S-coordinate stretching curves at W-points, defining the vertical stretching.
+    hc : float
+        Critical depth parameter (in meters), influencing vertical terrain-following transformation.
+    h : array-like
+        Bathymetric depth at RHO-points (in meters), representing the seafloor depth.
+
+    Returns
+    -------
+    array-like
+        Computed depth at RHO-points.
+    """
+    N = len(s)
+    M, L = h.shape
+    z0 = np.zeros((N, M, L))
+    depth = np.zeros((N, M, L))
+    for k in range(N):
+        z0[k, :, :] = (hc * s[k] + h * Cs[k]) / (hc + h)
+        depth[k, :, :] = z0[k, :, :] * h
+    return depth
