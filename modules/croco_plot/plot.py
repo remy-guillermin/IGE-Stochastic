@@ -143,8 +143,8 @@ def velocity(data_path, date):
 
     # Load simulation data
     u, v = load_data(data_path, ('u', 'v'))
-    u = u.sel(time=slice(start_time, end_time))
-    v = v.sel(time=slice(start_time, end_time))
+    u = u.sel(time=date)
+    v = v.sel(time=date)
 
     # Average over the selected time period
     u_mean = u.mean(dim='time')
@@ -186,8 +186,8 @@ def vorticity(data_path, date):
 
     # Load simulation data
     u, v = load_data(data_path, ('u', 'v'))
-    u = u.sel(time=slice(start_time, end_time))
-    v = v.sel(time=slice(start_time, end_time))
+    u = u.sel(time=date)
+    v = v.sel(time=date)
 
     # Average over the selected time period
     u_mean = u.mean(dim='time')
@@ -235,8 +235,8 @@ def helicity(data_path, date):
 
     # Load simulation data
     u, v = load_data(data_path, ('u', 'v'))
-    u = u.sel(time=slice(start_time, end_time))
-    v = v.sel(time=slice(start_time, end_time))
+    u = u.sel(time=date)
+    v = v.sel(time=date)
 
     # Average over the selected time period
     u_mean = u.mean(dim='time')
