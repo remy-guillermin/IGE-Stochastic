@@ -19,6 +19,8 @@ g = xr.open_dataset(grid)
 lon = g['lon_rho'][:, :] # Longitude
 lat = g['lat_rho'][:, :] # Latitude
 angle = g['angle'][:, :] # Deformation
+pm = g['pm'][:-1,:-1] # Curvilinear coordinate metric in XI [m^-1]
+pn = g['pn'][:-1,:-1] # Curvilinear coordinate metric in ETA [m^-1]
 msk = g['mask_rho'][:, :] # Mask
 msk_inv = np.where(msk == 0, msk, np.nan)
 g.close()
@@ -49,14 +51,9 @@ v_geo = u_mean[:-1,:].data * np.sin(angle[:-1,:-1]) + v_mean[:,:-1].data * np.co
 
 print('u,v: ', u_geo.shape, v_geo.shape)
 
-dlat = (np.radians(np.gradient(lat, axis=0)) * R)[:-1,:-1]  # Variation de latitude
-dlon = (np.radians(np.gradient(lon, axis=1)) * (R * np.cos(np.radians(lat))))[:-1,:-1]  # Variation de longitude corrigée
-
-print('dlat,dlon: ', dlat.shape, dlon.shape)
-
 # Calcul des dérivées
-dv_dlon = np.gradient(v_geo, axis=1) / dlon
-du_dlat = np.gradient(u_geo, axis=0) / dlat
+dv_dlon = np.gradient(v_geo, axis=1) * pm
+du_dlat = np.gradient(u_geo, axis=0) * pn
 
 # Calcul du rotationnel en coordonnées géographiques
 vorticity = (dv_dlon - du_dlat) * 3600
