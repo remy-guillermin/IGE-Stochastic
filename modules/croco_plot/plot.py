@@ -77,7 +77,7 @@ def save_figure(fig, filename):
 
 def open_figure(filename):
     """
-    Open the saved figure using a terminal command.
+    Open the saved figure using a terminal command without blocking the IPython session.
 
     Parameters
     ----------
@@ -87,7 +87,7 @@ def open_figure(filename):
     output_dir = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures'
     file_path = os.path.join(output_dir, filename)
     if os.path.exists(file_path):
-        subprocess.run(['eog', file_path])  # Use eog for Linux
+        subprocess.Popen(['eog', file_path])  # Use eog for Linux
     else:
         print(f"File {file_path} does not exist.")
 
