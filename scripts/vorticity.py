@@ -51,45 +51,91 @@ v_geo = u_mean[:-1,:].data * np.sin(angle[:-1,:-1]) + v_mean[:,:-1].data * np.co
 
 print('u,v: ', u_geo.shape, v_geo.shape)
 
+velocity = np.sqrt(u_geo**2 + v_geo**2)
+
 # Calcul des dérivées
 dv_dlon = np.gradient(v_geo, axis=1) * pm
 du_dlat = np.gradient(u_geo, axis=0) * pn
 
 # Calcul du rotationnel en coordonnées géographiques
-vorticity = (dv_dlon - du_dlat) * 3600
+vorticity = (dv_dlon - du_dlat)
 
-print(np.round(np.nanmin(vorticity.values),3), np.round(np.nanmax(vorticity.values),3))
+helicity = velocity * vorticity
 
-fig = plt.figure(figsize=(8, 8))
-ax = fig.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
-ax.set_title(f"Vorticity SWIO {start_time}", size=9) 
+print('velocity: ', np.round(np.nanmin(velocity.values),3), np.round(np.nanmax(velocity.values),3))
+print('vorticity: ', np.round(np.nanmin(vorticity.values),5), np.round(np.nanmax(vorticity.values),5))
+print('helicity: ', np.round(np.nanmin(helicity.values),5), np.round(np.nanmax(helicity.values),5))
 
-cmap = cmcrameri.cm.vik
-a = -0.15
-b = 0.15
-c = 10
+fig, axes = plt.subplots(1, 3, figsize=(18, 6), subplot_kw={'projection': ccrs.PlateCarree()})
+
+# Define common gridline styles
+gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.3}
+
+# --- Velocity Plot ---
+ax = axes[0]
+ax.set_title(f"Velocity SWIO {start_time}", size=9) 
+
+cmap = cmcrameri.cm.oslo
+a, b, c = 0, 2.5, 10
 levels = np.linspace(a, b, c * 2 - 1) 
 norm = mpl.colors.BoundaryNorm(levels, cmap.N)
 
-pcm = ax.pcolormesh(lon[:-1,:-1], lat[:-1,:-1], vorticity, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
-# Add contours / mask
+pcm = ax.pcolormesh(lon[:-1,:-1], lat[:-1,:-1], velocity, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
 ax.contour(lon, lat, msk, colors='k', linewidths=0.1)
 ax.contourf(lon, lat, msk_inv, colors='lightgray')
 
-gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True, linestyle='--', linewidth=0.3)
+gl = ax.gridlines(crs=ccrs.PlateCarree(), **gridline_style)
 gl.top_labels = False
 gl.right_labels = False
-gl.xlabel_style = {'size': 8, 'color': 'k'}
-gl.ylabel_style = {'size': 8, 'color': 'k'}
+gl.xlabel_style = gl.ylabel_style = {'size': 8, 'color': 'k'}
 
-### colorbar
-cb = fig.colorbar(pcm, ax=ax, label='Vorticity [$h^{-1}$]')
-posax = ax.get_position()
-poscb = cb.ax.get_position()
-cb.ax.set_position([0.76, posax.y0, poscb.width, posax.height])
+cb = fig.colorbar(pcm, ax=ax, label='Velocity [$m.s^{-1}$]', orientation='vertical')
 cb.set_ticks(np.linspace(a, b, c))
 cb.ax.set_yticklabels(np.round(np.linspace(a, b, c),2), fontsize=8)
-cb.ax.yaxis.label.set_font_properties(mpl.font_manager.FontProperties(size=8))
 
+# --- Vorticity Plot ---
+ax = axes[1]
+ax.set_title(f"Vorticity SWIO {start_time}", size=9) 
+
+cmap = cmcrameri.cm.vik
+a, b, c = -0.15, 0.15, 10
+levels = np.linspace(a, b, c * 2 - 1) 
+norm = mpl.colors.BoundaryNorm(levels, cmap.N)
+
+pcm = ax.pcolormesh(lon[:-1,:-1], lat[:-1,:-1], vorticity * 3600, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
+ax.contour(lon, lat, msk, colors='k', linewidths=0.1)
+ax.contourf(lon, lat, msk_inv, colors='lightgray')
+
+gl = ax.gridlines(crs=ccrs.PlateCarree(), **gridline_style)
+gl.top_labels = False
+gl.right_labels = False
+
+cb = fig.colorbar(pcm, ax=ax, label='Vorticity [$h^{-1}$]', orientation='vertical')
+cb.set_ticks(np.linspace(a, b, c))
+cb.ax.set_yticklabels(np.round(np.linspace(a, b, c),2), fontsize=8)
+
+# --- Helicity Plot ---
+ax = axes[2]
+ax.set_title(f"Helicity SWIO {start_time}", size=9) 
+
+cmap = cmcrameri.cm.vik
+a, b, c = -0.5, 0.5, 11
+levels = np.linspace(a, b, c * 2 - 1) 
+norm = mpl.colors.BoundaryNorm(levels, cmap.N)
+
+pcm = ax.pcolormesh(lon[:-1,:-1], lat[:-1,:-1], helicity * 3600 ** 2 / 1000, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
+ax.contour(lon, lat, msk, colors='k', linewidths=0.1)
+ax.contourf(lon, lat, msk_inv, colors='lightgray')
+
+gl = ax.gridlines(crs=ccrs.PlateCarree(), **gridline_style)
+gl.top_labels = False
+gl.right_labels = False
+
+cb = fig.colorbar(pcm, ax=ax, label='Helicity [$km.h^{-2}$]', orientation='vertical')
+cb.set_ticks(np.linspace(a, b, c))
+cb.ax.set_yticklabels(np.round(np.linspace(a, b, c),2), fontsize=8)
+
+plt.tight_layout()
 plt.show()
+
 
