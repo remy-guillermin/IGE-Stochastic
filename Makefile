@@ -1,4 +1,3 @@
-
 all:
 	make cleanpdf && make report.pdf && make slides.pdf
 
@@ -8,6 +7,11 @@ report.pdf:
 slides.pdf:
 	cd slides && latexmk -halt-on-error -f -shell-escape -pdf -quiet slides.tex && rsync slides.pdf ../slides.pdf 
 
+install:
+	pip install -e modules/
+	cp scripts/croco-ipy-load.py $$VIRTUAL_ENV/bin/croco-ipy-load
+	chmod +x $$VIRTUAL_ENV/bin/croco-ipy-load
+
 cleanpdf:
 	rm -f report.pdf slides.pdf report/report.pdf slides/slides.pdf
 
@@ -16,6 +20,7 @@ cleanaux:
 
 clean:
 	make cleanpdf && make cleanaux
+
 
 
 

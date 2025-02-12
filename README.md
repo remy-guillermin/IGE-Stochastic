@@ -24,6 +24,7 @@ source ./python_environment/bin/activate
 ## Makefile
 - `make` va créer les rendus (slides et rapport).
 - `make file.pdf` va compiler le fichier `.tex` associé (report.pdf et slide.pdf disponible).
+- `make install` va construire le module `croco_plot` et copier `croco-ipy-load` dans l'environnement en tant que commande.
 - `make cleanpdf` va supprimer tous les fichiers pdf compilés.
 - `make cleanaux` va supprimer tous les fichiers auxiliaires de compilation.
 - `make clean` va executer toutes les commandes `make clean*`.
