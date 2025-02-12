@@ -7,14 +7,9 @@ Ce module contient des fonctions utilitaires pour le traitement et le chargement
 import numpy as np
 import xarray as xr
 
-def load_grid(path):
+def load_grid():
     """
     Load the grid file into this iPython instance
-
-    Parameters
-    ----------
-    path : str
-        path to the 'swiose_grid.nc' file
 
     Returns
     -------
@@ -27,6 +22,7 @@ def load_grid(path):
         - msk_inv: Inverse mask array with invalid points set to NaN.
         - angle: Grid angle values representing the grid's orientation.
     """
+    path = '/lus/store/CT1/c1601279/lweiss/GRID/croco_grid_swio2.nc'
     g = xr.open_dataset(path)
     lon = g['lon_rho'][:, :]
     lat = g['lat_rho'][:, :]

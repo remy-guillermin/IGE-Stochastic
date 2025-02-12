@@ -51,17 +51,17 @@ def plot_data(ax, lon, lat, data, cmap, norm, label, msk, msk_inv, gridline_styl
     gl.xlabel_style = gl.ylabel_style = {'size': 8, 'color': 'k'}
 
     cb = plt.colorbar(pcm, ax=ax, label=label, orientation='vertical')
-    cb.ax.set_yticklabels(np.round(np.linspace(norm.vmin, norm.vmax, len(cb.get_ticks())), 2), fontsize=8)
+    ticks = np.linspace(norm.vmin, norm.vmax, len(cb.get_ticks()))
+    cb.set_ticks(ticks)
+    cb.ax.set_yticklabels(np.round(ticks, 2), fontsize=8)
 
 
-def vel_vort_hel(grid_path, data_path, start_time, end_time):
+def vel_vort_hel(data_path, start_time, end_time):
     """
     Plot velocity, vorticity, and helicity data on a map.
 
     Parameters
     ----------
-    grid_path : str
-        Path to the grid file.
     data_path : str
         Path to the simulation data file.
     start_time : str
@@ -70,7 +70,7 @@ def vel_vort_hel(grid_path, data_path, start_time, end_time):
         End time for the data slice.
     """
     # Load grid data
-    lon, lat, pm, pn, msk, msk_inv, angle = load_grid(grid_path)
+    lon, lat, pm, pn, msk, msk_inv, angle = load_grid()
 
     # Load simulation data
     u, v = load_data(data_path, ('u', 'v'))
@@ -127,21 +127,19 @@ def vel_vort_hel(grid_path, data_path, start_time, end_time):
     plt.show()
 
 
-def velocity(grid_path, data_path, date):
+def velocity(data_path, date):
     """
     Plot velocity data on a map for a specific date.
 
     Parameters
     ----------
-    grid_path : str
-        Path to the grid file.
     data_path : str
         Path to the simulation data file.
     date : str
         Date for the data slice in 'YYYY-MM-DD' format.
     """
     # Load grid data
-    lon, lat, pm, pn, msk, msk_inv, angle = load_grid(grid_path)
+    lon, lat, pm, pn, msk, msk_inv, angle = load_grid()
 
     # Load simulation data
     u, v = load_data(data_path, ('u', 'v'))
@@ -168,21 +166,19 @@ def velocity(grid_path, data_path, date):
     plt.show()
 
 
-def vorticity(grid_path, data_path, date):
+def vorticity(data_path, date):
     """
     Plot vorticity data on a map for a specific date.
 
     Parameters
     ----------
-    grid_path : str
-        Path to the grid file.
     data_path : str
         Path to the simulation data file.
     date : str
         Date for the data slice in 'YYYY-MM-DD' format.
     """
     # Load grid data
-    lon, lat, pm, pn, msk, msk_inv, angle = load_grid(grid_path)
+    lon, lat, pm, pn, msk, msk_inv, angle = load_grid()
 
     # Load simulation data
     u, v = load_data(data_path, ('u', 'v'))
@@ -215,21 +211,19 @@ def vorticity(grid_path, data_path, date):
     plt.show()
 
 
-def helicity(grid_path, data_path, date):
+def helicity(data_path, date):
     """
     Plot helicity data on a map for a specific date.
 
     Parameters
     ----------
-    grid_path : str
-        Path to the grid file.
     data_path : str
         Path to the simulation data file.
     date : str
         Date for the data slice in 'YYYY-MM-DD' format.
     """
     # Load grid data
-    lon, lat, pm, pn, msk, msk_inv, angle = load_grid(grid_path)
+    lon, lat, pm, pn, msk, msk_inv, angle = load_grid()
 
     # Load simulation data
     u, v = load_data(data_path, ('u', 'v'))
