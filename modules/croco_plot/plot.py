@@ -112,7 +112,7 @@ def velocity(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm.
     v = v[:,-1,:,:].sel(time=slice(start_date, end_date)).mean(dim='time')
 
     # Transform velocity components
-    u_geo, v_geo = transform_velocity(u_mean, v_mean, angle)
+    u_geo, v_geo = transform_velocity(u, v, angle)
     velocity = np.sqrt(u_geo**2 + v_geo**2)
 
     # Plotting
@@ -157,7 +157,7 @@ def vorticity(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm
     v = v[:,-1,:,:].sel(time=slice(start_date, end_date)).mean(dim='time')
 
     # Transform velocity components
-    u_geo, v_geo = transform_velocity(u_mean, v_mean, angle)
+    u_geo, v_geo = transform_velocity(u, v, angle)
 
     # Calculate derivatives
     dv_dlon = np.gradient(v_geo, axis=1) * pm
@@ -208,7 +208,7 @@ def helicity(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm.
     v = v[:,-1,:,:].sel(time=slice(start_date, end_date)).mean(dim='time')
     
     # Transform velocity components
-    u_geo, v_geo = transform_velocity(u_mean, v_mean, angle)
+    u_geo, v_geo = transform_velocity(u, v, angle)
     velocity = np.sqrt(u_geo**2 + v_geo**2)
 
     # Calculate derivatives
