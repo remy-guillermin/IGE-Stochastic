@@ -1,8 +1,7 @@
 """
 Module utils pour croco_plot.
 
-Ce module contient des fonctions utilitaires pour le traitement et l'affichage
-des données CROCO.
+Ce module contient des fonctions utilitaires pour le traitement et le chargement des données CROCO.
 """
 
 import numpy as np
@@ -22,6 +21,8 @@ def load_grid(path):
     tuple
         - lon: Longitude grid values.
         - lat: Latitude grid values.
+        - pm: Curvilinear coordinate metric in XI.
+        - pn: Curvilinear coordinate metric in ETA.
         - msk: Mask array of valid grid points.
         - msk_inv: Inverse mask array with invalid points set to NaN.
         - angle: Grid angle values representing the grid's orientation.
@@ -30,13 +31,56 @@ def load_grid(path):
     lon = g['lon_rho'][:, :]
     lat = g['lat_rho'][:, :]
     msk = g['mask_rho'][:, :]
+    pm = g['pm'][:-1,:-1] 
+    pn = g['pn'][:-1,:-1]
     msk_inv = np.where(msk == 0, msk, np.nan)
-    # dx = 1 / g['pm'] * units.meter
-    # dy = 1 / g['pn'] * units.meter
     angle = g['angle'][:, :]
-    #sys.exit()
     g.close()
-    return lon, lat, msk, msk_inv, angle
+    return lon, lat, pm, pn, msk, msk_inv, angle
+
+def load_data(path, fields):
+    """
+    Load the specified fields from the simulation data file.
+
+    Parameters
+    ----------
+    path : str
+        Path to the simulation data file.
+    fields : tuple
+        Tuple of field names to load (e.g., ('u', 'v', 'temp', 'salt')).
+
+    Returns
+    -------
+    tuple
+        Tuple of loaded fields in the same order as requested.
+    """
+    d = xr.open_dataset(path)
+    data = tuple(d[field][:, -1, :, :] for field in fields)
+    d.close()
+    return data
+
+def transform_velocity(u, v, angle):
+    """
+    Transform the velocity components from the deformed grid to the geographic grid.
+
+    Parameters
+    ----------
+    u_mean : array-like
+        Surface velocity u component.
+    v_mean : array-like
+        Surface velocity v component.
+    angle : array-like
+        Grid angle values representing the grid's orientation.
+
+    Returns
+    -------
+    tuple
+        - u_geo: Transformed surface velocity u component
+        - v_geo: Transformed surface velocity v component
+    """
+    u_geo = u[:-1,:].data * np.cos(angle[:-1,:-1]) - v[:,:-1].data * np.sin(angle[:-1,:-1])
+    v_geo = u[:-1,:].data * np.sin(angle[:-1,:-1]) + v[:,:-1].data * np.cos(angle[:-1,:-1])
+    return u_geo, v_geo
 
 def calc_depth(s, Cs, hc, h):
     """
