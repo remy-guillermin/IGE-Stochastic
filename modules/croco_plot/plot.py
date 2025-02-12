@@ -92,7 +92,7 @@ def open_figure(filename):
         print(f"File {file_path} does not exist.")
 
 
-def vel_vort_hel(data_path, start_time, end_time):
+def vel_vort_hel(data_path, start_time, end_time, figsize=(24, 8)):
     """
     Plot velocity, vorticity, and helicity data on a map.
 
@@ -104,6 +104,8 @@ def vel_vort_hel(data_path, start_time, end_time):
         Start time for the data slice.
     end_time : str
         End time for the data slice.
+    figsize : tuple, optional
+        Size of the figure, by default (24, 8)
     """
     # Load grid data
     lon, lat, pm, pn, msk, msk_inv, angle = load_grid()
@@ -130,7 +132,7 @@ def vel_vort_hel(data_path, start_time, end_time):
     helicity = velocity * vorticity
 
     # Plotting
-    fig, axes = plt.subplots(1, 3, figsize=(18, 6), subplot_kw={'projection': ccrs.PlateCarree()})
+    fig, axes = plt.subplots(1, 3, figsize=figsize, subplot_kw={'projection': ccrs.PlateCarree()})
 
     # Define common gridline styles
     gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.3}
@@ -164,24 +166,28 @@ def vel_vort_hel(data_path, start_time, end_time):
     plt.close(fig)
 
 
-def velocity(data_path, date):
+def velocity(data_path, start_date, end_date, figsize=(8, 8)):
     """
-    Plot velocity data on a map for a specific date.
+    Plot velocity data on a map for a specific date range.
 
     Parameters
     ----------
     data_path : str
         Path to the simulation data file.
-    date : str
-        Date for the data slice in 'YYYY-MM-DD' format.
+    start_date : str
+        Start date for the data slice in 'YYYY-MM-DD' format.
+    end_date : str
+        End date for the data slice in 'YYYY-MM-DD' format.
+    figsize : tuple, optional
+        Size of the figure, by default (8, 8)
     """
     # Load grid data
     lon, lat, pm, pn, msk, msk_inv, angle = load_grid()
 
     # Load simulation data
     u, v = load_data(data_path, ('u', 'v'))
-    u = u.sel(time=date)
-    v = v.sel(time=date)
+    u = u.sel(time=slice(start_date, end_date))
+    v = v.sel(time=slice(start_date, end_date))
 
     # Average over the selected time period
     u_mean = u.mean(dim='time')
@@ -192,40 +198,44 @@ def velocity(data_path, date):
     velocity = np.sqrt(u_geo**2 + v_geo**2)
 
     # Plotting
-    fig, ax = plt.subplots(figsize=(6, 6), subplot_kw={'projection': ccrs.PlateCarree()})
+    fig, ax = plt.subplots(figsize=figsize, subplot_kw={'projection': ccrs.PlateCarree()})
 
     # Define common gridline styles
     gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.3}
 
-    ax.set_title(f"Velocity SWIO {date}", size=9)
+    ax.set_title(f"Velocity SWIO {start_date} to {end_date}", size=9)
     cmap = cmcrameri.cm.oslo
     levels = np.linspace(0, 2.5, 19)
     norm = mpl.colors.BoundaryNorm(levels, cmap.N)
     plot_data(ax, lon, lat, velocity, cmap, norm, 'Velocity [$m.s^{-1}$]', msk, msk_inv, gridline_style)
 
     plt.tight_layout()
-    save_figure(fig, f"velocity_{date}.png")
+    save_figure(fig, f"velocity_{start_date}_{end_date}.png")
     plt.close(fig)
 
 
-def vorticity(data_path, date):
+def vorticity(data_path, start_date, end_date, figsize=(8, 8)):
     """
-    Plot vorticity data on a map for a specific date.
+    Plot vorticity data on a map for a specific date range.
 
     Parameters
     ----------
     data_path : str
         Path to the simulation data file.
-    date : str
-        Date for the data slice in 'YYYY-MM-DD' format.
+    start_date : str
+        Start date for the data slice in 'YYYY-MM-DD' format.
+    end_date : str
+        End date for the data slice in 'YYYY-MM-DD' format.
+    figsize : tuple, optional
+        Size of the figure, by default (8, 8)
     """
     # Load grid data
     lon, lat, pm, pn, msk, msk_inv, angle = load_grid()
 
     # Load simulation data
     u, v = load_data(data_path, ('u', 'v'))
-    u = u.sel(time=date)
-    v = v.sel(time=date)
+    u = u.sel(time=slice(start_date, end_date))
+    v = v.sel(time=slice(start_date, end_date))
 
     # Average over the selected time period
     u_mean = u.mean(dim='time')
@@ -242,40 +252,44 @@ def vorticity(data_path, date):
     vorticity = dv_dlon - du_dlat
 
     # Plotting
-    fig, ax = plt.subplots(figsize=(6, 6), subplot_kw={'projection': ccrs.PlateCarree()})
+    fig, ax = plt.subplots(figsize=figsize, subplot_kw={'projection': ccrs.PlateCarree()})
 
     # Define common gridline styles
     gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.3}
 
-    ax.set_title(f"Vorticity SWIO {date}", size=9)
+    ax.set_title(f"Vorticity SWIO {start_date} to {end_date}", size=9)
     cmap = cmcrameri.cm.vik
     levels = np.linspace(-0.15, 0.15, 19)
     norm = mpl.colors.BoundaryNorm(levels, cmap.N)
     plot_data(ax, lon, lat, vorticity * 3600, cmap, norm, 'Vorticity [$h^{-1}$]', msk, msk_inv, gridline_style)
 
     plt.tight_layout()
-    save_figure(fig, f"vorticity_{date}.png")
+    save_figure(fig, f"vorticity_{start_date}_{end_date}.png")
     plt.close(fig)
 
 
-def helicity(data_path, date):
+def helicity(data_path, start_date, end_date, figsize=(8, 8)):
     """
-    Plot helicity data on a map for a specific date.
+    Plot helicity data on a map for a specific date range.
 
     Parameters
     ----------
     data_path : str
         Path to the simulation data file.
-    date : str
-        Date for the data slice in 'YYYY-MM-DD' format.
+    start_date : str
+        Start date for the data slice in 'YYYY-MM-DD' format.
+    end_date : str
+        End date for the data slice in 'YYYY-MM-DD' format.
+    figsize : tuple, optional
+        Size of the figure, by default (8, 8)
     """
     # Load grid data
     lon, lat, pm, pn, msk, msk_inv, angle = load_grid()
 
     # Load simulation data
     u, v = load_data(data_path, ('u', 'v'))
-    u = u.sel(time=date)
-    v = v.sel(time=date)
+    u = u.sel(time=slice(start_date, end_date))
+    v = v.sel(time=slice(start_date, end_date))
 
     # Average over the selected time period
     u_mean = u.mean(dim='time')
@@ -294,17 +308,17 @@ def helicity(data_path, date):
     helicity = velocity * vorticity
 
     # Plotting
-    fig, ax = plt.subplots(figsize=(6, 6), subplot_kw={'projection': ccrs.PlateCarree()})
+    fig, ax = plt.subplots(figsize=figsize, subplot_kw={'projection': ccrs.PlateCarree()})
 
     # Define common gridline styles
     gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.3}
 
-    ax.set_title(f"Helicity SWIO {date}", size=9)
+    ax.set_title(f"Helicity SWIO {start_date} to {end_date}", size=9)
     cmap = cmcrameri.cm.vik
     levels = np.linspace(-0.5, 0.5, 21)
     norm = mpl.colors.BoundaryNorm(levels, cmap.N)
     plot_data(ax, lon, lat, helicity * 3600 ** 2 / 1000, cmap, norm, 'Helicity [$km.h^{-2}$]', msk, msk_inv, gridline_style)
 
     plt.tight_layout()
-    save_figure(fig, f"helicity_{date}.png")
+    save_figure(fig, f"helicity_{start_date}_{end_date}.png")
     plt.close(fig)
