@@ -34,7 +34,7 @@ def sss(data_path, start_date, end_date, figsize=(8, 8), cmap=cmocean.cm.haline)
     lon, lat, pm, pn, msk, msk_inv, angle = load_grid()
 
     # Load simulation data
-    salt = load_data(data_path, ('salt',)).sel(time=slice(start_date, end_date)).mean(dim='time')
+    salt = load_data(data_path, ('salt',))[:, -1, :, :].sel(time=slice(start_date, end_date)).mean(dim='time')
 
     # Plotting
     fig, ax = plt.subplots(figsize=figsize, subplot_kw={'projection': ccrs.PlateCarree()})
@@ -112,7 +112,7 @@ def sst(data_path, start_date, end_date, figsize=(8, 8), cmap=cmocean.cm.thermal
     lon, lat, pm, pn, msk, msk_inv, angle = load_grid()
 
     # Load simulation data
-    temp = load_data(data_path, ('temp',)).sel(time=slice(start_date, end_date)).mean(dim='time')
+    temp = load_data(data_path, ('temp',))[:, -1, :, :].sel(time=slice(start_date, end_date)).mean(dim='time')
 
     # Plotting
     fig, ax = plt.subplots(figsize=figsize, subplot_kw={'projection': ccrs.PlateCarree()})

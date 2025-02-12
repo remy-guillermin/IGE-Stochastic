@@ -35,7 +35,6 @@ def load_grid(is_Velocity=False):
         pm = g['pm'][:-1,:-1] 
         pn = g['pn'][:-1,:-1]
         msk_inv = np.where(msk == 0, msk, np.nan)
-        angle = g['angle'][:-1, :-1]
     else:
         lon = g['lon_rho'][:, :]
         lat = g['lat_rho'][:, :]
@@ -43,7 +42,7 @@ def load_grid(is_Velocity=False):
         pm = g['pm'][:,:] 
         pn = g['pn'][:,:]
         msk_inv = np.where(msk == 0, msk, np.nan)
-        angle = g['angle'][:, :]
+    angle = g['angle'][:, :]
     g.close()
     return lon, lat, pm, pn, msk, msk_inv, angle
 
@@ -66,9 +65,9 @@ def load_data(path, fields):
     """
     d = xr.open_dataset(path)
     if len(fields) == 1:
-        data = d[fields[0]].values
+        data = d[fields[0]]  # Return DataArray instead of values
     else:
-        data = tuple(d[field].values for field in fields)
+        data = tuple(d[field] for field in fields)
     d.close()
     return data
 
@@ -183,18 +182,25 @@ def save_figure(fig, filename):
     print(f"Figure saved as {filename}.")
 
 
-def open_figure(filename):
+def open_figure(filenames):
     """
-    Open the saved figure using a terminal command without blocking the IPython session.
+    Open the saved figure(s) using a terminal command without blocking the IPython session.
 
     Parameters
     ----------
-    filename : str
-        The name of the file to open.
+    filenames : str or list of str
+        The name of the file or list of files to open.
     """
     output_dir = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures'
-    file_path = os.path.join(output_dir, filename)
-    if os.path.exists(file_path):
+    
+    if isinstance(filenames, str):
+        filenames = [filenames]
+
+    file_paths = [os.path.join(output_dir, filename) for filename in filenames]
+
+    for file_path in file_paths:
+        if not os.path.exists(file_path):
+            print(f"File {file_path} does not exist.")
+
+    for file_path in file_paths:
         subprocess.Popen(['eog', file_path])  # Use eog for Linux
-    else:
-        print(f"File {file_path} does not exist.")
