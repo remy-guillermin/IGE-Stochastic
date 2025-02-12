@@ -5,6 +5,7 @@ Repo pour mon stage à l'IGE sur l'étude des sources d'incertitudes associées 
 - [bibliography](bibliography/) contient les documents de bilbiographie.
 - [book](book/) contient des rapports journaliers et résumés hebdomadaires de mes avancées.
 - [documentation](documentation/) contient divers notes de codes.
+- [modules](modules/) contient le nécessaire pour *build* mon package.
 - [report](report/) contient le nécessaire pour écrire le rapport.
 - [scripts](scripts/) contient les scripts python utilisés.
 - [slides](slides/) contient le nécessaire pour produire les slides.

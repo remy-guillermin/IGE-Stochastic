@@ -37,7 +37,5 @@ Icon?
 *.snm
 
 # Modules files
-#modules/*egg-info/*
-#modules/*/__pycache__/*
-modules/*
-scripts/croco-ipy-load.py
+modules/*egg-info/*
+modules/*/__pycache__/*

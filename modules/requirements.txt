@@ -1,0 +1,7 @@
+numpy
+xarray
+matplotlib
+cmocean
+cmcrameri
+cartopy
+metpy
