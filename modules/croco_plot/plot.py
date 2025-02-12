@@ -256,6 +256,12 @@ def eke(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm.lapaz
 
     # Load simulation data
     u, v, w = load_data(data_path, ('u', 'v', 'w'))
+    
+    fill_value = 9.96921e+36
+    u = u.where((u != fill_value), np.nan)
+    v = v.where((v != fill_value), np.nan)
+    w = w.where((w != fill_value), np.nan)
+    
     u = u[:,-1,:,:].sel(time=slice(start_date, end_date)).mean(dim='time')
     v = v[:,-1,:,:].sel(time=slice(start_date, end_date)).mean(dim='time')
     w = w[:,-1,:,:].sel(time=slice(start_date, end_date)).mean(dim='time')
@@ -279,7 +285,7 @@ def eke(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm.lapaz
     c = 10
     levels = np.logspace(np.log10(a), np.log10(b), c * 2 - 1)
     norm = mpl.colors.BoundaryNorm(levels, cmap.N)
-    plot_data(ax, lon[:-1,:-1], lat[:-1,:-1], EKE, cmap, norm, 'EKE [$m^2.s^{-2}$]', msk, msk_inv, gridline_style)
+    plot_data(ax, lon, lat, EKE, cmap, norm, 'EKE [$m^2.s^{-2}$]', msk, msk_inv, gridline_style)
 
     plt.tight_layout()
     save_figure(fig, f"eke_{start_date}_{end_date}.png")
