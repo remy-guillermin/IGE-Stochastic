@@ -6,6 +6,10 @@ Ce module contient des fonctions utilitaires pour le traitement et le chargement
 
 import numpy as np
 import xarray as xr
+import os
+import subprocess
+import matplotlib.pyplot as plt
+import cartopy.crs as ccrs
 
 def load_grid():
     """
@@ -106,3 +110,78 @@ def calc_depth(s, Cs, hc, h):
         z0[k, :, :] = (hc * s[k] + h * Cs[k]) / (hc + h)
         depth[k, :, :] = z0[k, :, :] * h
     return depth
+
+def plot_data(ax, lon, lat, data, cmap, norm, label, msk, msk_inv, gridline_style):
+    """
+    Helper function to plot data on a given axis.
+
+    Parameters
+    ----------
+    ax : GeoAxes
+        The axis to plot on.
+    lon : ndarray
+        Longitudes.
+    lat : ndarray
+        Latitudes.
+    data : ndarray
+        Data to plot.
+    cmap : Colormap
+        Colormap to use.
+    norm : Normalize
+        Normalization for the colormap.
+    label : str
+        Label for the colorbar.
+    msk : ndarray
+        Mask for contour.
+    msk_inv : ndarray
+        Inverse mask for contourf.
+    gridline_style : dict
+        Style for gridlines.
+    """
+    pcm = ax.pcolormesh(lon[:-1, :-1], lat[:-1, :-1], data, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
+    ax.contour(lon, lat, msk, colors='k', linewidths=0.1)
+    ax.contourf(lon, lat, msk_inv, colors='lightgray')
+
+    gl = ax.gridlines(crs=ccrs.PlateCarree(), **gridline_style)
+    gl.top_labels = False
+    gl.right_labels = False
+    gl.xlabel_style = gl.ylabel_style = {'size': 8, 'color': 'k'}
+
+    cb = plt.colorbar(pcm, ax=ax, label=label, orientation='vertical')
+    ticks = np.linspace(norm.vmin, norm.vmax, len(cb.get_ticks()))
+    cb.set_ticks(ticks)
+    cb.ax.set_yticklabels(np.round(ticks, 2), fontsize=8)
+
+
+def save_figure(fig, filename):
+    """
+    Save the figure to the specified filename.
+
+    Parameters
+    ----------
+    fig : Figure
+        The figure to save.
+    filename : str
+        The path to save the figure.
+    """
+    output_dir = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures'
+    os.makedirs(output_dir, exist_ok=True)
+    fig.savefig(os.path.join(output_dir, filename))
+    print(f"Figure saved as {filename}.")
+
+
+def open_figure(filename):
+    """
+    Open the saved figure using a terminal command without blocking the IPython session.
+
+    Parameters
+    ----------
+    filename : str
+        The name of the file to open.
+    """
+    output_dir = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures'
+    file_path = os.path.join(output_dir, filename)
+    if os.path.exists(file_path):
+        subprocess.Popen(['eog', file_path])  # Use eog for Linux
+    else:
+        print(f"File {file_path} does not exist.")
