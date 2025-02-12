@@ -143,11 +143,15 @@ def velocity(data_path, date):
 
     # Load simulation data
     u, v = load_data(data_path, ('u', 'v'))
-    u = u.sel(time=date)
-    v = v.sel(time=date)
+    u = u.sel(time=slice(start_time, end_time))
+    v = v.sel(time=slice(start_time, end_time))
+
+    # Average over the selected time period
+    u_mean = u.mean(dim='time')
+    v_mean = v.mean(dim='time')
 
     # Transform velocity components
-    u_geo, v_geo = transform_velocity(u, v, angle)
+    u_geo, v_geo = transform_velocity(u_mean, v_mean, angle)
     velocity = np.sqrt(u_geo**2 + v_geo**2)
 
     # Plotting
@@ -182,11 +186,15 @@ def vorticity(data_path, date):
 
     # Load simulation data
     u, v = load_data(data_path, ('u', 'v'))
-    u = u.sel(time=date)
-    v = v.sel(time=date)
+    u = u.sel(time=slice(start_time, end_time))
+    v = v.sel(time=slice(start_time, end_time))
+
+    # Average over the selected time period
+    u_mean = u.mean(dim='time')
+    v_mean = v.mean(dim='time')
 
     # Transform velocity components
-    u_geo, v_geo = transform_velocity(u, v, angle)
+    u_geo, v_geo = transform_velocity(u_mean, v_mean, angle)
 
     # Calculate derivatives
     dv_dlon = np.gradient(v_geo, axis=1) * pm
@@ -227,11 +235,16 @@ def helicity(data_path, date):
 
     # Load simulation data
     u, v = load_data(data_path, ('u', 'v'))
-    u = u.sel(time=date)
-    v = v.sel(time=date)
+    u = u.sel(time=slice(start_time, end_time))
+    v = v.sel(time=slice(start_time, end_time))
+
+    # Average over the selected time period
+    u_mean = u.mean(dim='time')
+    v_mean = v.mean(dim='time')
 
     # Transform velocity components
-    u_geo, v_geo = transform_velocity(u, v, angle)
+    u_geo, v_geo = transform_velocity(u_mean, v_mean, angle)
+    
     velocity = np.sqrt(u_geo**2 + v_geo**2)
 
     # Calculate derivatives
