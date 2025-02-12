@@ -262,7 +262,7 @@ def eke(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm.lapaz
 
     # Transform velocity components
     u_geo, v_geo = transform_velocity(u, v, angle)
-    w_geo = w.data
+    w_geo = w.data[:-1,:-1]
 
     # Calculate EKE
     EKE = 1 / 2 * (u_geo ** 2 + v_geo ** 2 + w_geo ** 2)
