@@ -8,6 +8,7 @@ Fonctionnalités principales :
 Modules :
 - utils.py : Contient des fonctions de base notamment pour charger des fichiers types grid ou his.
 - plot.py : Contient des fonctions pour l'affichage des données CROCO.
+- surf_plot.py : Contient des fonctions pour l'affichage des données de surface CROCO.
 
 Installation :
     pip install -e modules/
@@ -20,3 +21,4 @@ __version__ = '0.0.3'
 
 from . import utils
 from . import plot
+from . import surf_plot

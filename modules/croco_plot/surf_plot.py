@@ -46,7 +46,7 @@ def sss(data_path, start_date, end_date, figsize=(8, 8), cmap=cmocean.cm.haline)
     levels = np.linspace(34, 36, 15)
     norm = mpl.colors.BoundaryNorm(levels, cmap.N)
     plot_data(ax, lon, lat, salt, cmap, norm, 'SSS [psu]', msk, msk_inv, gridline_style)
-
+    
     plt.tight_layout()
     save_figure(fig, f"sss_{start_date}_{end_date}.png")
     plt.close(fig)

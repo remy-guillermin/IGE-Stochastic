@@ -296,7 +296,7 @@ def eke(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm.lapaz
     c = 10
     levels = np.logspace(np.log10(a), np.log10(b), c * 2 - 1)
     norm = mpl.colors.BoundaryNorm(levels, cmap.N)
-    plot_data(ax, lon, lat, EKE, cmap, norm, 'EKE [$m^2.s^{-2}$]', msk, msk_inv, gridline_style)
+    plot_data(ax, lon[:-1,:-1], lat[:-1,:-1], EKE, cmap, norm, 'EKE [$m^2.s^{-2}$]', msk, msk_inv, gridline_style)
 
     plt.tight_layout()
     save_figure(fig, f"eke_{start_date}_{end_date}.png")

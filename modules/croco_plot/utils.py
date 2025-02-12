@@ -11,7 +11,7 @@ import subprocess
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 
-def load_grid():
+def load_grid(is_Velocity=False):
     """
     Load the grid file into this iPython instance
 
@@ -28,13 +28,22 @@ def load_grid():
     """
     path = '/lus/store/CT1/c1601279/lweiss/GRID/croco_grid_swio2.nc'
     g = xr.open_dataset(path)
-    lon = g['lon_rho'][:, :]
-    lat = g['lat_rho'][:, :]
-    msk = g['mask_rho'][:, :]
-    pm = g['pm'][:-1,:-1] 
-    pn = g['pn'][:-1,:-1]
-    msk_inv = np.where(msk == 0, msk, np.nan)
-    angle = g['angle'][:, :]
+    if is_Velocity:
+        lon = g['lon_rho'][:-1, :-1]
+        lat = g['lat_rho'][:-1, :-1]
+        msk = g['mask_rho'][:-1, :-1]
+        pm = g['pm'][:-1,:-1] 
+        pn = g['pn'][:-1,:-1]
+        msk_inv = np.where(msk == 0, msk, np.nan)
+        angle = g['angle'][:-1, :-1]
+    else:
+        lon = g['lon_rho'][:, :]
+        lat = g['lat_rho'][:, :]
+        msk = g['mask_rho'][:, :]
+        pm = g['pm'][:,:] 
+        pn = g['pn'][:,:]
+        msk_inv = np.where(msk == 0, msk, np.nan)
+        angle = g['angle'][:, :]
     g.close()
     return lon, lat, pm, pn, msk, msk_inv, angle
 
@@ -51,11 +60,15 @@ def load_data(path, fields):
 
     Returns
     -------
-    tuple
-        Tuple of loaded fields in the same order as requested.
+    tuple or DataArray
+        Tuple of loaded fields in the same order as requested if multiple fields are requested,
+        otherwise a single DataArray if only one field is requested.
     """
     d = xr.open_dataset(path)
-    data = tuple(d[field][:, -1, :, :] for field in fields)
+    if len(fields) == 1:
+        data = d[fields[0]].values
+    else:
+        data = tuple(d[field].values for field in fields)
     d.close()
     return data
 
@@ -138,7 +151,7 @@ def plot_data(ax, lon, lat, data, cmap, norm, label, msk, msk_inv, gridline_styl
     gridline_style : dict
         Style for gridlines.
     """
-    pcm = ax.pcolormesh(lon[:-1, :-1], lat[:-1, :-1], data, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
+    pcm = ax.pcolormesh(lon[:, :], lat[:, :], data, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
     ax.contour(lon, lat, msk, colors='k', linewidths=0.1)
     ax.contourf(lon, lat, msk_inv, colors='lightgray')
 
