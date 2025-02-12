@@ -87,13 +87,7 @@ def open_figure(filename):
     output_dir = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures'
     file_path = os.path.join(output_dir, filename)
     if os.path.exists(file_path):
-        if os.name == 'posix':  # For macOS and Linux
-            try:
-                subprocess.run(['open', file_path])  # macOS
-            except FileNotFoundError:
-                subprocess.run(['eog', file_path])  # Linux
-        elif os.name == 'nt':  # For Windows
-            subprocess.run(['start', file_path], shell=True)
+        subprocess.run(['eog', file_path])  # Use eog for Linux
     else:
         print(f"File {file_path} does not exist.")
 
