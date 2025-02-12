@@ -88,7 +88,10 @@ def open_figure(filename):
     file_path = os.path.join(output_dir, filename)
     if os.path.exists(file_path):
         if os.name == 'posix':  # For macOS and Linux
-            subprocess.run(['open', file_path])
+            try:
+                subprocess.run(['open', file_path])  # macOS
+            except FileNotFoundError:
+                subprocess.run(['eog', file_path])  # Linux
         elif os.name == 'nt':  # For Windows
             subprocess.run(['start', file_path], shell=True)
     else:
