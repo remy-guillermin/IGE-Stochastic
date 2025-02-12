@@ -1,4 +1,5 @@
 import numpy as np
+from numpy.fft import fft2, fftshift
 import xarray as xr
 import matplotlib.pyplot as plt
 import matplotlib as mpl
@@ -7,6 +8,8 @@ import cmcrameri
 import sys
 import cartopy.crs as ccrs
 from metpy.units import units
+
+R = 6371e3
 
 data = '/lus/store/CT1/c1601279/lweiss/RUN_CROCO/'
 simu = 'run_swio2_deter_2017_2023_complet/'
@@ -21,21 +24,20 @@ msk_inv = np.where(msk == 0, msk, np.nan)
 g.close()
 
 d = xr.open_dataset(data + simu + 'swio_avg_2017.nc')
-u = d['sustr'][:, :, :] # Vitesse surface u
-v = d['svstr'][:, :, :] # Vitesse surface v
+u = d['u'][:, -1, :, :] # Vitesse surface u
+v = d['v'][:, -1, :, :] # Vitesse surface v
 d.close()
-
-start_time = '2017-01-31'
-end_time = '2017-01-31'
-
-u = u.sel(time=slice(start_time, end_time))
-v = v.sel(time=slice(start_time, end_time))
-print('u,v: ', u.shape, v.shape)
 
 # Remplacer les valeurs hors domaine par NaN
 fill_value = 9.96921e+36
 u = u.where((u != fill_value), np.nan)
 v = v.where((v != fill_value), np.nan)
+
+start_time = '2017-07-11'
+end_time = '2017-07-11'
+u = u.sel(time=slice(start_time, end_time))
+v = v.sel(time=slice(start_time, end_time))
+print('u,v: ', u.shape, v.shape)
 
 # Moyenne sur start - end
 u_mean = u.mean(dim='time')
@@ -46,25 +48,33 @@ u_geo = u_mean[:-1,:].data * np.cos(angle[:-1,:-1]) - v_mean[:,:-1].data * np.si
 v_geo = u_mean[:-1,:].data * np.sin(angle[:-1,:-1]) + v_mean[:,:-1].data * np.cos(angle[:-1,:-1])
 
 print('u,v: ', u_geo.shape, v_geo.shape)
-# Calcul de l'intensité du stress du vent
-wind_stress = np.sqrt(u_geo**2 + v_geo**2)
-print('wind stress: ', wind_stress.shape)
+
+dlat = (np.radians(np.gradient(lat, axis=0)) * R)[:-1,:-1]  # Variation de latitude
+dlon = (np.radians(np.gradient(lon, axis=1)) * (R * np.cos(np.radians(lat))))[:-1,:-1]  # Variation de longitude corrigée
+
+print('dlat,dlon: ', dlat.shape, dlon.shape)
+
+# Calcul des dérivées
+dv_dlon = np.gradient(v_geo, axis=1) / dlon
+du_dlat = np.gradient(u_geo, axis=0) / dlat
+
+# Calcul du rotationnel en coordonnées géographiques
+vorticity = (dv_dlon - du_dlat) * 3600
+
+print(np.round(np.nanmin(vorticity.values),3), np.round(np.nanmax(vorticity.values),3))
 
 fig = plt.figure(figsize=(8, 8))
 ax = fig.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
-ax.set_title(f"Wind Stress SWIO {start_time}", size=9) 
+ax.set_title(f"Vorticity SWIO {start_time}", size=9) 
 
-cmap = cmcrameri.cm.batlow
-a = 0
-b = 0.2
-c = 5
-levels = np.linspace(a, b, c * 4 - 3) 
+cmap = cmcrameri.cm.vik
+a = -0.15
+b = 0.15
+c = 10
+levels = np.linspace(a, b, c * 2 - 1) 
 norm = mpl.colors.BoundaryNorm(levels, cmap.N)
 
-pcm = ax.pcolormesh(lon[:-1,:-1], lat[:-1,:-1], wind_stress, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
-# Ajouter les vecteurs de stress du vent (u_geo, v_geo)
-step = 10
-quiver = ax.quiver(lon[:-1:step,:-1:step].data, lat[:-1:step,:-1:step].data, u_geo[::step, ::step], v_geo[::step, ::step], transform=ccrs.PlateCarree(), width=0.05, units='xy', scale=0.09, headlength=4, headwidth=4, color='black')
+pcm = ax.pcolormesh(lon[:-1,:-1], lat[:-1,:-1], vorticity, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
 # Add contours / mask
 ax.contour(lon, lat, msk, colors='k', linewidths=0.1)
 ax.contourf(lon, lat, msk_inv, colors='lightgray')
@@ -76,7 +86,7 @@ gl.xlabel_style = {'size': 8, 'color': 'k'}
 gl.ylabel_style = {'size': 8, 'color': 'k'}
 
 ### colorbar
-cb = fig.colorbar(pcm, ax=ax, label='wind stress (N/m²)')
+cb = fig.colorbar(pcm, ax=ax, label='Vorticity [$h^{-1}$]')
 posax = ax.get_position()
 poscb = cb.ax.get_position()
 cb.ax.set_position([0.76, posax.y0, poscb.width, posax.height])
@@ -85,3 +95,4 @@ cb.ax.set_yticklabels(np.round(np.linspace(a, b, c),2), fontsize=8)
 cb.ax.yaxis.label.set_font_properties(mpl.font_manager.FontProperties(size=8))
 
 plt.show()
+

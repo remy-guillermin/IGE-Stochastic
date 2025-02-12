@@ -10,7 +10,7 @@ from scipy.interpolate import interp1d
 from metpy.units import units
 
 data = '/lus/store/CT1/c1601279/lweiss/RUN_CROCO/'
-simu = 'run_swio2_deter_2017_2023/'
+simu = 'run_swio2_deter_2017_2023_complet/'
 grid = '/lus/store/CT1/c1601279/lweiss/GRID/croco_grid_swio2.nc'
 
 g = xr.open_dataset(grid)
@@ -22,7 +22,7 @@ msk = g['mask_rho'][:, :] # Mask
 msk_inv = np.where(msk == 0, msk, np.nan)
 g.close()
 
-d = xr.open_dataset(data + simu + 'swio_avg.nc')
+d = xr.open_dataset(data + simu + 'swio_avg_2017.nc')
 s_rho = d['s_rho'][:] # s_rho(s_rho) S-coordinate at RHO-points
 Cs_rho = d['Cs_rho'][:] # Cs_rho(s_rho) S-coordinate stretching curves at RHO-points
 hc = d['hc'].values # S-coordinate parameter, critical depth
@@ -42,7 +42,7 @@ def calc_depth(s, Cs, hc, h):
 # Calcul de la profondeur
 depth_sigma = calc_depth(s_rho, Cs_rho, hc, h)
 
-fig = plt.figure(figsize=(6, 6))
+fig = plt.figure(figsize=(8, 8))
 ax = fig.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
 
 cs = ax.contour(lon, lat, h, levels=np.arange(0, 6000, 1000), colors='grey',
@@ -61,7 +61,7 @@ gl.right_labels = False
 gl.xlabel_style = {'size': 6, 'color': 'k'}
 gl.ylabel_style = {'size': 6, 'color': 'k'}
 
-fig = plt.figure(figsize=(6, 6))
+fig = plt.figure(figsize=(8, 8))
 ax = fig.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
     
 cmap = cmocean.cm.deep_r
