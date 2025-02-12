@@ -1,16 +1,17 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='croco_plot',               # Nom de ton package
-    version='0.0.3',                 # Version du package
-    packages=find_packages(),        # Trouver tous les sous-dossiers contenant __init__.py
-    install_requires=[               # Dépendances du package
+    name='croco_plot',
+    version='0.0.3',
+    packages=find_packages(where='modules'),
+    package_dir={'': 'modules'},
+    install_requires=[
         'numpy',
         'xarray',
         'matplotlib',
         'cmocean',
         'cmcrameri',
         'cartopy',
-        'metpy',
+        'metpy'
     ],
 )

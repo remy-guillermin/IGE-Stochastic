@@ -7,6 +7,7 @@ Fonctionnalités principales :
 
 Modules :
 - utils.py : Contient des fonctions de base notamment pour charger des fichiers types grid ou his.
+- plot.py : Contient des fonctions pour l'affichage des données CROCO.
 
 Installation :
     pip install -e modules/
@@ -18,3 +19,4 @@ Dépendances :
 __version__ = '0.0.3'
 
 from . import utils
+from . import plot
