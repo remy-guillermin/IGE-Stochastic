@@ -4,7 +4,11 @@ Repo pour mon stage à l'IGE sur l'étude des sources d'incertitudes associées 
 ## Structure du repo
 - [bibliography](bibliography/) contient les documents de bilbiographie.
 - [book](book/) contient des rapports journaliers et résumés hebdomadaires de mes avancées.
+- [documentation](documentation/) contient divers notes de codes.
 - [modules](modules/) contient le nécessaire pour *build* mon package.
+- [report](report/) contient le nécessaire pour écrire le rapport.
+- [scripts](scripts/) contient les scripts python utilisés.
+- [slides](slides/) contient le nécessaire pour produire les slides.
 
 ## Connexion à Adastra
 Pour me connecter à Adastra je fais 
@@ -19,7 +23,6 @@ source ./python_environment/bin/activate
 
 ## Makefile
 - `make` va créer les rendus (slides et rapport).
-- `make tree` va créer le fichier `project.tree` représentant l'arborescence du projet.
 - `make file.pdf` va compiler le fichier `.tex` associé (report.pdf et slide.pdf disponible).
 - `make cleanpdf` va supprimer tous les fichiers pdf compilés.
 - `make cleanaux` va supprimer tous les fichiers auxiliaires de compilation.

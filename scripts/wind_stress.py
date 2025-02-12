@@ -8,24 +8,22 @@ import sys
 import cartopy.crs as ccrs
 from metpy.units import units
 
-data = '/lus/work/CT1/c1601279/lweiss/CROCO/RUN/SWIOSE/RUN_CROCO/'
-work = '/lus/work/CT1/c1601279/lweiss/CROCO/'
+data = '/lus/store/CT1/c1601279/lweiss/RUN_CROCO/'
+simu = 'run_swio2_deter_2017_2023_complet/'
+grid = '/lus/store/CT1/c1601279/lweiss/GRID/croco_grid_swio2.nc'
 
-simu = 'run_swio_stogen_1mth_diff_100p_10jo1ud12_0001/'
-
-g = xr.open_dataset(data + simu + 'swiose_grid.nc')
+g = xr.open_dataset(grid)
 lon = g['lon_rho'][:, :] # Longitude
 lat = g['lat_rho'][:, :] # Latitude
+angle = g['angle'][:, :] # Deformation
 msk = g['mask_rho'][:, :] # Mask
 msk_inv = np.where(msk == 0, msk, np.nan)
-angle = g['angle'][:, :] # Deformation
 g.close()
 
-
-data = xr.open_dataset(data + simu + '001swiose_his.nc')
-u = data['sustr'][:, :, :] # Vitesse surface u
-v = data['svstr'][:, :, :] # Vitesse surface v
-data.close()
+d = xr.open_dataset(data + simu + 'swio_avg_2017.nc')
+u = d['sustr'][:, :, :] # Vitesse surface u
+v = d['svstr'][:, :, :] # Vitesse surface v
+d.close()
 
 start_time = '2017-01-31'
 end_time = '2017-01-31'
@@ -52,7 +50,7 @@ print('u,v: ', u_geo.shape, v_geo.shape)
 wind_stress = np.sqrt(u_geo**2 + v_geo**2)
 print('wind stress: ', wind_stress.shape)
 
-fig = plt.figure(figsize=(10, 10))
+fig = plt.figure(figsize=(8, 8))
 ax = fig.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
 ax.set_title(f"Wind Stress SWIO {start_time}", size=9) 
 
