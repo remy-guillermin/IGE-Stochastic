@@ -12,6 +12,8 @@ import cmcrameri
 import cartopy.crs as ccrs
 import xarray as xr
 from .utils import load_grid, load_data, transform_velocity
+import os
+import subprocess  # Add this import
 
 
 def plot_data(ax, lon, lat, data, cmap, norm, label, msk, msk_inv, gridline_style):
@@ -54,6 +56,43 @@ def plot_data(ax, lon, lat, data, cmap, norm, label, msk, msk_inv, gridline_styl
     ticks = np.linspace(norm.vmin, norm.vmax, len(cb.get_ticks()))
     cb.set_ticks(ticks)
     cb.ax.set_yticklabels(np.round(ticks, 2), fontsize=8)
+
+
+def save_figure(fig, filename):
+    """
+    Save the figure to the specified filename.
+
+    Parameters
+    ----------
+    fig : Figure
+        The figure to save.
+    filename : str
+        The path to save the figure.
+    """
+    output_dir = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures'
+    os.makedirs(output_dir, exist_ok=True)
+    fig.savefig(os.path.join(output_dir, filename))
+    print(f"Figure saved as {os.path.join(output_dir, filename)}.")
+
+
+def open_figure(filename):
+    """
+    Open the saved figure using a terminal command.
+
+    Parameters
+    ----------
+    filename : str
+        The name of the file to open.
+    """
+    output_dir = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures'
+    file_path = os.path.join(output_dir, filename)
+    if os.path.exists(file_path):
+        if os.name == 'posix':  # For macOS and Linux
+            subprocess.run(['open', file_path])
+        elif os.name == 'nt':  # For Windows
+            subprocess.run(['start', file_path], shell=True)
+    else:
+        print(f"File {file_path} does not exist.")
 
 
 def vel_vort_hel(data_path, start_time, end_time):
@@ -124,7 +163,8 @@ def vel_vort_hel(data_path, start_time, end_time):
     plot_data(ax, lon, lat, helicity * 3600 ** 2 / 1000, cmap, norm, 'Helicity [$km.h^{-2}$]', msk, msk_inv, gridline_style)
 
     plt.tight_layout()
-    plt.show()
+    save_figure(fig, f"vel_vort_hel_{start_time}_{end_time}.png")
+    plt.close(fig)
 
 
 def velocity(data_path, date):
@@ -167,7 +207,8 @@ def velocity(data_path, date):
     plot_data(ax, lon, lat, velocity, cmap, norm, 'Velocity [$m.s^{-1}$]', msk, msk_inv, gridline_style)
 
     plt.tight_layout()
-    plt.show()
+    save_figure(fig, f"velocity_{date}.png")
+    plt.close(fig)
 
 
 def vorticity(data_path, date):
@@ -216,7 +257,8 @@ def vorticity(data_path, date):
     plot_data(ax, lon, lat, vorticity * 3600, cmap, norm, 'Vorticity [$h^{-1}$]', msk, msk_inv, gridline_style)
 
     plt.tight_layout()
-    plt.show()
+    save_figure(fig, f"vorticity_{date}.png")
+    plt.close(fig)
 
 
 def helicity(data_path, date):
@@ -241,10 +283,9 @@ def helicity(data_path, date):
     # Average over the selected time period
     u_mean = u.mean(dim='time')
     v_mean = v.mean(dim='time')
-
+    
     # Transform velocity components
     u_geo, v_geo = transform_velocity(u_mean, v_mean, angle)
-    
     velocity = np.sqrt(u_geo**2 + v_geo**2)
 
     # Calculate derivatives
@@ -268,4 +309,5 @@ def helicity(data_path, date):
     plot_data(ax, lon, lat, helicity * 3600 ** 2 / 1000, cmap, norm, 'Helicity [$km.h^{-2}$]', msk, msk_inv, gridline_style)
 
     plt.tight_layout()
-    plt.show()
+    save_figure(fig, f"helicity_{date}.png")
+    plt.close(fig)
