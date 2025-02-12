@@ -80,7 +80,7 @@ wt_geo = wt[:-1,:-1].data
 
 print('ut,vt,wt: ', ut_geo.shape, vt_geo.shape, wt_geo.shape)
 # Calcul de l'EKE
-EKE = ut_geo ** 2 + vt_geo ** 2 + wt_geo ** 2
+EKE = 1 / 2 * (ut_geo ** 2 + vt_geo ** 2 + wt_geo ** 2)
 
 print('EKE: ', EKE.shape)
 print('max EKE: ', np.round(float(np.max(EKE)), 3))
@@ -90,10 +90,10 @@ ax = fig.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
 ax.set_title(f"EKE SWIO {start_time}", size=9) 
 
 cmap = cmcrameri.cm.lapaz
-a = 0
-b = 2
-c = 5
-levels = np.linspace(a, b, c * 4 - 3) 
+a = 1e-2
+b = 1
+c = 10
+levels = np.logspace(np.log10(a), np.log10(b), c * 2 - 1) 
 norm = mpl.colors.BoundaryNorm(levels, cmap.N)
 
 pcm = ax.pcolormesh(lon[:-1,:-1], lat[:-1,:-1], EKE, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
@@ -108,12 +108,12 @@ gl.xlabel_style = {'size': 8, 'color': 'k'}
 gl.ylabel_style = {'size': 8, 'color': 'k'}
 
 ### colorbar
-cb = fig.colorbar(pcm, ax=ax, label='EKE [$m^2.s^{-2}$]')
+cb = fig.colorbar(pcm, ax=ax, label='EKE [$m^2.s^{-2}$]', norm=mpl.colors.LogNorm(vmin=a, vmax=b))
 posax = ax.get_position()
 poscb = cb.ax.get_position()
 cb.ax.set_position([0.76, posax.y0, poscb.width, posax.height])
-cb.set_ticks(np.linspace(a, b, c))
-cb.ax.set_yticklabels(np.round(np.linspace(a, b, c),2), fontsize=8)
+cb.set_ticks(np.logspace(np.log10(a), np.log10(b), c))
+cb.ax.set_yticklabels(np.round(np.logspace(np.log10(a), np.log10(b), c), 2), fontsize=8)
 cb.ax.yaxis.label.set_font_properties(mpl.font_manager.FontProperties(size=8))
 
 plt.show()
