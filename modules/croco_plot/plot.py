@@ -233,10 +233,75 @@ def helicity(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm.
     plt.tight_layout()
     save_figure(fig, f"helicity_{start_date}_{end_date}.png")
     plt.close(fig)
-
-def eke(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm.lapaz):
+    
+def eke(data_path, date, figsize=(8, 8), cmap=cmcrameri.cm.lapaz):
     """
     Plot EKE data on a map for a specific date range.
+
+    Parameters
+    ----------
+    data_path : str
+        Path to the simulation data file.
+    date : str
+        Date for the data slice in 'YYYY-MM-DD' format.
+    figsize : tuple, optional
+        Size of the figure, by default (8, 8)
+    cmap : colormap, optional
+        Colormap for EKE, by default cmcrameri.cm.lapaz
+    """
+    
+    # Load grid data
+    lon, lat, pm, pn, msk, msk_inv, angle = load_grid(is_Velocity=True)
+
+    # Load simulation data
+    u, v, w = load_data(data_path, ('u', 'v', 'w'))
+    
+    fill_value = 9.96921e+36
+    u = u.where((u != fill_value), np.nan)
+    v = v.where((v != fill_value), np.nan)
+    w = w.where((w != fill_value), np.nan)
+    
+    # Moyenne annuelle
+    u_yr = np.nanmean(u, axis = 0)
+    v_yr = np.nanmean(v, axis = 0)
+    w_yr = np.nanmean(w, axis = 0)
+    
+    u = u[:,:,:,:].sel(time=date)
+    v = v[:,:,:,:].sel(time=date)
+    w = w[:,:,:,:].sel(time=date)
+    
+    # Vitesse turbulente
+    ut = (u_yr - u).data.reshape(1, u.shape[2], u.shape[3], u.shape[1])
+    vt = (v_yr - v).data.reshape(1, v.shape[2], v.shape[3], v.shape[1])
+    wt = (w_yr - w).data.reshape(1, w.shape[2], w.shape[3], w.shape[1])
+    
+    angle_expand = angle[:,:].data.reshape(1, angle.shape[0], angle.shape[1], 1)
+    
+    ut_geo, vt_geo, wt_geo = transform_velocity(ut, vt, wt, angle_expand)
+    
+    EKE = 1 / 2 * (ut_geo[0,:,:,-1] ** 2 + vt_geo[0,:,:,-1] ** 2 + wt_geo[0,:,:,-1] ** 2)
+    
+    # Plotting
+    fig, ax = plt.subplots(figsize=figsize, subplot_kw={'projection': ccrs.PlateCarree()})
+
+    # Define common gridline styles
+    gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.3}
+
+    ax.set_title(f"EKE SWIO {date}", size=9)
+    a = 1e-2
+    b = 1
+    c = 10
+    levels = np.logspace(np.log10(a), np.log10(b), c * 2 - 1)
+    norm = mpl.colors.BoundaryNorm(levels, cmap.N)
+    plot_map(ax, lon, lat, EKE, cmap, norm, 'EKE [$m^2.s^{-2}$]', msk, msk_inv, gridline_style)
+
+    plt.tight_layout()
+    save_figure(fig, f"eke_{date}.png")
+    plt.close(fig)
+
+def mke(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm.lapaz):
+    """
+    Plot MKE data on a map for a specific date range.
 
     Parameters
     ----------
@@ -257,21 +322,23 @@ def eke(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm.lapaz
     # Load simulation data
     u, v, w = load_data(data_path, ('u', 'v', 'w'))
     
+    u = u[:,:,:,:].sel(time=slice(start_date, end_date)).mean(dim='time')
+    v = v[:,:,:,:].sel(time=slice(start_date, end_date)).mean(dim='time')
+    w = w[:,:,:,:].sel(time=slice(start_date, end_date)).mean(dim='time')
+    
     fill_value = 9.96921e+36
     u = u.where((u != fill_value), np.nan)
     v = v.where((v != fill_value), np.nan)
     w = w.where((w != fill_value), np.nan)
     
-    u = u[:,-1,:,:].sel(time=slice(start_date, end_date)).mean(dim='time')
-    v = v[:,-1,:,:].sel(time=slice(start_date, end_date)).mean(dim='time')
-    w = w[:,-1,:,:].sel(time=slice(start_date, end_date)).mean(dim='time')
+    # Transformation des composantes de vent (grille déformée -> grille géographique) pour chaque time index
+    angle_expand = angle[:,:].data.reshape(1, angle.shape[0], angle.shape[1], 1)
 
     # Transform velocity components
-    u_geo, v_geo = transform_velocity(u, v, angle)
-    w_geo = w.data[:-1,:-1]
+    u_geo, v_geo, w_geo = transform_velocity(u, v, w, angle_expand)
 
     # Calculate EKE
-    EKE = 1 / 2 * (u_geo ** 2 + v_geo ** 2 + w_geo ** 2)
+    MKE = 1 / 2 * (u_geo ** 2 + v_geo ** 2 + w_geo ** 2)
 
     # Plotting
     fig, ax = plt.subplots(figsize=figsize, subplot_kw={'projection': ccrs.PlateCarree()})
@@ -279,14 +346,14 @@ def eke(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm.lapaz
     # Define common gridline styles
     gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.3}
 
-    ax.set_title(f"EKE SWIO {start_date} to {end_date}", size=9)
+    ax.set_title(f"MKE SWIO {start_date} to {end_date}", size=9)
     a = 1e-2
     b = 1
     c = 10
     levels = np.logspace(np.log10(a), np.log10(b), c * 2 - 1)
     norm = mpl.colors.BoundaryNorm(levels, cmap.N)
-    plot_map(ax, lon, lat, EKE, cmap, norm, 'EKE [$m^2.s^{-2}$]', msk, msk_inv, gridline_style)
+    plot_map(ax, lon, lat, MKE, cmap, norm, 'MKE [$m^2.s^{-2}$]', msk, msk_inv, gridline_style)
 
     plt.tight_layout()
-    save_figure(fig, f"eke_{start_date}_{end_date}.png")
+    save_figure(fig, f"mke_{start_date}_{end_date}.png")
     plt.close(fig)
