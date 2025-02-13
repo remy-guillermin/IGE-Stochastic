@@ -11,7 +11,7 @@ import cmocean
 import cmcrameri
 import cartopy.crs as ccrs
 import xarray as xr
-from .utils import load_grid, load_data, transform_velocity, save_figure, plot_map
+from .utils import load_grid, load_data, transform_3D_velocity, save_figure, plot_map
 
 def vel_vort_hel(data_path, start_date, end_date, figsize=(24, 8), cmap_velocity=cmcrameri.cm.oslo, cmap_vorticity=cmcrameri.cm.vik, cmap_helicity=cmcrameri.cm.vik):
     """
@@ -208,7 +208,7 @@ def helicity(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm.
     v = v[:,-1,:,:].sel(time=slice(start_date, end_date)).mean(dim='time')
     
     # Transform velocity components
-    u_geo, v_geo = transform_velocity(u, v, angle)
+    u_geo, v_geo = transform_3D_velocity(u, v, angle)
     velocity = np.sqrt(u_geo**2 + v_geo**2)
 
     # Calculate derivatives
