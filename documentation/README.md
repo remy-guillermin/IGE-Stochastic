@@ -1,7 +1,10 @@
 # Documentation
+
 ## Adastra
+
 ### Connexion et configuration
-Configuration du fichier `./ssh/config`
+
+#### Configuration du fichier `./ssh/config`
 ```bash
 Host *
 	ServerAliveInterval 30
@@ -16,25 +19,33 @@ Host adastra
 	User rguillermin
 	ProxyCommand ssh ige-ssh nc %h %p  
 ```
-Après avoir obtenu login sur Adastra
-`ssh adastra` sur ma machine, besoin du *password* de l'IGE ainsi que de celui d'Adastra
+
+Après avoir obtenu le login sur Adastra, utilisez la commande suivante pour vous connecter :
+```bash
+ssh adastra
+```
+Vous aurez besoin du mot de passe de l'IGE ainsi que de celui d'Adastra.
+
 #### Configuration `ssh` pour accéder aux machines de l'IGE avec une clé
-```bash
-ssh-keygen -t rsa -b 4096 -C "remy.guillermin1@etu.univ-grenoble-alpes.fr" -f ~/.ssh/ige_ssh
-ssh-copy-id -i ~/.ssh/ige_ssh.pub guilremy@ige-ssh.u-ga.fr
-```
-
-Après avoir copié la clé publique sur la machine de l'IGE, on peut modifier le fichier `./ssh/config`
-```bash
-Host ige-ssh
-	HostName ige-ssh.u-ga.fr
-	User guilremy
-	IdentityFile ~/.ssh/ige_ssh
-```
-
-Et on peut maintenant se connecter aux machines de l'IGE sans mot de passe et à Adastra avec uniquement le mot de passe d'Adastra
+1. Générer une clé SSH :
+    ```bash
+    ssh-keygen -t rsa -b 4096 -C "remy.guillermin1@etu.univ-grenoble-alpes.fr" -f ~/.ssh/ige_ssh
+    ```
+2. Copier la clé publique sur la machine de l'IGE :
+    ```bash
+    ssh-copy-id -i ~/.ssh/ige_ssh.pub guilremy@ige-ssh.u-ga.fr
+    ```
+3. Modifier le fichier `./ssh/config` :
+    ```bash
+    Host ige-ssh
+    	HostName ige-ssh.u-ga.fr
+    	User guilremy
+    	IdentityFile ~/.ssh/ige_ssh
+    ```
+4. Se connecter aux machines de l'IGE sans mot de passe et à Adastra avec uniquement le mot de passe d'Adastra.
 
 ### Commandes importantes
+
 #### Variables d'environnement 
 ```bash
 $HOMEDIR = /lus/home/CT1/c1601279/rguillermin
@@ -44,19 +55,19 @@ $STOREDIR = /lus/store/CT1/c1601279/rguillermin
 ```
 
 #### Projet actuel
-Pour afficher les informations du projet (quotas, stockages, etc)
+Pour afficher les informations du projet (quotas, stockages, etc) :
 ```bash
 myproject -s
 ```
 
 ### Modules
-Pour afficher les modules actuels
+Pour afficher les modules actuels :
 ```bash
 module list
 ```
 
-#### Environnement Python
-Je peux utiliser la doc d'Adastra et executer le script `env.sh` qui contient
+### Environnement Python
+Pour configurer l'environnement Python, utilisez le script `env.sh` :
 ```bash
 #!/bin/bash
 
@@ -78,56 +89,66 @@ source ./python_environment/bin/activate
 python3 -m pip install --upgrade pip
 ```
 
-Je peux donc activer mon environnement en me connecter et en executant
+Pour activer l'environnement :
 ```bash
 source ./python_environment/bin/activate
 ```
 
-
 ### Données de Lisa
-Pour accéder aux données de Lisa, qui sont stockées sur le repertoire de travail, il faut faire
+Pour accéder aux données de Lisa :
 ```bash
 cd $STOREDIR
 cd ../lweiss/RUN_CROCO/
 cd run_swio2_deter_2017_2023_restart/
 ```
 
-Et il est ensuite possible d'afficher le header d'un fichier `.nc` avec
+Pour afficher le header d'un fichier `.nc` :
 ```bash
 ncdump -h swio_avg.nc 
 ```
 
-Et aussi d'afficher les données avec
+Pour afficher les données :
 ```bash
 ncview swio_avg.nc
 ```
 
 ### Copie de données
-Pour transférer les données d'Adastra (ici les scripts de Lisa enregistrés dans [ce dossier](../scripts/lweiss_scripts/)) sur mon ordi je fais dois faire
-```bash
-(python_environment) [c1601279] rguillermin@login3:~$ tar -czvf lweiss_scripts.tar.gz ../lweiss/PYTHON/scripts/*/*.py
-(python_environment) [c1601279] rguillermin@login3:~$ exit
-remyguillermin@eduroam-049197 % ssh ige-ssh
-guilremy@ige-ssh:~$ scp rguillermin@adastra.cines.fr:/lus/home/CT1/c1601279/rguillermin/lweiss_scripts.tar.gz .
-guilremy@ige-ssh:~$ exit
-(main) remyguillermin@eduroam-049197 % scp -i ~/.ssh/ige_ssh guilremy@ige-ssh.u-ga.fr:lweiss_scripts.tar.gz .
-(main) remyguillermin@eduroam-049197 % tar -xzvf lweiss_scripts.tar.gz
-```
+Pour transférer les données d'Adastra sur votre ordinateur :
+1. Compresser les scripts de Lisa :
+    ```bash
+    tar -czvf lweiss_scripts.tar.gz ../lweiss/PYTHON/scripts/*/*.py
+    ```
+2. Se déconnecter d'Adastra :
+    ```bash
+    exit
+    ```
+3. Copier les données sur votre machine via ige-ssh :
+    ```bash
+    ssh ige-ssh
+    scp rguillermin@adastra.cines.fr:/lus/home/CT1/c1601279/rguillermin/lweiss_scripts.tar.gz .
+    exit
+    scp -i ~/.ssh/ige_ssh guilremy@ige-ssh.u-ga.fr:lweiss_scripts.tar.gz .
+    tar -xzvf lweiss_scripts.tar.gz
+    ```
 
 ## Packages `croco_plot`
-Je développe un package python pour me faciliter la tâches afin d'afficher les cartes dont j'aurais besoin.
+Je développe un package python pour faciliter l'affichage des cartes.
 
 ### Installation
-Pour une installation locale, il faut se situer à la racine du projet et exécuter 
+Pour une installation locale, exécutez :
 ```bash
 pip install -e modules/
 ```
 
 ### Commande `croco-ipy-load`
-Il est possible d'utiliser le script [croco-ipy-load](../scripts/croco-ipy-load.py) afin de directement lancer `iPython` en exécutant la commande `croco-ipy-load`. Pour cela il faut copier le script dans le`/bin/` de l'environnement.
-```bash
-mkdir -p $VIRTUAL_ENV/bin 
-cp scripts/croco-ipy-load.py $VIRTUAL_ENV/bin/croco-ipy-load
-chmod +x $VIRTUAL_ENV/bin/croco-ipy-load
-source ./python_environment/bin/activate
-```
+Pour utiliser le script `croco-ipy-load` :
+1. Copier le script dans le `/bin/` de l'environnement :
+    ```bash
+    mkdir -p $VIRTUAL_ENV/bin 
+    cp scripts/croco-ipy-load.py $VIRTUAL_ENV/bin/croco-ipy-load
+    chmod +x $VIRTUAL_ENV/bin/croco-ipy-load
+    source ./python_environment/bin/activate
+    ```
+
+#### Arguments
+- `--clear` : exécute `clear` avant de lancer l'instance `iPython`

@@ -1,2 +1,2 @@
 # Scripts de Lisa modifiés
-Dans ce dossier sont regroupés les scripts Python de Lisa que j'ai modifié.
+Dans ce dossier sont regroupés les scripts Python de Lisa que j'ai modifiés.
