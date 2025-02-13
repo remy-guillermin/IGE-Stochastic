@@ -123,7 +123,7 @@ def calc_depth(s, Cs, hc, h):
         depth[k, :, :] = z0[k, :, :] * h
     return depth
 
-def plot_data(ax, lon, lat, data, cmap, norm, label, msk, msk_inv, gridline_style):
+def plot_map(ax, lon, lat, data, cmap, norm, label, msk, msk_inv, gridline_style):
     """
     Helper function to plot data on a given axis.
 

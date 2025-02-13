@@ -11,7 +11,7 @@ import cmocean
 import cmcrameri
 import cartopy.crs as ccrs
 import xarray as xr
-from .utils import load_grid, load_data, transform_velocity, save_figure, plot_data
+from .utils import load_grid, load_data, transform_velocity, save_figure, plot_map
 
 def vel_vort_hel(data_path, start_date, end_date, figsize=(24, 8), cmap_velocity=cmcrameri.cm.oslo, cmap_vorticity=cmcrameri.cm.vik, cmap_helicity=cmcrameri.cm.vik):
     """
@@ -65,21 +65,21 @@ def vel_vort_hel(data_path, start_date, end_date, figsize=(24, 8), cmap_velocity
     ax.set_title(f"Velocity SWIO {start_date}", size=9)
     levels = np.linspace(0, 2.5, 19)
     norm = mpl.colors.BoundaryNorm(levels, cmap_velocity.N)
-    plot_data(ax, lon, lat, velocity, cmap_velocity, norm, 'Velocity [$m.s^{-1}$]', msk, msk_inv, gridline_style)
+    plot_map(ax, lon, lat, velocity, cmap_velocity, norm, 'Velocity [$m.s^{-1}$]', msk, msk_inv, gridline_style)
 
     # --- Vorticity Plot ---
     ax = axes[1]
     ax.set_title(f"Vorticity SWIO {start_date}", size=9)
     levels = np.linspace(-0.15, 0.15, 19)
     norm = mpl.colors.BoundaryNorm(levels, cmap_vorticity.N)
-    plot_data(ax, lon, lat, vorticity * 3600, cmap_vorticity, norm, 'Vorticity [$h^{-1}$]', msk, msk_inv, gridline_style)
+    plot_map(ax, lon, lat, vorticity * 3600, cmap_vorticity, norm, 'Vorticity [$h^{-1}$]', msk, msk_inv, gridline_style)
 
     # --- Helicity Plot ---
     ax = axes[2]
     ax.set_title(f"Helicity SWIO {start_date}", size=9)
     levels = np.linspace(-0.5, 0.5, 21)
     norm = mpl.colors.BoundaryNorm(levels, cmap_helicity.N)
-    plot_data(ax, lon, lat, helicity * 3600 ** 2 / 1000, cmap_helicity, norm, 'Helicity [$km.h^{-2}$]', msk, msk_inv, gridline_style)
+    plot_map(ax, lon, lat, helicity * 3600 ** 2 / 1000, cmap_helicity, norm, 'Helicity [$km.h^{-2}$]', msk, msk_inv, gridline_style)
 
     plt.tight_layout()
     save_figure(fig, f"vel_vort_hel_{start_date}_{end_date}.png")
@@ -124,7 +124,7 @@ def velocity(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm.
     ax.set_title(f"Velocity SWIO {start_date} to {end_date}", size=9)
     levels = np.linspace(0, 2.5, 19)
     norm = mpl.colors.BoundaryNorm(levels, cmap.N)
-    plot_data(ax, lon, lat, velocity, cmap, norm, 'Velocity [$m.s^{-1}$]', msk, msk_inv, gridline_style)
+    plot_map(ax, lon, lat, velocity, cmap, norm, 'Velocity [$m.s^{-1}$]', msk, msk_inv, gridline_style)
 
     plt.tight_layout()
     save_figure(fig, f"velocity_{start_date}_{end_date}.png")
@@ -175,7 +175,7 @@ def vorticity(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm
     ax.set_title(f"Vorticity SWIO {start_date} to {end_date}", size=9)
     levels = np.linspace(-0.15, 0.15, 19)
     norm = mpl.colors.BoundaryNorm(levels, cmap.N)
-    plot_data(ax, lon, lat, vorticity * 3600, cmap, norm, 'Vorticity [$h^{-1}$]', msk, msk_inv, gridline_style)
+    plot_map(ax, lon, lat, vorticity * 3600, cmap, norm, 'Vorticity [$h^{-1}$]', msk, msk_inv, gridline_style)
 
     plt.tight_layout()
     save_figure(fig, f"vorticity_{start_date}_{end_date}.png")
@@ -228,7 +228,7 @@ def helicity(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm.
     ax.set_title(f"Helicity SWIO {start_date} to {end_date}", size=9)
     levels = np.linspace(-0.5, 0.5, 21)
     norm = mpl.colors.BoundaryNorm(levels, cmap.N)
-    plot_data(ax, lon, lat, helicity * 3600 ** 2 / 1000, cmap, norm, 'Helicity [$km.h^{-2}$]', msk, msk_inv, gridline_style)
+    plot_map(ax, lon, lat, helicity * 3600 ** 2 / 1000, cmap, norm, 'Helicity [$km.h^{-2}$]', msk, msk_inv, gridline_style)
 
     plt.tight_layout()
     save_figure(fig, f"helicity_{start_date}_{end_date}.png")
@@ -285,7 +285,7 @@ def eke(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm.lapaz
     c = 10
     levels = np.logspace(np.log10(a), np.log10(b), c * 2 - 1)
     norm = mpl.colors.BoundaryNorm(levels, cmap.N)
-    plot_data(ax, lon, lat, EKE, cmap, norm, 'EKE [$m^2.s^{-2}$]', msk, msk_inv, gridline_style)
+    plot_map(ax, lon, lat, EKE, cmap, norm, 'EKE [$m^2.s^{-2}$]', msk, msk_inv, gridline_style)
 
     plt.tight_layout()
     save_figure(fig, f"eke_{start_date}_{end_date}.png")

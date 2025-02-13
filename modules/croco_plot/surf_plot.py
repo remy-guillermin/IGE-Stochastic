@@ -11,7 +11,7 @@ import cmocean
 import cmcrameri
 import cartopy.crs as ccrs
 import xarray as xr
-from .utils import load_grid, load_data, transform_velocity, save_figure, plot_data
+from .utils import load_grid, load_data, transform_velocity, save_figure, plot_map
 
 def sss(data_path, start_date, end_date, figsize=(8, 8), cmap=cmocean.cm.haline):
     """
@@ -45,7 +45,7 @@ def sss(data_path, start_date, end_date, figsize=(8, 8), cmap=cmocean.cm.haline)
     ax.set_title(f"SSS SWIO {start_date} to {end_date}", size=9)
     levels = np.linspace(34, 36, 15)
     norm = mpl.colors.BoundaryNorm(levels, cmap.N)
-    plot_data(ax, lon, lat, salt, cmap, norm, 'SSS [psu]', msk, msk_inv, gridline_style)
+    plot_map(ax, lon, lat, salt, cmap, norm, 'SSS [psu]', msk, msk_inv, gridline_style)
     
     plt.tight_layout()
     save_figure(fig, f"sss_{start_date}_{end_date}.png")
@@ -84,7 +84,7 @@ def ssh(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm.roma_
     ax.set_title(f"SSH SWIO {start_date} to {end_date}", size=9)
     levels = np.linspace(0, 1, 21)
     norm = mpl.colors.BoundaryNorm(levels, cmap.N)
-    plot_data(ax, lon, lat, zeta, cmap, norm, 'SSH [m]', msk, msk_inv, gridline_style)
+    plot_map(ax, lon, lat, zeta, cmap, norm, 'SSH [m]', msk, msk_inv, gridline_style)
 
     plt.tight_layout()
     save_figure(fig, f"ssh_{start_date}_{end_date}.png")
@@ -123,7 +123,7 @@ def sst(data_path, start_date, end_date, figsize=(8, 8), cmap=cmocean.cm.thermal
     ax.set_title(f"SST SWIO {start_date} to {end_date}", size=9)
     levels = np.linspace(20, 30, 21)
     norm = mpl.colors.BoundaryNorm(levels, cmap.N)
-    plot_data(ax, lon, lat, temp, cmap, norm, 'SST [°C]', msk, msk_inv, gridline_style)
+    plot_map(ax, lon, lat, temp, cmap, norm, 'SST [°C]', msk, msk_inv, gridline_style)
 
     plt.tight_layout()
     save_figure(fig, f"sst_{start_date}_{end_date}.png")
