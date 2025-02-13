@@ -331,6 +331,10 @@ def mke(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm.lapaz
     v = v.where((v != fill_value), np.nan)
     w = w.where((w != fill_value), np.nan)
     
+    u = u.reshape(1, u.shape[0], u.shape[1], u.shape[2])    
+    v = v.reshape(1, v.shape[0], v.shape[1], v.shape[2]) 
+    w = w.reshape(1, w.shape[0], w.shape[1], w.shape[2]) 
+    
     # Transformation des composantes de vent (grille déformée -> grille géographique) pour chaque time index
     angle_expand = angle[:,:].data.reshape(1, angle.shape[0], angle.shape[1], 1)
 
