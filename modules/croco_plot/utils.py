@@ -6,8 +6,12 @@ Ce module contient des fonctions utilitaires pour le traitement et le chargement
 
 import numpy as np
 import xarray as xr
+import os
+import subprocess
+import matplotlib.pyplot as plt
+import cartopy.crs as ccrs
 
-def load_grid():
+def load_grid(is_Velocity=False):
     """
     Load the grid file into this iPython instance
 
@@ -24,14 +28,23 @@ def load_grid():
     """
     path = '/lus/store/CT1/c1601279/lweiss/GRID/croco_grid_swio2.nc'
     g = xr.open_dataset(path)
-    lon = g['lon_rho'][:, :]
-    lat = g['lat_rho'][:, :]
-    msk = g['mask_rho'][:, :]
-    pm = g['pm'][:-1,:-1] 
-    pn = g['pn'][:-1,:-1]
-    msk_inv = np.where(msk == 0, msk, np.nan)
+    if is_Velocity:
+        lon = g['lon_rho'][:-1, :-1]
+        lat = g['lat_rho'][:-1, :-1]
+        msk = g['mask_rho'][:-1, :-1]
+        pm = g['pm'][:-1,:-1] 
+        pn = g['pn'][:-1,:-1]
+        msk_inv = np.where(msk == 0, msk, np.nan)
+    else:
+        lon = g['lon_rho'][:, :]
+        lat = g['lat_rho'][:, :]
+        msk = g['mask_rho'][:, :]
+        pm = g['pm'][:,:] 
+        pn = g['pn'][:,:]
+        msk_inv = np.where(msk == 0, msk, np.nan)
     angle = g['angle'][:, :]
     g.close()
+    print("Grid loaded.")
     return lon, lat, pm, pn, msk, msk_inv, angle
 
 def load_data(path, fields):
@@ -47,36 +60,18 @@ def load_data(path, fields):
 
     Returns
     -------
-    tuple
-        Tuple of loaded fields in the same order as requested.
+    tuple or DataArray
+        Tuple of loaded fields in the same order as requested if multiple fields are requested,
+        otherwise a single DataArray if only one field is requested.
     """
     d = xr.open_dataset(path)
-    data = tuple(d[field][:, -1, :, :] for field in fields)
+    if len(fields) == 1:
+        data = d[fields[0]]  # Return DataArray instead of values
+    else:
+        data = tuple(d[field] for field in fields)
     d.close()
+    print("Data loaded.")
     return data
-
-def transform_velocity(u, v, angle):
-    """
-    Transform the velocity components from the deformed grid to the geographic grid.
-
-    Parameters
-    ----------
-    u_mean : array-like
-        Surface velocity u component.
-    v_mean : array-like
-        Surface velocity v component.
-    angle : array-like
-        Grid angle values representing the grid's orientation.
-
-    Returns
-    -------
-    tuple
-        - u_geo: Transformed surface velocity u component
-        - v_geo: Transformed surface velocity v component
-    """
-    u_geo = u[:-1,:].data * np.cos(angle[:-1,:-1]) - v[:,:-1].data * np.sin(angle[:-1,:-1])
-    v_geo = u[:-1,:].data * np.sin(angle[:-1,:-1]) + v[:,:-1].data * np.cos(angle[:-1,:-1])
-    return u_geo, v_geo
 
 def calc_depth(s, Cs, hc, h):
     """
@@ -106,3 +101,88 @@ def calc_depth(s, Cs, hc, h):
         z0[k, :, :] = (hc * s[k] + h * Cs[k]) / (hc + h)
         depth[k, :, :] = z0[k, :, :] * h
     return depth
+
+def plot_map(ax, lon, lat, data, cmap, norm, levels, label, msk, msk_inv, gridline_style):
+    """
+    Helper function to plot data on a given axis.
+
+    Parameters
+    ----------
+    ax : GeoAxes
+        The axis to plot on.
+    lon : ndarray
+        Longitudes.
+    lat : ndarray
+        Latitudes.
+    data : ndarray
+        Data to plot.
+    cmap : Colormap
+        Colormap to use.
+    norm : Normalize
+        Normalization for the colormap.
+    label : str
+        Label for the colorbar.
+    msk : ndarray
+        Mask for contour.
+    msk_inv : ndarray
+        Inverse mask for contourf.
+    gridline_style : dict
+        Style for gridlines.
+    """
+    pcm = ax.pcolormesh(lon[:, :], lat[:, :], data, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
+    ax.contour(lon, lat, msk, colors='k', linewidths=0.1)
+    ax.contourf(lon, lat, msk_inv, colors='lightgray')
+
+    gl = ax.gridlines(crs=ccrs.PlateCarree(), **gridline_style)
+    gl.top_labels = False
+    gl.right_labels = False
+    gl.xlabel_style = gl.ylabel_style = {'size': 8, 'color': 'k'}
+
+    cb = plt.colorbar(pcm, ax=ax, label=label, orientation='vertical')
+    ticks = levels
+    cb.set_ticks(ticks)
+    cb.ax.set_yticklabels(np.round(ticks, 2), fontsize=8)
+
+
+def save_figure(fig, filename):
+    """
+    Save the figure to the specified filename.
+
+    Parameters
+    ----------
+    fig : Figure
+        The figure to save.
+    filename : str
+        The path to save the figure.
+    """
+    output_dir = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures'
+    os.makedirs(output_dir, exist_ok=True)
+    fig.savefig(os.path.join(output_dir, filename))
+    print(f"""
+Figure saved as {filename}.
+To open the figure, run: cplot.utils.open_figure('{filename}')
+""")
+
+
+def open_figure(filenames):
+    """
+    Open the saved figure(s) using a terminal command without blocking the IPython session.
+
+    Parameters
+    ----------
+    filenames : str or list of str
+        The name of the file or list of files to open.
+    """
+    output_dir = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures'
+    
+    if isinstance(filenames, str):
+        filenames = [filenames]
+
+    file_paths = [os.path.join(output_dir, filename) for filename in filenames]
+
+    for file_path in file_paths:
+        if not os.path.exists(file_path):
+            print(f"File {file_path} does not exist.")
+
+    for file_path in file_paths:
+        subprocess.Popen(['eog', file_path])  # Use eog for Linux
