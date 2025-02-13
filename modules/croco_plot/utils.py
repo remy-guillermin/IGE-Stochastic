@@ -44,6 +44,7 @@ def load_grid(is_Velocity=False):
         msk_inv = np.where(msk == 0, msk, np.nan)
     angle = g['angle'][:, :]
     g.close()
+    print("Grid loaded.")
     return lon, lat, pm, pn, msk, msk_inv, angle
 
 def load_data(path, fields):
@@ -69,32 +70,8 @@ def load_data(path, fields):
     else:
         data = tuple(d[field] for field in fields)
     d.close()
+    print("Data loaded.")
     return data
-
-def transform_3D_velocity(u, v, w, angle):
-    """
-    Transform the velocity components from the deformed grid to the geographic grid.
-
-    Parameters
-    ----------
-    u_mean : array-like
-        Surface velocity u component.
-    v_mean : array-like
-        Surface velocity v component.
-    angle : array-like
-        Grid angle values representing the grid's orientation.
-
-    Returns
-    -------
-    tuple
-        - u_geo: Transformed surface velocity u component
-        - v_geo: Transformed surface velocity v component
-    """
-    print('Transforming data to geographical coordinates')
-    u_geo = u[:,:-1,:,:] * np.cos(angle[:,:-1,:-1:,]) - v[:,:,:-1,:] * np.sin(angle[:,:-1,:-1,:])
-    v_geo = u[:,:-1,:,:] * np.sin(angle[:,:-1,:-1:,]) + v[:,:,:-1,:] * np.cos(angle[:,:-1,:-1,:])
-    w_geo = w[:,:-1,:-1,:]
-    return u_geo, v_geo, w_geo
 
 def calc_depth(s, Cs, hc, h):
     """
@@ -125,7 +102,7 @@ def calc_depth(s, Cs, hc, h):
         depth[k, :, :] = z0[k, :, :] * h
     return depth
 
-def plot_map(ax, lon, lat, data, cmap, norm, label, msk, msk_inv, gridline_style, log=False):
+def plot_map(ax, lon, lat, data, cmap, norm, levels, label, msk, msk_inv, gridline_style):
     """
     Helper function to plot data on a given axis.
 
@@ -162,10 +139,7 @@ def plot_map(ax, lon, lat, data, cmap, norm, label, msk, msk_inv, gridline_style
     gl.xlabel_style = gl.ylabel_style = {'size': 8, 'color': 'k'}
 
     cb = plt.colorbar(pcm, ax=ax, label=label, orientation='vertical')
-    if log:
-        ticks = np.logspace(norm.vmin, norm.vmax, len(cb.get_ticks()))
-    else:
-        ticks = np.linspace(norm.vmin, norm.vmax, len(cb.get_ticks()))
+    ticks = levels
     cb.set_ticks(ticks)
     cb.ax.set_yticklabels(np.round(ticks, 2), fontsize=8)
 
