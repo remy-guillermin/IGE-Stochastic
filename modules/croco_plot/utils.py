@@ -158,12 +158,10 @@ def save_figure(fig, filename):
     output_dir = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures'
     os.makedirs(output_dir, exist_ok=True)
     fig.savefig(os.path.join(output_dir, filename))
-    print(f
-"""
+    print(f"""
 Figure saved as {filename}.
 To open the figure, run: cplot.utils.open_figure('{filename}')
-"""
-)
+""")
 
 
 def open_figure(filenames):
