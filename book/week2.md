@@ -30,3 +30,13 @@ Adastra est en panne aujourd'hui donc je fais de la lecture. J'ai lu et annoté 
 *Figure 1: Vue schématique des phénomènes clés dans l'Océan Indien. https://doi.org/10.5194/os-17-1677-2021*
 
 J'ai commencé à plot différentes cartes, pour le moment carte de vent et cartes de bathymétrie. Demain je vais essayer de faire une carte d'EKE et travailler sur les zones de Lisa qui sont dans [ce script](../scripts/lweiss_mod/KE/eke_avg_croco.py).
+
+## Mercredi
+J'ai pas mal avancé sur les figures aujourd'hui. J'ai des scripts pour afficher les vitesses, vorticité, hélicité ($u \times \omega$) ainsi que les SST SSH et SSS. Mon package est à jour par rapport à mes figures.
+
+> [!IMPORTANT]
+> Demain il faut modifier la `cmap` de l'EKE car elle est en log mais pas les ticks.
+> 
+
+## Jeudi
+Aujourd'hui je commence l'analyse des zones, avec en premier l'EKE de surface et la SLA. J'ai fait des moyennes glissantes pour la SLA en plus.
