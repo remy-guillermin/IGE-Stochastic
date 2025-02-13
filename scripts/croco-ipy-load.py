@@ -10,6 +10,7 @@ def start_ipython_hello():
         description="Start IPython and load croco_plot in a folder."
     )
     parser.add_argument("path_dir", nargs="?", default=None)
+    parser.add_argument("--clear", action="store_true", help="Clear the terminal before starting IPython")
     args = parser.parse_args()
     
     from IPython import start_ipython
@@ -29,6 +30,10 @@ def start_ipython_hello():
     
     if args.path_dir is not None:
         lines.insert(1, f"os.chdir('{args.path_dir}')")
+    
+    if args.clear:
+        import os
+        os.system('clear')
     
     argv.append("; ".join(lines))
     start_ipython(argv=argv)

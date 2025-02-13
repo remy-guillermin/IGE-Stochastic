@@ -43,7 +43,7 @@ def vel_vort_hel(data_path, start_date, end_date, figsize=(24, 8), cmap_velocity
     v = v[:,-1,:,:].sel(time=slice(start_date, end_date)).mean(dim='time')
 
     # Transform velocity components
-    u_geo, v_geo = transform_velocity(u, v, angle)
+    u_geo, v_geo = transform_3D_velocity(u, v, angle)
     velocity = np.sqrt(u_geo**2 + v_geo**2)
 
     # Calculate derivatives
@@ -112,7 +112,7 @@ def velocity(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm.
     v = v[:,-1,:,:].sel(time=slice(start_date, end_date)).mean(dim='time')
 
     # Transform velocity components
-    u_geo, v_geo = transform_velocity(u, v, angle)
+    u_geo, v_geo = transform_3D_velocity(u, v, angle)
     velocity = np.sqrt(u_geo**2 + v_geo**2)
 
     # Plotting
@@ -157,7 +157,7 @@ def vorticity(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm
     v = v[:,-1,:,:].sel(time=slice(start_date, end_date)).mean(dim='time')
 
     # Transform velocity components
-    u_geo, v_geo = transform_velocity(u, v, angle)
+    u_geo, v_geo = transform_3D_velocity(u, v, angle)
 
     # Calculate derivatives
     dv_dlon = np.gradient(v_geo, axis=1) * pm
@@ -277,7 +277,7 @@ def eke(data_path, date, figsize=(8, 8), cmap=cmcrameri.cm.lapaz):
     
     angle_expand = angle[:,:].data.reshape(1, angle.shape[0], angle.shape[1], 1)
     
-    ut_geo, vt_geo, wt_geo = transform_velocity(ut, vt, wt, angle_expand)
+    ut_geo, vt_geo, wt_geo = transform_3D_velocity(ut, vt, wt, angle_expand)
     
     EKE = 1 / 2 * (ut_geo[0,:,:,-1] ** 2 + vt_geo[0,:,:,-1] ** 2 + wt_geo[0,:,:,-1] ** 2)
     
@@ -335,7 +335,7 @@ def mke(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm.lapaz
     angle_expand = angle[:,:].data.reshape(1, angle.shape[0], angle.shape[1], 1)
 
     # Transform velocity components
-    u_geo, v_geo, w_geo = transform_velocity(u, v, w, angle_expand)
+    u_geo, v_geo, w_geo = transform_3D_velocity(u, v, w, angle_expand)
 
     # Calculate EKE
     MKE = 1 / 2 * (u_geo ** 2 + v_geo ** 2 + w_geo ** 2)
