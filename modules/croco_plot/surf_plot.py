@@ -11,7 +11,7 @@ import cmocean
 import cmcrameri
 import cartopy.crs as ccrs
 import xarray as xr
-from .utils import load_grid, load_data, transform_velocity, save_figure, plot_map
+from .utils import load_grid, load_data, transform_3D_velocity, save_figure, plot_map
 
 def sss(data_path, start_date, end_date, figsize=(8, 8), cmap=cmocean.cm.haline):
     """
