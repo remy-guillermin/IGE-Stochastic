@@ -21,6 +21,7 @@ def start_ipython_hello():
         """
         import os
         import croco_plot as cplot
+        import glob 
         print("Listing files in", os.getcwd())
         print(os.listdir())
     """

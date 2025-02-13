@@ -39,12 +39,24 @@ def vel_vort_hel(data_path, start_date, end_date, figsize=(24, 8), cmap_velocity
 
     # Load simulation data
     u, v = load_data(data_path, ('u', 'v'))
-    u = u[:,-1,:,:].sel(time=slice(start_date, end_date)).mean(dim='time')
-    v = v[:,-1,:,:].sel(time=slice(start_date, end_date)).mean(dim='time')
-
-    # Transform velocity components
-    u_geo, v_geo = transform_3D_velocity(u, v, angle)
-    velocity = np.sqrt(u_geo**2 + v_geo**2)
+    
+    u = u[:,:,:,:].sel(time=slice(start_date, end_date)).mean(dim='time')
+    v = v[:,:,:,:].sel(time=slice(start_date, end_date)).mean(dim='time')
+    print("Data selected")
+    
+    fill_value = 9.96921e+36
+    u = u.where((u != fill_value), np.nan).data
+    v = v.where((v != fill_value), np.nan).data
+    print("NaN values added")
+    
+    # Transformation des composantes de vent (grille déformée -> grille géographique) pour chaque time index
+    angle_expand = angle[:,:].data.reshape(1, angle.shape[0], angle.shape[1])
+    
+    u_geo = u[:,:-1,:] * np.cos(angle_expand[:,:-1,:-1]) - v[:,:,:-1] * np.sin(angle_expand[:,:-1,:-1])
+    v_geo = u[:,:-1,:] * np.sin(angle_expand[:,:-1,:-1]) + v[:,:,:-1] * np.cos(angle_expand[:,:-1,:-1])
+    print("Velocity transformed")
+    
+    velocity = np.sqrt(u_geo**2 + v_geo**2 )
 
     # Calculate derivatives
     dv_dlon = np.gradient(v_geo, axis=1) * pm
@@ -108,11 +120,23 @@ def velocity(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm.
 
     # Load simulation data
     u, v = load_data(data_path, ('u', 'v'))
-    u = u[:,-1,:,:].sel(time=slice(start_date, end_date)).mean(dim='time')
-    v = v[:,-1,:,:].sel(time=slice(start_date, end_date)).mean(dim='time')
-
-    # Transform velocity components
-    u_geo, v_geo = transform_3D_velocity(u, v, angle)
+    
+    u = u[:,:,:,:].sel(time=slice(start_date, end_date)).mean(dim='time')
+    v = v[:,:,:,:].sel(time=slice(start_date, end_date)).mean(dim='time')
+    print("Data selected")
+    
+    fill_value = 9.96921e+36
+    u = u.where((u != fill_value), np.nan).data
+    v = v.where((v != fill_value), np.nan).data
+    print("NaN values added")
+    
+    # Transformation des composantes de vent (grille déformée -> grille géographique) pour chaque time index
+    angle_expand = angle[:,:].data.reshape(1, angle.shape[0], angle.shape[1])
+    
+    u_geo = u[:,:-1,:] * np.cos(angle_expand[:,:-1,:-1]) - v[:,:,:-1] * np.sin(angle_expand[:,:-1,:-1])
+    v_geo = u[:,:-1,:] * np.sin(angle_expand[:,:-1,:-1]) + v[:,:,:-1] * np.cos(angle_expand[:,:-1,:-1])
+    print("Velocity transformed")
+    
     velocity = np.sqrt(u_geo**2 + v_geo**2)
 
     # Plotting
@@ -153,11 +177,22 @@ def vorticity(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm
 
     # Load simulation data
     u, v = load_data(data_path, ('u', 'v'))
-    u = u[:,-1,:,:].sel(time=slice(start_date, end_date)).mean(dim='time')
-    v = v[:,-1,:,:].sel(time=slice(start_date, end_date)).mean(dim='time')
-
-    # Transform velocity components
-    u_geo, v_geo = transform_3D_velocity(u, v, angle)
+    
+    u = u[:,:,:,:].sel(time=slice(start_date, end_date)).mean(dim='time')
+    v = v[:,:,:,:].sel(time=slice(start_date, end_date)).mean(dim='time')
+    print("Data selected")
+    
+    fill_value = 9.96921e+36
+    u = u.where((u != fill_value), np.nan).data
+    v = v.where((v != fill_value), np.nan).data
+    print("NaN values added")
+    
+    # Transformation des composantes de vent (grille déformée -> grille géographique) pour chaque time index
+    angle_expand = angle[:,:].data.reshape(1, angle.shape[0], angle.shape[1])
+    
+    u_geo = u[:,:-1,:] * np.cos(angle_expand[:,:-1,:-1]) - v[:,:,:-1] * np.sin(angle_expand[:,:-1,:-1])
+    v_geo = u[:,:-1,:] * np.sin(angle_expand[:,:-1,:-1]) + v[:,:,:-1] * np.cos(angle_expand[:,:-1,:-1])
+    print("Velocity transformed")
 
     # Calculate derivatives
     dv_dlon = np.gradient(v_geo, axis=1) * pm
