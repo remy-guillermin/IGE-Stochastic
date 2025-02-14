@@ -38,6 +38,8 @@ def box_eke(data_files,
     colors : list of str
         Colors for the plot lines.
     """
+    if isinstance(data_files, str):
+        data_files = [data_files]
     # Load grid data
     lon, lat, _, _, msk, msk_inv, angle, h = load_grid()
 
@@ -158,6 +160,8 @@ def box_mke(data_files,
     colors : list of str
         Colors for the plot lines.
     """
+    if isinstance(data_files, str):
+        data_files = [data_files]
     # Load grid data
     lon, lat, _, _, msk, msk_inv, angle, h = load_grid()
 
@@ -263,6 +267,8 @@ def box_sla(data_files,
     y_max : float
         Maximum y-axis value for the plot.
     """
+    if isinstance(data_files, str):
+        data_files = [data_files]
     lon, lat, _, _, msk, msk_inv, _, _ = load_grid()
     
     sla_results = {name: [] for name in names}
@@ -299,7 +305,8 @@ def box_sla(data_files,
         ax.plot(time_results, sla_results[name], color=color, linestyle='--', linewidth=1)
         # Apply centered rolling mean
         sla_rolling_mean = np.convolve(sla_results[name], np.ones(roll)/roll, mode='same')
-        ax.plot(time_results, sla_rolling_mean, color=color, linestyle='-', linewidth=1.5, alpha=0.8)
+        valid_indices = ~np.isnan(sla_rolling_mean)
+        ax.plot(time_results[valid_indices], sla_rolling_mean[valid_indices], color=color, linestyle='-', linewidth=1.5, alpha=0.8)
         ax.set_ylabel('SLA [m]')
         ax.set_ylim(y_min, y_max)
         ax.set_title(name)
@@ -334,6 +341,8 @@ def box_sta(data_files,
     y_max : float
         Maximum y-axis value for the plot.
     """
+    if isinstance(data_files, str):
+        data_files = [data_files]
     lon, lat, _, _, msk, msk_inv, _, _ = load_grid()
     
     sta_results = {name: [] for name in names}
@@ -371,7 +380,8 @@ def box_sta(data_files,
         ax.plot(time_results, sta_results[name], color=color, linestyle='--', linewidth=1)
         # Apply centered rolling mean
         sta_rolling_mean = np.convolve(sta_results[name], np.ones(roll)/roll, mode='same')
-        ax.plot(time_results, sta_rolling_mean, color=color, linestyle='-', linewidth=1.5, alpha=0.8)
+        valid_indices = ~np.isnan(sta_rolling_mean)
+        ax.plot(time_results[valid_indices], sta_rolling_mean[valid_indices], color=color, linestyle='-', linewidth=1.5, alpha=0.8)
         ax.set_ylabel('STA [°C]')
         ax.set_ylim(y_min, y_max)
         ax.set_title(name)
@@ -406,6 +416,8 @@ def box_ssa(data_files,
     y_max : float
         Maximum y-axis value for the plot.
     """
+    if isinstance(data_files, str):
+        data_files = [data_files]
     lon, lat, _, _, msk, msk_inv, _, _ = load_grid()
     
     ssa_results = {name: [] for name in names}
@@ -443,7 +455,8 @@ def box_ssa(data_files,
         ax.plot(time_results, ssa_results[name], color=color, linestyle='--', linewidth=1)
         # Apply centered rolling mean
         ssa_rolling_mean = np.convolve(ssa_results[name], np.ones(roll)/roll, mode='same')
-        ax.plot(time_results, ssa_rolling_mean, color=color, linestyle='-', linewidth=1.5, alpha=0.8)
+        valid_indices = ~np.isnan(ssa_rolling_mean)
+        ax.plot(time_results[valid_indices], ssa_rolling_mean[valid_indices], color=color, linestyle='-', linewidth=1.5, alpha=0.8)
         ax.set_ylabel('SSA [psu]')
         ax.set_ylim(y_min, y_max)
         ax.set_title(name)
@@ -478,6 +491,8 @@ def box_ssh(data_files,
     y_max : float
         Maximum y-axis value for the plot.
     """
+    if isinstance(data_files, str):
+        data_files = [data_files]
     lon, lat, _, _, msk, msk_inv, _, _ = load_grid()
     
     ssh_results = {name: [] for name in names}
@@ -510,7 +525,8 @@ def box_ssh(data_files,
         ax.plot(time_results, ssh_results[name], color=color, linestyle='--', linewidth=1)
         # Apply centered rolling mean
         ssh_rolling_mean = np.convolve(ssh_results[name], np.ones(roll)/roll, mode='same')
-        ax.plot(time_results, ssh_rolling_mean, color=color, linestyle='-', linewidth=1.5, alpha=0.8)
+        valid_indices = ~np.isnan(ssh_rolling_mean)
+        ax.plot(time_results[valid_indices], ssh_rolling_mean[valid_indices], color=color, linestyle='-', linewidth=1.5, alpha=0.8)
         ax.set_ylabel('SSH [m]')
         ax.set_ylim(y_min, y_max)
         ax.set_title(name)
@@ -545,6 +561,8 @@ def box_sst(data_files,
     y_max : float
         Maximum y-axis value for the plot.
     """
+    if isinstance(data_files, str):
+        data_files = [data_files]
     lon, lat, _, _, msk, msk_inv, _, _ = load_grid()
     
     sst_results = {name: [] for name in names}
@@ -578,7 +596,8 @@ def box_sst(data_files,
         ax.plot(time_results, sst_results[name], color=color, linestyle='--', linewidth=1)
         # Apply centered rolling mean 
         sst_rolling_mean = np.convolve(sst_results[name], np.ones(roll)/roll, mode='same')
-        ax.plot(time_results, sst_rolling_mean, color=color, linestyle='-', linewidth=1.5, alpha=0.8)
+        valid_indices = ~np.isnan(sst_rolling_mean)
+        ax.plot(time_results[valid_indices], sst_rolling_mean[valid_indices], color=color, linestyle='-', linewidth=1.5, alpha=0.8)
         ax.set_ylabel('SST [°C]')
         ax.set_ylim(y_min, y_max)
         #ax.set_title(name)
@@ -593,8 +612,8 @@ def box_sss(data_files,
         names=['Equator', 'Mayotte-Comores', 'South-Moz', 'Mascarene'], 
         colors=['saddlebrown', 'darkorchid', 'navy', 'teal'], 
         roll = 9,
-        y_min=0.25, 
-        y_max=-0.25):
+        y_min=35.25, 
+        y_max=35.75):
     """
     Calculate and plot the time series of Sea Surface Salinity (SSS) for specified regions.
 
@@ -613,7 +632,8 @@ def box_sss(data_files,
     y_max : float
         Maximum y-axis value for the plot.
     """
-    
+    if isinstance(data_files, str):
+        data_files = [data_files]
     lon, lat, _, _, msk, msk_inv, _, _ = load_grid()
     
     sss_results = {name: [] for name in names}
@@ -646,14 +666,14 @@ def box_sss(data_files,
     for ax, (name, color) in zip(axes, zip(names, colors)):
         ax.plot(time_results, sss_results[name], color=color, linestyle='--', linewidth=1)
         # Apply centered rolling mean
-        ssa_rolling_mean = np.convolve(sss_results[name], np.ones(roll)/roll, mode='same')
-        ax.plot(time_results, sss_rolling_mean, color=color, linestyle='-', linewidth=1.5, alpha=0.8)
+        sss_rolling_mean = np.convolve(sss_results[name], np.ones(roll)/roll, mode='same')
+        valid_indices = ~np.isnan(sss_rolling_mean)
+        ax.plot(time_results[valid_indices], sss_rolling_mean[valid_indices], color=color, linestyle='-', linewidth=1.5, alpha=0.8)
         ax.set_ylabel('SSS [psu]')
-        #ax.set_ylim(y_min, y_max)
+        ax.set_ylim(y_min, y_max)
         ax.set_title(name)
 
     axes[-1].set_xlabel('Time')
     fig.suptitle('Sea Surface Salinity Over Time for Different Boxes')
     save_figure(fig, f"sss_boxes_time_series.png")
     plt.close(fig)
-    
