@@ -247,8 +247,8 @@ def box_sla(data_files,
         names=['Equator', 'Mayotte-Comores', 'South-Moz', 'Mascarene'], 
         colors=['saddlebrown', 'darkorchid', 'navy', 'teal'], 
         roll = 9,
-        y_min=-0.25, 
-        y_max=0.25):
+        y_min=None, 
+        y_max=None):
     """
     Calculate and plot the time series of Sea Level Anomaly (SLA) for specified regions.
 
@@ -262,6 +262,8 @@ def box_sla(data_files,
         Names of the regions.
     colors : list of str
         Colors for the plot lines.
+    roll : int
+        Window size for the centered rolling mean.
     y_min : float
         Minimum y-axis value for the plot.
     y_max : float
@@ -306,7 +308,7 @@ def box_sla(data_files,
         # Apply centered rolling mean
         sla_rolling_mean = np.convolve(sla_results[name], np.ones(roll)/roll, mode='same')
         valid_indices = ~np.isnan(sla_rolling_mean)
-        ax.plot(time_results[valid_indices], sla_rolling_mean[valid_indices], color=color, linestyle='-', linewidth=1.5, alpha=0.8)
+        ax.plot(time_results[int((roll-1)/2):-int((roll-1)/2)], sla_rolling_mean[int((roll-1)/2):-int((roll-1)/2)], color=color, linestyle='-', linewidth=1.5, alpha=0.8)
         ax.set_ylabel('SLA [m]')
         ax.set_ylim(y_min, y_max)
         ax.set_title(name)
@@ -321,8 +323,8 @@ def box_sta(data_files,
         names=['Equator', 'Mayotte-Comores', 'South-Moz', 'Mascarene'], 
         colors=['saddlebrown', 'darkorchid', 'navy', 'teal'], 
         roll = 9,
-        y_min=-2.5, 
-        y_max=2.5):
+        y_min=None, 
+        y_max=None):
     """
     Calculate and plot the time series of Sea Temperature Anomaly (STA) for specified regions.
 
@@ -336,6 +338,8 @@ def box_sta(data_files,
         Names of the regions.
     colors : list of str
         Colors for the plot lines.
+    roll : int
+        Window size for the centered rolling mean.
     y_min : float
         Minimum y-axis value for the plot.
     y_max : float
@@ -381,7 +385,7 @@ def box_sta(data_files,
         # Apply centered rolling mean
         sta_rolling_mean = np.convolve(sta_results[name], np.ones(roll)/roll, mode='same')
         valid_indices = ~np.isnan(sta_rolling_mean)
-        ax.plot(time_results[valid_indices], sta_rolling_mean[valid_indices], color=color, linestyle='-', linewidth=1.5, alpha=0.8)
+        ax.plot(time_results[int((roll-1)/2):-int((roll-1)/2)], sta_rolling_mean[int((roll-1)/2):-int((roll-1)/2)], color=color, linestyle='-', linewidth=1.5, alpha=0.8)
         ax.set_ylabel('STA [°C]')
         ax.set_ylim(y_min, y_max)
         ax.set_title(name)
@@ -396,8 +400,8 @@ def box_ssa(data_files,
         names=['Equator', 'Mayotte-Comores', 'South-Moz', 'Mascarene'], 
         colors=['saddlebrown', 'darkorchid', 'navy', 'teal'], 
         roll = 9,
-        y_min=-0.25, 
-        y_max=0.25):
+        y_min=None, 
+        y_max=None):
     """
     Calculate and plot the time series of Sea Salinity Anomaly (SSA) for specified regions.
 
@@ -411,6 +415,8 @@ def box_ssa(data_files,
         Names of the regions.
     colors : list of str
         Colors for the plot lines.
+    roll : int
+        Window size for the centered rolling mean.
     y_min : float
         Minimum y-axis value for the plot.
     y_max : float
@@ -456,7 +462,7 @@ def box_ssa(data_files,
         # Apply centered rolling mean
         ssa_rolling_mean = np.convolve(ssa_results[name], np.ones(roll)/roll, mode='same')
         valid_indices = ~np.isnan(ssa_rolling_mean)
-        ax.plot(time_results[valid_indices], ssa_rolling_mean[valid_indices], color=color, linestyle='-', linewidth=1.5, alpha=0.8)
+        ax.plot(time_results[int((roll-1)/2):-int((roll-1)/2)], ssa_rolling_mean[int((roll-1)/2):-int((roll-1)/2)], color=color, linestyle='-', linewidth=1.5, alpha=0.8)
         ax.set_ylabel('SSA [psu]')
         ax.set_ylim(y_min, y_max)
         ax.set_title(name)
@@ -471,8 +477,8 @@ def box_ssh(data_files,
         names=['Equator', 'Mayotte-Comores', 'South-Moz', 'Mascarene'], 
         colors=['saddlebrown', 'darkorchid', 'navy', 'teal'], 
         roll = 9,
-        y_min=0, 
-        y_max=1):
+        y_min=None, 
+        y_max=None):
     """
     Calculate and plot the time series of Sea Surface Height (SSH) for specified regions.
 
@@ -486,6 +492,8 @@ def box_ssh(data_files,
         Names of the regions.
     colors : list of str
         Colors for the plot lines.
+    roll : int
+        Window size for the centered rolling mean.
     y_min : float
         Minimum y-axis value for the plot.
     y_max : float
@@ -526,7 +534,7 @@ def box_ssh(data_files,
         # Apply centered rolling mean
         ssh_rolling_mean = np.convolve(ssh_results[name], np.ones(roll)/roll, mode='same')
         valid_indices = ~np.isnan(ssh_rolling_mean)
-        ax.plot(time_results[valid_indices], ssh_rolling_mean[valid_indices], color=color, linestyle='-', linewidth=1.5, alpha=0.8)
+        ax.plot(time_results[int((roll-1)/2):-int((roll-1)/2)], ssh_rolling_mean[int((roll-1)/2):-int((roll-1)/2)], color=color, linestyle='-', linewidth=1.5, alpha=0.8)
         ax.set_ylabel('SSH [m]')
         ax.set_ylim(y_min, y_max)
         ax.set_title(name)
@@ -541,8 +549,8 @@ def box_sst(data_files,
         names=['Equator', 'Mayotte-Comores', 'South-Moz', 'Mascarene'], 
         colors=['saddlebrown', 'darkorchid', 'navy', 'teal'], 
         roll = 9,
-        y_min=2.5, 
-        y_max=-2.5):
+        y_min=None, 
+        y_max=None):
     """
     Calculate and plot the time series of Sea Surface Temperature (SST) for specified regions.
 
@@ -556,6 +564,8 @@ def box_sst(data_files,
         Names of the regions.
     colors : list of str
         Colors for the plot lines.
+    roll : int
+        Window size for the centered rolling mean.
     y_min : float
         Minimum y-axis value for the plot.
     y_max : float
@@ -596,8 +606,7 @@ def box_sst(data_files,
         ax.plot(time_results, sst_results[name], color=color, linestyle='--', linewidth=1)
         # Apply centered rolling mean 
         sst_rolling_mean = np.convolve(sst_results[name], np.ones(roll)/roll, mode='same')
-        valid_indices = ~np.isnan(sst_rolling_mean)
-        ax.plot(time_results[valid_indices], sst_rolling_mean[valid_indices], color=color, linestyle='-', linewidth=1.5, alpha=0.8)
+        ax.plot(time_results[int((roll-1)/2):-int((roll-1)/2)], sst_rolling_mean[int((roll-1)/2):-int((roll-1)/2)], color=color, linestyle='-', linewidth=1.5, alpha=0.8)
         ax.set_ylabel('SST [°C]')
         ax.set_ylim(y_min, y_max)
         #ax.set_title(name)
@@ -612,8 +621,8 @@ def box_sss(data_files,
         names=['Equator', 'Mayotte-Comores', 'South-Moz', 'Mascarene'], 
         colors=['saddlebrown', 'darkorchid', 'navy', 'teal'], 
         roll = 9,
-        y_min=35.25, 
-        y_max=35.75):
+        y_min=None, 
+        y_max=None):
     """
     Calculate and plot the time series of Sea Surface Salinity (SSS) for specified regions.
 
@@ -627,6 +636,8 @@ def box_sss(data_files,
         Names of the regions.
     colors : list of str
         Colors for the plot lines.
+    roll : int
+        Window size for the centered rolling mean.
     y_min : float
         Minimum y-axis value for the plot.
     y_max : float
@@ -667,8 +678,7 @@ def box_sss(data_files,
         ax.plot(time_results, sss_results[name], color=color, linestyle='--', linewidth=1)
         # Apply centered rolling mean
         sss_rolling_mean = np.convolve(sss_results[name], np.ones(roll)/roll, mode='same')
-        valid_indices = ~np.isnan(sss_rolling_mean)
-        ax.plot(time_results[valid_indices], sss_rolling_mean[valid_indices], color=color, linestyle='-', linewidth=1.5, alpha=0.8)
+        ax.plot(time_results[int((roll-1)/2):-int((roll-1)/2)], sss_rolling_mean[int((roll-1)/2):-int((roll-1)/2)], color=color, linestyle='-', linewidth=1.5, alpha=0.8)
         ax.set_ylabel('SSS [psu]')
         ax.set_ylim(y_min, y_max)
         ax.set_title(name)
