@@ -52,8 +52,15 @@ Aujourd'hui, j'ai continué à travailler sur mes scripts pour les séries tempo
 - **Séries temporelles:** J'ai amélioré les scripts pour générer des séries temporelles plus précises des différentes variables océanographiques.
 - **Énergie:** J'ai analysé les flux d'énergie dans l'océan Indien, en me concentrant sur les échanges entre les différentes couches de l'océan.
 - **Anomalies de la mer:** J'ai travaillé sur la détection et l'analyse des anomalies de la mer, en particulier les anomalies de température et de salinité de surface.
+- **Cartes de vent et de bathymétrie:** J'ai finalisé les cartes de vent et de bathymétrie et commencé à travailler sur les cartes d'EKE.
+- **Analyse des zones:** J'ai approfondi l'analyse des zones avec l'EKE de surface et la SLA, en utilisant des moyennes glissantes pour la SLA.
 
 ### Résumé des commits d'aujourd'hui
 - Amélioration des scripts pour les séries temporelles.
 - Analyse des flux d'énergie dans l'océan Indien.
 - Détection et analyse des anomalies de la mer.
+- Finalisation des cartes de vent et de bathymétrie.
+- Travail sur les cartes d'EKE et analyse des zones avec l'EKE de surface et la SLA.
+
+## TODO pour Lundi
+- Réfléchir à un plan pour le premier chapitre de mon rapport.

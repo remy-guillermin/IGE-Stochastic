@@ -40,6 +40,6 @@ Aujourd'hui, on a finalisé la configuration de l'accès à Adastra. Je peux don
 ## Vendredi
 Aujourd'hui, je me focalise sur la compréhension des codes de Lisa. J'arrive à les exécuter. Je dois maintenant réussir à refaire ces plots par moi-même.
 
-## À faire pour lundi 
+## TODO pour lundi 
 - Lire un des deux autres articles et l'annoter.
 - Vérifier l'article de Jean-Michel pour voir si j'ai d'autres questions.

@@ -25,6 +25,7 @@ def load_grid(is_Velocity=False):
         - msk: Mask array of valid grid points.
         - msk_inv: Inverse mask array with invalid points set to NaN.
         - angle: Grid angle values representing the grid's orientation.
+        - h: Bathymetric depth values.
     """
     path = '/lus/store/CT1/c1601279/lweiss/GRID/croco_grid_swio2.nc'
     g = xr.open_dataset(path)
