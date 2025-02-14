@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 import cmocean
 import cartopy.crs as ccrs
-from matplotlib.patches import Rectangle
 
 # Load data (same as your existing code)
 data = '/lus/store/CT1/c1601279/lweiss/RUN_CROCO/'

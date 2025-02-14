@@ -37,11 +37,10 @@ def all_surf(data_path, start_date, end_date, figsize=(24, 6), sss_cmap=cmocean.
     # Load grid data
     lon, lat, _, _, msk, msk_inv, _, _ = load_grid()
     
-    salt, zeta, temp = load_data(data_path, ('salt', 'zeta', 'temp'))[:, -1, :, :]
-     
-    salt = salt.sel(time=slice(start_date, end_date)).mean(dim='time')
+    salt, zeta, temp = load_data(data_path, ('salt', 'zeta', 'temp'))
+    salt = salt[:, -1, :, :].sel(time=slice(start_date, end_date)).mean(dim='time')
     zeta = zeta.sel(time=slice(start_date, end_date)).mean(dim='time')
-    temp = temp.sel(time=slice(start_date, end_date)).mean(dim='time')
+    temp = temp[:, -1, :, :].sel(time=slice(start_date, end_date)).mean(dim='time')
     
     # Plotting
     fig, axs = plt.subplots(1, 3, figsize=figsize, subplot_kw={'projection': ccrs.PlateCarree()})

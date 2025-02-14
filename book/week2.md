@@ -45,3 +45,15 @@ Aujourd'hui, je commence l'analyse des zones, avec en premier l'EKE de surface e
 - Mis à jour les figures et les scripts pour afficher les vitesses, vorticité, hélicité, SST, SSH et SSS.
 - Travaillé sur les cartes de vent et de bathymétrie.
 - Préparé une carte d'EKE et commencé à analyser les zones avec l'EKE de surface et la SLA.
+
+## Vendredi 
+Aujourd'hui, j'ai continué à travailler sur mes scripts pour les séries temporelles, l'énergie et les anomalies de la mer.
+
+- **Séries temporelles:** J'ai amélioré les scripts pour générer des séries temporelles plus précises des différentes variables océanographiques.
+- **Énergie:** J'ai analysé les flux d'énergie dans l'océan Indien, en me concentrant sur les échanges entre les différentes couches de l'océan.
+- **Anomalies de la mer:** J'ai travaillé sur la détection et l'analyse des anomalies de la mer, en particulier les anomalies de température et de salinité de surface.
+
+### Résumé des commits d'aujourd'hui
+- Amélioration des scripts pour les séries temporelles.
+- Analyse des flux d'énergie dans l'océan Indien.
+- Détection et analyse des anomalies de la mer.

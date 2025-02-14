@@ -72,7 +72,7 @@ def load_data(path, fields):
     else:
         data = tuple(d[field] for field in fields)
     d.close()
-    print("Data loaded.")
+    print(f"Data in {path} loaded.")
     return data
 
 def calc_depth(s, Cs, hc, h):
