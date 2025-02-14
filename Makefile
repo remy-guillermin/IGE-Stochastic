@@ -1,6 +1,9 @@
 all:
 	make cleanpdf && make report.pdf && make slides.pdf
 
+draft.pdf:
+	cd draft && latexmk -halt-on-error -f -shell-escape -pdf -quiet draft.tex && rsync draft.pdf ../draft.pdf 
+
 report.pdf:
 	cd report && latexmk -halt-on-error -f -shell-escape -pdf -quiet report.tex && rsync report.pdf ../report.pdf 
 

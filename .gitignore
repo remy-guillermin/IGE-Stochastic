@@ -13,6 +13,12 @@ Icon?
 *.png
 !bibliography/*.png
 !book/*.png
+!draft/*.png
+!draft/figures/*.png
+!report/*.png
+!report/figures/*.png
+!slides/*.png
+!slides/figures/*.png
 *.jpg
 *.jpeg
 

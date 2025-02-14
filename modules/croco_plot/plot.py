@@ -35,7 +35,7 @@ def vel_vort_hel(data_path, start_date, end_date, figsize=(24, 8), cmap_velocity
         Colormap for helicity, by default cmcrameri.cm.vik
     """
     # Load grid data
-    lon, lat, pm, pn, msk, msk_inv, angle = load_grid(is_Velocity=True)
+    lon, lat, pm, pn, msk, msk_inv, angle, _ = load_grid(is_Velocity=True)
 
     # Load simulation data
     u, v = load_data(data_path, ('u', 'v'))
@@ -119,7 +119,7 @@ def velocity(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm.
         Colormap for velocity, by default cmcrameri.cm.oslo
     """
     # Load grid data
-    lon, lat, pm, pn, msk, msk_inv, angle = load_grid(is_Velocity=True)
+    lon, lat, _, _, msk, msk_inv, angle, _ = load_grid(is_Velocity=True)
 
     # Load simulation data
     u, v = load_data(data_path, ('u', 'v'))
@@ -176,7 +176,7 @@ def vorticity(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm
         Colormap for vorticity, by default cmcrameri.cm.vik
     """
     # Load grid data
-    lon, lat, pm, pn, msk, msk_inv, angle = load_grid(is_Velocity=True)
+    lon, lat, pm, pn, msk, msk_inv, angle, _ = load_grid(is_Velocity=True)
 
     # Load simulation data
     u, v = load_data(data_path, ('u', 'v'))
@@ -241,7 +241,7 @@ def helicity(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm.
         Colormap for helicity, by default cmcrameri.cm.vik
     """
     # Load grid data
-    lon, lat, pm, pn, msk, msk_inv, angle = load_grid(is_Velocity=True)
+    lon, lat, pm, pn, msk, msk_inv, angle, _ = load_grid(is_Velocity=True)
 
     # Load simulation data
     u, v = load_data(data_path, ('u', 'v'))
@@ -292,7 +292,7 @@ def eke(data_path, date, figsize=(8, 8), cmap=cmcrameri.cm.lapaz):
     """
     
     # Load grid data
-    lon, lat, pm, pn, msk, msk_inv, angle = load_grid(is_Velocity=True)
+    lon, lat, _, _, msk, msk_inv, angle, _ = load_grid(is_Velocity=True)
 
     # Load simulation data
     u, v, w = load_data(data_path, ('u', 'v', 'w'))
@@ -366,7 +366,7 @@ def mke(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm.lapaz
         Colormap for EKE, by default cmcrameri.cm.lapaz
     """
     # Load grid data
-    lon, lat, pm, pn, msk, msk_inv, angle = load_grid(is_Velocity=True)
+    lon, lat, _, _, msk, msk_inv, angle, _ = load_grid(is_Velocity=True)
 
     # Load simulation data
     u, v, w = load_data(data_path, ('u', 'v', 'w'))

@@ -12,7 +12,7 @@ simu = 'run_swio2_deter_2017_2023_complet/'
 grid = '/lus/store/CT1/c1601279/lweiss/GRID/croco_grid_swio2.nc'
 
 g = xr.open_dataset(grid)
-h = g['h'][:, :]
+h = g['h'][:, :] # Bathymetry
 lon = g['lon_rho'][:, :]  # Longitude
 lat = g['lat_rho'][:, :]  # Latitude
 angle = g['angle'][:, :]  # Deformation

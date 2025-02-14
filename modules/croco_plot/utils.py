@@ -35,6 +35,7 @@ def load_grid(is_Velocity=False):
         pm = g['pm'][:-1,:-1] 
         pn = g['pn'][:-1,:-1]
         msk_inv = np.where(msk == 0, msk, np.nan)
+        h = g['h'][:-1, :-1]
     else:
         lon = g['lon_rho'][:, :]
         lat = g['lat_rho'][:, :]
@@ -42,10 +43,11 @@ def load_grid(is_Velocity=False):
         pm = g['pm'][:,:] 
         pn = g['pn'][:,:]
         msk_inv = np.where(msk == 0, msk, np.nan)
+        h = g['h'][:, :]
     angle = g['angle'][:, :]
     g.close()
     print("Grid loaded.")
-    return lon, lat, pm, pn, msk, msk_inv, angle
+    return lon, lat, pm, pn, msk, msk_inv, angle, h
 
 def load_data(path, fields):
     """
