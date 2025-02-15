@@ -4,6 +4,7 @@ Icon?
 
 # Archives & Compressed files
 *.tar.gz
+*.synctex.gz
 
 # Documents
 *.pdf
