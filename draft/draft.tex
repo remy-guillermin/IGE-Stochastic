@@ -3,8 +3,14 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[french]{babel}
-\usepackage[backend=bibtex, style=numeric-comp, sorting=nyt]{biblatex}
+\usepackage[backend=bibtex, style=phys, sorting=nyt]{biblatex}
 \addbibresource{references.bib}
+\usepackage{wrapfig}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usepackage{subfigure}
 
 % Definition des nouvelles commandes pour les dérivées partielles
 \newcommand{\pd}[2]{\frac{\partial #1}{\partial #2}}
@@ -31,5 +37,14 @@
 \begin{document}
 
 \include{Chapters/Chapter1}
+\include{Chapters/Chapter2}
+
+\appendix
+
+\include{Appendices/AppendixA}
+
+
+
+\printbibliography
 
 \end{document}
