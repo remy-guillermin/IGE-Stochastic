@@ -16,10 +16,10 @@ install:
 	chmod +x $$VIRTUAL_ENV/bin/croco-ipy-load
 
 cleanpdf:
-	rm -f report.pdf slides.pdf report/report.pdf slides/slides.pdf
+	rm -f report.pdf slides.pdf draft.pdf report/report.pdf slides/slides.pdf draft/draft.pdf
 
 cleanaux:
-	rm -f */*.aux */*.fdb_latexmk */*.fls */*.log */*.bak* */*.bbl */*.blg */*.out */*Notes.bib */*blx.bib */*.run.xml */*.toc */*.spl */*.nav */*.snm
+	rm -f */*.aux */*.fdb_latexmk */*.fls */*.log */*.bak* */*.bbl */*.blg */*.out */*Notes.bib */*blx.bib */*.run.xml */*.toc */*.spl */*.nav */*.snm */*.lof */*.lot
 
 clean:
 	make cleanpdf && make cleanaux

@@ -42,6 +42,8 @@ Icon?
 *.spl 
 *.nav 
 *.snm
+*.lof
+*.lot
 
 # Modules files
 modules/*egg-info/*
