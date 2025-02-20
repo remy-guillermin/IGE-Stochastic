@@ -55,25 +55,22 @@ def all_surf(data_path, start_date, end_date, figsize=(24, 6), sss_cmap=cmocean.
     gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.3}
     
     ax = axs[0]
-    str_sss = r'$\overline{\overline{SSS}}$'
-    ax.set_title(f"{str_sss} SWIO {start_date} to {end_date}", size=9)
+    ax.set_title(f"SWIO {start_date} to {end_date}", size=9)
     levels = np.linspace(34, 36, 21)
     norm = mpl.colors.BoundaryNorm(levels, sss_cmap.N)
-    plot_map(ax, lon, lat, salt, sss_cmap, norm, levels, 'SSS [psu]', msk, msk_inv, gridline_style)
+    plot_map(ax, lon, lat, salt, sss_cmap, norm, levels, r'$\overline{\overline{SSS}}$ [psu]', msk, msk_inv, gridline_style)
     
     ax = axs[1]
-    str_ssh = r'$\overline{\overline{SSH}}$'
-    ax.set_title(f"{str_ssh} SWIO {start_date} to {end_date}", size=9)
+    ax.set_title(f"SWIO {start_date} to {end_date}", size=9)
     levels = np.linspace(0, 1, 21)
     norm = mpl.colors.BoundaryNorm(levels, ssh_cmap.N)
-    plot_map(ax, lon, lat, zeta, ssh_cmap, norm, levels, 'SSH [m]', msk, msk_inv, gridline_style)
+    plot_map(ax, lon, lat, zeta, ssh_cmap, norm, levels, r'$\overline{\overline{SSH}}$ [m]', msk, msk_inv, gridline_style)
     
     ax = axs[2]
-    str_sst = r'$\overline{\overline{SST}}$'
-    ax.set_title(f"{str_sst} SWIO {start_date} to {end_date}", size=9)
+    ax.set_title(f"SWIO {start_date} to {end_date}", size=9)
     levels = np.linspace(20, 30, 21)
     norm = mpl.colors.BoundaryNorm(levels, sst_cmap.N)
-    plot_map(ax, lon, lat, temp, sst_cmap, norm, levels, 'SST [°C]', msk, msk_inv, gridline_style)
+    plot_map(ax, lon, lat, temp, sst_cmap, norm, levels, r'$\overline{\overline{SST}}$ [°C]', msk, msk_inv, gridline_style)
     
     plt.tight_layout()
     save_figure(fig, f"sea_surface_{start_date}_{end_date}.png")
@@ -121,22 +118,19 @@ def all_annual_anomaly(data_path, figsize=(24, 6), sss_cmap=cmocean.cm.haline, s
     gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.3}
     
     ax = axs[0]
-    ax.set_title(r"$\overline{\overline{SSA}}$ SWIO", size=9)
     levels = np.linspace(0, 1, 11)
     norm = mpl.colors.BoundaryNorm(levels, sss_cmap.N)
-    plot_map(ax, lon, lat, SSA[-1,:,:], sss_cmap, norm, levels, 'SSA [psu]', msk, msk_inv, gridline_style)
+    plot_map(ax, lon, lat, SSA[-1,:,:], sss_cmap, norm, levels, r'$\overline{\overline{SSA}}$ [psu]', msk, msk_inv, gridline_style)
     
     ax = axs[1]
-    ax.set_title(r"$\overline{\overline{SLA}}$ SWIO", size=9)
     levels = np.linspace(0, 0.2, 11)
     norm = mpl.colors.BoundaryNorm(levels, ssh_cmap.N)
-    plot_map(ax, lon, lat, SLA, ssh_cmap, norm, levels, 'SLA [m]', msk, msk_inv, gridline_style)
+    plot_map(ax, lon, lat, SLA, ssh_cmap, norm, levels, r'$\overline{\overline{SLA}}$ [m]', msk, msk_inv, gridline_style)
     
     ax = axs[2]
-    ax.set_title(r"$\overline{\overline{STA}}$ SWIO", size=9)
     levels = np.linspace(0, 5, 11)
     norm = mpl.colors.BoundaryNorm(levels, sst_cmap.N)
-    plot_map(ax, lon, lat, STA[-1,:,:], sst_cmap, norm, levels, 'STA [°C]', msk, msk_inv, gridline_style)
+    plot_map(ax, lon, lat, STA[-1,:,:], sst_cmap, norm, levels, r'$\overline{\overline{STA}}$ SWIO [°C]', msk, msk_inv, gridline_style)
     
     plt.tight_layout()
     save_figure(fig, f"sea_anomaly_annual_{data_path}.png")
@@ -171,11 +165,10 @@ def sss(data_path, start_date, end_date, figsize=(8, 8), cmap=cmocean.cm.haline)
     # Define common gridline styles
     gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.3}
 
-    str_sss = r'$\overline{\overline{SSS}}$'
-    ax.set_title(f"{str_sss} SWIO {start_date} to {end_date}", size=9)
+    ax.set_title(f"SWIO {start_date} to {end_date}", size=9)
     levels = np.linspace(34, 36, 21)
     norm = mpl.colors.BoundaryNorm(levels, cmap.N)
-    plot_map(ax, lon, lat, salt, cmap, norm, levels, 'SSS [psu]', msk, msk_inv, gridline_style)
+    plot_map(ax, lon, lat, salt, cmap, norm, levels, r'$\overline{\overline{SSS}}$ [psu]', msk, msk_inv, gridline_style)
     
     plt.tight_layout()
     save_figure(fig, f"sss_{start_date}_{end_date}.png")
@@ -212,11 +205,10 @@ def ssh(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm.roma_
     # Define common gridline styles
     gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.3}
 
-    str_ssh = r'$\overline{\overline{SSH}}$'
-    ax.set_title(f"{str_ssh} SWIO {start_date} to {end_date}", size=9)
+    ax.set_title(f"SWIO {start_date} to {end_date}", size=9)
     levels = np.linspace(0, 1, 21)
     norm = mpl.colors.BoundaryNorm(levels, cmap.N)
-    plot_map(ax, lon, lat, zeta, cmap, norm, levels, 'SSH [m]', msk, msk_inv, gridline_style)
+    plot_map(ax, lon, lat, zeta, cmap, norm, levels, r'$\overline{\overline{SSH}}$ [m]', msk, msk_inv, gridline_style)
 
     plt.tight_layout()
     save_figure(fig, f"ssh_{start_date}_{end_date}.png")
@@ -252,11 +244,10 @@ def sst(data_path, start_date, end_date, figsize=(8, 8), cmap=cmocean.cm.thermal
     # Define common gridline styles
     gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.3}
     
-    str_sst = r'$\overline{\overline{SST}}$'
     ax.set_title(f"{str_sst} SWIO {start_date} to {end_date}", size=9)
     levels = np.linspace(20, 30, 21)
     norm = mpl.colors.BoundaryNorm(levels, cmap.N)
-    plot_map(ax, lon, lat, temp, cmap, norm, levels, 'SST [°C]', msk, msk_inv, gridline_style)
+    plot_map(ax, lon, lat, temp, cmap, norm, levels, r'$\overline{\overline{SST}}$ [°C]', msk, msk_inv, gridline_style)
 
     plt.tight_layout()
     save_figure(fig, f"sst_{start_date}_{end_date}.png")
