@@ -1,36 +1,27 @@
 \chapter{Éléments théoriques et méthodes}
 
 \section{Description du modèle \textbf{CROCO}}
-\textbf{CROCO} est un modèle de résolution numérique des océans permettant des études sur des zones côtières ou hauturières. Il s'agit d'un modèle parent du modèle \textbf{ROMS}, utilisant des scripts Fortran compilés en C prenant en entrée des fichiers netcdf et qui produit des fichiers de sortie netcdf également. Ces scripts sont compatibles avec les modules de parallélisation permettant une résolution plus rapide par fragmentation de la grille. Dans notre cas nous effectuerons les simulations sur le cluster du CINES Adastra ce qui nous permet de faire des simulations de plusieurs sur la zone étudiée, ainsi que des ensembles de simulations, que nous décrirons plus tard.
+\textbf{CROCO} \cite{noauthor_crocos_nodate} est un modèle de résolution numérique des océans permettant des études sur des zones côtières ou hauturières. Il s'agit d'un modèle parent du modèle \textbf{ROMS}, utilisant des scripts Fortran compilés en C prenant en entrée des fichiers netcdf et qui produit des fichiers de sortie netcdf également. Ces scripts sont compatibles avec les modules de parallélisation permettant une résolution plus rapide par fragmentation de la grille. Dans notre cas nous effectuerons les simulations sur le cluster du CINES Adastra ce qui nous permet de faire des simulations de plusieurs sur la zone étudiée, ainsi que des ensembles de simulations, que nous décrirons plus tard.
 
-\subsection{Grille et équations}
+\subsection{Grille}
 \subsubsection{Résolution verticale}
-\begin{wrapfigure}{r}{0.4\textwidth}
-    \centering
-    \vspace{-60pt}
-    \includegraphics[width=0.4\textwidth]{figures/vcoord_ex4.png}
-    \caption{Exemple de résolution verticale tiré de la documentation de \textbf{CROCO} - ROMS-RUTGERS team}
-    \label{fig:vcoord_ex4}
-    \vspace{-50pt}
-\end{wrapfigure}
-
 La particularité de \textbf{CROCO} est l'emploi d'une coordonnée d'étirement verticale qui suit le relief du terrain, la coordonnée $\sigma$, qui varie entre $-1$ et $0$. Cette approche va permettre une meilleure résolution des phénomènes côtiers ou à faible profondeur, tout en évitant de surcharger le modèle avec une grille trop résolue verticalement. Cela nous permet de réécrire la coordonnée verticale $z$ en \autoref{eq:1}
 \begin{subequations} \label{eq:1}
     \begin{align}
-        z(x,y,\sigma,t)  = & z_0(x,y,\sigma) + \zeta(x,y,t) \left[ 1+\frac{z_0(x,y,\sigma)}{h(x,y)} \right] \label{eq:1a} \\
-        z_0 (x,y,\sigma) = & h_c \sigma +    \left[ h(x,y) - h_c \right]  Cs(\sigma) \label{eq:1b}
+        z(x,y,\sigma,t)  & = \zeta(x,y,\sigma) +  \left[ \zeta(x,y,t) + h(x,y) \right]  z_0(x,y,\sigma) \label{eq:1a} \\
+        z_0 (x,y,\sigma) & = \frac{ h_c \sigma + h(x,y)Cs(\sigma)}{h_c+h(x,y)} \label{eq:1b}
     \end{align}
 \end{subequations}
 
 Ici, $z_0(x,y,\sigma)$ est une transformation verticale non-linéaire, $\zeta(x,y,t)$ et $h(x,y)$ sont respectivement la surface libre et le fond de l'océan, $h_c$ est la profondeur de transition entre les niveaux de surface horizontaux et les niveaux de profondeur qui suivent la bathymétrie (le relief) et $Cs(\sigma)$ est un étirement non dimensionnel, vertical et monotone. 
 
-$Cs(\sigma)$ est défini avec deux autres paramètres, $\theta_s$ le paramètre d'étirement de surface et $\theta_b$ le paramètre d'étirement de fond. Dans notre cas, $Cs(\sigma)$ suivra la loi en \autoref{eq:Cs}.
-\begin{equation} \label{eq:Cs}
-	Cs(\sigma) = (1-\theta_b) \frac{\sinh(\theta_s \ \sigma)}{\sinh(\theta_s)}
-+ \theta_b \left[  \frac{0.5 \ \tanh\left( \left(\sigma+0.5 \right)\theta_s \right)  }{ \tanh (0.5 \ \theta_s) }  - 0.5 \right]
-\end{equation}
+$Cs(\sigma)$ est défini avec trois autres paramètres, $\theta_s$ et $\theta_b$ les paramètres d'étirement de surface et de fond, ainsi que $N$ le nombre de niveaux. Dans notre cas, $Cs(\sigma)$ suivra la loi en \autoref{eq:Cs}.
+\begin{align} \label{eq:Cs}
+  sc  = \frac{\sigma-N}{N} && csf = \frac{1 - \cosh(\theta_s  \ sc)}{\cosh(\theta_s) - 1} && Cs(\sigma) = \frac{e^{\theta_b csf} - 1}{1 - e^{1 - \theta_b}}
+\end{align}
 
-On peut voir en \autoref{fig:vcoord_ex4} l'avantage que procure cette résolution variables dans les zones a faible profondeur. Si nous n'avions pas cette résolution, nous ne pourrions pas simuler correctement les phénomènes apparaissant dans ces zones dite \textit{shallow waterss} (eaux peu profondes). Toutes ces expressions sont gérées au sein de \textbf{CROCO}, nous donnons juste en entrée les différents paramètres que nous souhaitons. Vous trouverez en annexe d'autres exemples de configuration en \autoref{sec:vertical grid}.
+
+On peut voir en \autoref{fig:} l'avantage que procure cette résolution variables dans les zones a faible profondeur. Si nous n'avions pas cette résolution, nous ne pourrions pas simuler correctement les phénomènes apparaissant dans ces zones dite \textit{shallow waterss} (eaux peu profondes). Toutes ces expressions sont gérées au sein de \textbf{CROCO}, nous donnons juste en entrée les différents paramètres que nous souhaitons. 
 
 \subsubsection{Grille horizontale}
 Dans le cas de simulation à grande échelle des océans, il n'est plus possible d'utiliser les simples coordonnées $x$ et $y$ formant un repère orthonormé, il est nécessaire de prendre en compte la courbure de la Terre ce qui introduit deux nouvelles coordonnées $\xi$ et $\eta$, alignées respectivement selon la latitude et la longitude, ainsi que la métrique terrestre que nous allons définir avec $m$ et $n$. On peut donc écrire les relations entre la longueur d'un arc horizontal $ds$ et les distances différentielles $d\xi$ et $d\eta$
@@ -40,6 +31,7 @@ Dans le cas de simulation à grande échelle des océans, il n'est plus possible
 	\end{align}
 \end{subequations}
 
+\subsubsection{Grille décalée}
 \begin{wrapfigure}{r}{0.4\textwidth}	
 \centering
 	\begin{tikzpicture}
@@ -62,11 +54,110 @@ Dans le cas de simulation à grande échelle des océans, il n'est plus possible
 	\node at (2,1) {$\mathbf{\boldsymbol{\rho} \boldsymbol{[}i,j+1\boldsymbol{]}}$};
 	\end{tikzpicture}
 	\caption{Décalage des variables sur la grille utilisée par \textbf{CROCO}}
-	\vspace{-30pt}
 \end{wrapfigure}
-
-\subsubsection{Grille décalée}
 La discrétisation au sein de \textbf{CROCO} est basée sur une grille décalée (\textit{staggered grid} en anglais). Les données comme la surface libre $\zeta$, la densité $\rho$ ainsi que les traceurs telles que la température $T$ ou la salinité $S$ seront localisés au milieu de chaque cellule alors que les vitesses horizontales $(u,v)$ se trouveront sur les bords des cellules. On voit donc que si l'on souhaite paralléliser notre simulation, ce que nous allons faire, il est nécessaire de diviser notre domaine entier d'une certaine manière: Les premiers sous-domaines, ou boîte, simulés à chaque itération de temps vont être ceux situés en bas à gauche de notre domaine.
+
+\subsection{Équations}
+Ce modèle résout les équations qu'on appelle primitive. Ces équations sont les équations de Navier-Stokes sous certaines approximations que l'on va présenter 
+\begin{itemize}
+\item \textbf{Hypothèse hydrostatique :}
+L’équation verticale de quantité de mouvement est réduite à un équilibre entre le gradient de pression et la force de flottabilité.
+\begin{equation}
+\frac{\partial p}{\partial z} = -\rho g
+\end{equation}
+Cela signifie que les processus non hydrostatiques, comme la convection, doivent être paramétrés.
+\item \textbf{Approximation de Boussinesq :}  
+      Il s'agit d'une approximation courante pour la résolution des écoulements réels. On considère les variations de densité comme négligeables, sauf dans la contribution à la flottabilité \cite{boussinesq_essai_1877}.  
+
+\item \textbf{Incompressibilité :}  
+      Cette approximation découle de la précédente. En supposant la densité constante, l'équation de continuité devient :  
+      \begin{equation}  
+          \pd{\rho}{t} + \bnabla \cdot (\rho \uu) = \pd{u}{x} + \pd{v}{y} + \pd{w}{z} = 0  
+      \end{equation}  
+
+\item \textbf{Approximation de Terre sphérique :}  
+      On suppose que les surfaces géopotentielles sont des sphères, ce qui oriente la gravité et la verticale locale parallèlement au rayon terrestre.  
+
+\item \textbf{Approximation en coque mince :}  
+      L'océan est considéré comme ayant une épaisseur négligeable par rapport au rayon de la Terre.  
+
+\item \textbf{Hypothèse de fermeture turbulente :}  
+      Les flux turbulents sont exprimés en termes de structures à grande échelle.  
+\end{itemize}
+
+Ce qui nous donne donc le système d'équations résolues par \textbf{CROCO}, en coordonnées cartésiennes
+\begin{subequations}
+\begin{align}
+	\pd{u}{t} + \bnabla \cdot (\uu \ u) - fv & = - \pd{\phi}{x} + \mathcal{F}_u + \mathcal{D}_u \\
+	\pd{v}{t} + \bnabla \cdot (\uu \ v) + fu & = - \pd{\phi}{y} + \mathcal{F}_v + \mathcal{D}_v \\
+	\pd{\phi}{z} & = \frac{\rho g}{\rho_0} \\
+	\pd{\mathcal{C}}{t} + \bnabla \cdot (\uu \ \mathcal{C}) & = \mathcal{F}_\mathcal{C} + \mathcal{D}_\mathcal{C} \\
+	\pd{u}{x} + \pd{v}{y} + \pd{w}{z} & = 0  
+\end{align}
+\end{subequations}
+
+Avec les termes de diffusion $\mathcal{D}_i$, les termes de forçage $\mathcal{F}_i$, le paramètre de Coriolis $f(x,y) = 2 \Omega \sin{\varphi}$, l'accélération de la pesanteur $g$, la pression dynamique $\phi = P/ \rho_0$, la densité locale $\rho_0 + \rho(x,y,z,t)$ et $u,v,w$ les composantes de la vitesse $\uu$. Ces équations doivent ensuite être adaptées à la coordonnée verticale variable du modèle (en \autoref{sec:eq adapte}). La densité suit une équation d'état en $\rho = \rho(T,S,P)$.
+
+\subsection{Forçages}
+\subsubsection{Forçage atmosphérique}
+Concernant le forçage atmosphérique, au premier ordre l'atmosphere a un plus grand impact sur l'océan que l'inverse, nous ne considérerons donc pas un modèle couplé océan-atmosphère mais un modèle océan avec un forçage atmosphérique. Ce forçage est en réalité les données issues d'un modèle atmosphérique générées au préalable qui seront appliquées à chaque itération temporelle comme une condition limite. Les divergences, notamment entre la vitesse du vent et celle de la surface libre ou celles dans le transfert de chaleur seront sauvegardées en tant que contraintes à la surface. Il est donc tout à fait possible d'injecter les données atmosphérique in situ comme forçage si nous en avions a notre disposition couvrant la zone d'étude.
+\subsubsection{Forçage aux frontières}
+Comme nous étudions une zone spécifique de l'océan indien, nous avons besoin de condition aux limites de notre boîte, nous nous plaçons donc en conditions aux limites ouvertes et nous avons besoin de données correspondant à ces zones frontières. Ces conditions concernent les flux de masses ainsi que les traceurs passifs comme la température et la salinité.
+\subsubsection{Marées}
+\textbf{CROCO} dispose d'un module permettant la prise en compte des marées que nous allons utiliser pour reproduire au mieux les conditions réelles.
+
+\subsection{Paramétrisation}
+\subsubsection{Mélange vertical}
+Dans ce modèle, le mélange vertical peut être géré de différentes manières. Ici, nous allons utiliser une paramétrisation en échelle de longueur caractéristiques (\textbf{GLS}). Plusieurs modèles existent pour cette paramétrisation, notamment le modèle $k-\omega$ et le modèle $k-\varepsilon$, où $k$ représente l'énergie turbulente, $\omega$ la fréquence de dissipation de $k$ et $\varepsilon$ son taux de dissipation. Nous avons choisi d'utiliser le modèle $k-\varepsilon$ \cite{launder_numerical_1974}, qui est le plus simple dans notre cas. En effet, le modèle $k - \omega$ convient davantage aux écoulements en présence de parois, tandis que nous paramétriserons ici également les effets de friction de fond. Ce choix implique l'approximation d'une turbulence isotrope dans l'océan. Dans \textbf{CROCO}, ce modèle est représenté par deux équations : \autoref{eq:dkdt} pour l'énergie cinétique et \autoref{eq:dpsidt} pour l'échelle de longueur caractéristique.
+\begin{subequations}
+	\begin{align}
+		\pd{k}{t} & = \pd{}{z} \left( K_k \pd{k}{z} \right) + P + B - \varepsilon \label{eq:dkdt} \\
+		\pd{\psi}{t} & = \pd{}{z} \left( K_\psi \pd{\psi}{z} \right) + \psi k^{-1} \left( \beta_1 P + \beta_3^\pm B - \beta_2 \varepsilon \right) \label{eq:dpsidt}
+	\end{align}
+\end{subequations}
+
+Avec $K_k = K_m / Sc_k$, $K_\psi = K_m / Sc_\psi$, ici $K_m$ est la viscosité turbulente et $Sc_i$ sont des paramètres appelés nombres de Schmidt. $P = K_m \left[ (\partial_z u)^2 + (\partial_z v)^2 \right]$ et $B = - K_s N^2$ représentent respectivement la production de TKE par frottement vertical et la destruction de TKE par stratification, ici $K_s$ est la diffusivité turbulente et $N^2$ est la fréquence de Brunt-Väisälä locale. Les termes $\beta_i$ sont des constantes. Nous pouvons ensuite calculer $\varepsilon$ et $\psi$ en \autoref{eq:varepsilon} ainsi que $l$ la longueur de mélange.
+\begin{equation} \label{eq:varepsilon}
+	\varepsilon = (c_\mu^0)^{3+p/n} k^{3/2+m/n} \psi^{-1/n} \qquad \psi = (c_\mu^0)^p k^m l^n \qquad  l = (c_\mu^0)^{3} k^{3/2} \varepsilon^{-1}
+\end{equation}
+Ici, $c_\mu^0$ est une constante entre $0.526$ et $0.555$ et $(m,n,p)$ un triplet de paramètres.
+
+On peut finalement exprimer $K_m$ et $K_s$ en fonction des paramètres
+\begin{equation}
+	K_m = c_\mu \left( \frac{k^2}{\varepsilon} \right) = \frac{c_\mu}{(c_\mu^0)^{3}} (l \sqrt{k}) \qquad K_s = c_\mu^{'} \left(\frac{k^2}{\varepsilon}\right) = \frac{c_\mu^{'}}{(c_\mu^0)^{3}} (l \sqrt{k})
+\end{equation}
+
+Ici $c_\mu$ et $c_\mu^{'}$ sont déterminés à partir des équations de stabilité en \autoref{sec:eq stabilite}. Il sera donc possible de produire un ensemble stochastique sur le mélange vertical en faisant varier les paramètres $K_m$ et $K_s$.
+
+\subsubsection{Friction de fond}
+La friction au fond de l'océan est également paramétrisée suivant une loi quadratique.
+
+\section{Processus stochastiques}
+Nous allons baser nos travaux principalement sur l'article de Jean-Michel Brankart \cite{brankart_generic_2015}. Bien que cet article parle du développement d'un module permettant l'injection de processus stochastiques dans le cadre du modèle \textbf{NEMO}, la méthode reste la même pour le modèle \textbf{CROCO}.
+
+\subsection{Définition}
+L'approche primaire afin de transformer un modèle déterministe en un modèle probabiliste est d'utiliser des processus gaussien indépendants et autoregressifs $X^{(i)}, i=1,\ldots,m$ générés à chaque point de la grille en suivant l'\autoref{eq:autoreg}.
+\begin{equation} \label{eq:autoreg}
+	X^{(i)}_{t+1} = a^{(i)} X^{(i)}_t + b^{(i)} w + c^{(i)}
+\end{equation}
+
+Ici $t$ correspond à l'indice temporel du modèle, $a^{(i)}, b^{(i)}, c^{(i)}$ sont des paramètres qui définissent la moyenne $\mu^{(i)}$, l'écart type $\sigma^{(i)}$ et l'échelle temporelle de correlation $\tau^{(i)}$ de chaque processus.
+
+\subsection{Implémentation}
+Ces processus stochastiques sont implémentés dans \textbf{CROCO} sous la forme d'un module Fortran \textsc{STOGEN} couplé au code \textbf{CROCO}. Dans notre cas, nous allons avoir les paramètres suivants
+\begin{align}
+	\mu^{(i)} = \frac{c}{1-a} && \sigma^{(i)} = \frac{b}{\sqrt{1 - a^2}} && \operatorname{Corr} \left[X^{(i)}_t, X^{(i)}_{t-k} \right] = a^k
+\end{align}
+
+Les statistiques de $X$ sont supposés constantes dans l'espace (homogénéité) et dans le temps (stationnarité) ainsi que non corrélées spatiallement.
+ 
+Nous pouvons donc initialiser $a = \exp{\left(-1/\tau^{(i)} \right)}$ et $b = \sqrt{1 - a^2}$ en donnant comme paramètre d'entrée l'échelle de corrélation temporelle. Nous devons ensuite affiner ces valeurs afin d'obtenir des statistiques cohérentes avec celles des paramètres que nous souhaitons étudier.
+
+\subsection{Champs d'étude}
+Nous allons étudier différentes sources d'incertitudes du modèle. La première, et la plus importante, est la variabilité du champ de conditions initiales. Ce premier ensemble permettra de quantifier la variabilité intrinsèque du modèle qui sera toujours présente dans les ensembles suivants. D'autres pistes seront étudiées par Lisa notamment la variabilité due au forçage atmosphérique ainsi que celle crée par les conditions aux frontières. Une autre voie d'étude est la variabilité induite par la paramétrisation du mélange verticale.
+
+
+
 
 
 

@@ -10,6 +10,7 @@ from matplotlib.patches import Rectangle
 data = '/lus/store/CT1/c1601279/lweiss/RUN_CROCO/'
 simu = 'run_swio2_deter_2017_2023_complet/'
 grid = '/lus/store/CT1/c1601279/lweiss/GRID/croco_grid_swio2.nc'
+figures = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures'
 
 g = xr.open_dataset(grid)
 h = g['h'][:, :] # Bathymetry
@@ -58,7 +59,7 @@ for (xmin, xmax, ymin, ymax), name, color in zip(boxes, names, colors):
     ax.text((xmin + xmax) / 2, ymax + 0.5, name, color=color, fontsize=8, ha='center', va='bottom', transform=ccrs.PlateCarree())
 
 # Add bathymetry colorbar
-cb = fig.colorbar(pcm, ax=ax, label='Bathymetry (m)')
+cb = fig.colorbar(pcm, ax=ax, label='Bathymetrie (m)')
 colorbaryticks = np.linspace(a, b, c)
 posax = ax.get_position()
 poscb = cb.ax.get_position()
@@ -69,4 +70,5 @@ text = cb.ax.yaxis.label
 font = mpl.font_manager.FontProperties(size=6)
 text.set_font_properties(font)
 
+plt.savefig(f'{figures}/bathy_zones.png', dpi=300)
 plt.show()

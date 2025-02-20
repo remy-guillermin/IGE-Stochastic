@@ -9,3 +9,36 @@ Concernant les modèles d'océanographie, il faut attendre le milieu du XX\texts
 Les modèles évoqués précédemment sont des modèles déterministes, qui ne décrivent pas de manière cohérente les incertitudes du modèles pour les systèmes d'assimilation de données. Ces incertitudes ne sont pas les incertitudes d'ordre matériel comme la précision des machines ou les schémas numériques, mais bien les incertitudes liées à la dynamique, comme la turbulence non résolue, le forçage ou encore les conditions initiales.. Afin de pouvoir considérer ces modèles comme des modèles prédictifs, selon les définitions données dans \cite{brier_verification_1950, toth_7_2003}, il faut tenir compte de ces incertitudes dans le modèle en lui-même.
 
 Dès le début du XXI\textsuperscript{e} siècle, la modélisation de ces incertitudes devient un enjeu central. Par exemple, \cite{buizza_stochastic_1999} analyse l’impact des paramétrisations randomisées sur l’ECMWF EPS, un modèle météorologique.. Concernant l'océanographie, Jean-Michel Brankart a développé des méthodes de paramétrisations stochastiques appliquées au modèle \textbf{NEMO} \cite{brankart_generic_2015}, méthodes qui seront adaptées pour produire des ensembles de simulations avec \textbf{CROCO}, un modèle se distinguant de \textbf{NEMO} par sa coordonnée verticale, qui varie selon la bathymétrie et permet une meilleure résolution des phénomènes côtiers.
+
+\section{Phénoménologie de l'océan Indien}
+L'océan Indien est le seul océan n'ayant pas accès au pôle nord, de ce fait il est sujet à de nombreux phénomènes climatiques qui lui sont propres. Cet océan comporte différents courant de bord comme le courant des Aiguilles (\textit{Agulhas current}) qui est un acteur majeur de l'export de température de l'océan Indien (à hauteur de 30\% de l'export total). Le courant géostrophique de surface dirigé de l'Australie vers Madagascar est un courant important dans la création de structures tourbillonnaires proche de Madagascar. La circulation thermohaline est également un facteur majeur des mouvements de masses d'eau avec les eaux profondes venant de l'Antarctique et remontant dans l'océan Indien. Les phénomènes pseudo périodiques présent dans l'océan Pacifique tels que \textit{El Niño} (Augmentation des températures de l'océan Pacifique) et \textit{La Niña} (Diminution des températures de l'océan Pacifique) impacte également fortement l'océan Indien au travers  du flot Indonésien entrant (\textit{Indonesian throughflow}). Tous ces phénomènes climatiques sont des acteurs majeurs qui définissent les mouvements des différentes masses d'eaux chacune ayant une signature propre (température, salinité). Il est nécessaire d'avoir connaissance de ces processus afin de savoir qu'est ce qui va impacter la fiabilité de notre modèle dans cette région.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width = \textwidth]{figures/indian_ocean_circulation.png}
+	\caption{Vue schématique des phénomènes clés dans l'Océan Indien - https://doi.org/10.5194/os-17-1677-2021}
+	\label{fig:indian circ}
+\end{figure}
+
+\section{Objectifs}
+L'objectif de ce stage est de présenter et d'utiliser une méthode d'injection de stochasticité sur divers paramètres de la simulation afin d'en étudier l'impact et permettre une caractérisation ainsi qu'une quantification des incertitudes associées. Dans un premier temps nous ferons une présentation du modèle utilisé ainsi qu'une discussion sur les méthodes stochastiques. Dans un second temps nous ferons l'analyse d'un ou plusieurs ensembles de simulation comprenant des processus stochastiques sur les conditions initiales ainsi que sur la paramétrisation du mélange vertical. Les simulations seront effectués sur l'océan Indien Sud-Ouest, voir \autoref{fig:bathy}. Différentes boites seront analysées plus en détail afin d'étudier les comportements dans des bathymétries particulières:
+\begin{itemize}
+	\item[\textbf{Equator:}] Cette zone proche de l'équateur est donc moins impactée par la rotation de la Terre
+	\item[\textbf{Mayotte-Comores:}] Ces îles sont dans la continuité du courant géostrophique une fois qu'il est arrivé sur Madagascar, elles sont donc sujettes à des phénomènes tourbillonnaires plus intenses. 
+	\item[\textbf{Mascarenes:}] Il s'agit d'un archipel à l'Est de Madagascar qui cette fois est dans le courant géostrophique avant qu'il n'atteigne Madagascar ce qui permettra une comparaison avec la zone précedente.
+	\item[\textbf{South-Moz:}] Cette zone située dans le Sud du Canal du Mozambique est au départ du courant des Aiguilles. 
+\end{itemize}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics{figures/bathy_zones.png}
+	\caption{Bathymétrie de la zone étudiée}
+	\label{fig:bathy}
+\end{figure}
+
+
+ Il s'agit d'une partie de l'océan Indien comprenant de nombreuses îles créant ainsi des structures turbulentes sujettes à une forte variabilité, ainsi qu'une zone géographique dont la compréhension climatique est un enjeu majeur dans le développement économique et touristique des pays avoisinants (Tanzanie, Madagascar). Une compréhension accrue de la circulation océanique dans le canal du Mozambique permettrait une meilleure connaissance des déplacements de biodiversité, ce qui favoriserait le développement de la pêche par exemple.
+
+
+
+
