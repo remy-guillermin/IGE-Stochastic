@@ -21,8 +21,14 @@ headsepline, % Uncomment to get a line under the header
 \usepackage[utf8]{inputenc} % Required for inputting international characters
 \usepackage[T1]{fontenc} % Output font encoding for international characters
 \usepackage[french]{babel}
-\usepackage[backend=bibtex, style=numeric-comp, sorting=nyt]{biblatex}
+\usepackage[backend=bibtex, style=phys, sorting=nyt]{biblatex}
 \addbibresource{references.bib}
+\usepackage{wrapfig}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usepackage{subfigure}
 
 %------------------------------------------------------------------------------
 %	COMMANDS
@@ -57,7 +63,7 @@ headsepline, % Uncomment to get a line under the header
 %------------------------------------------------------------------------------
 
 \thesistitle{Caractérisation d'incertitudes dans un ensemble de simulations stochastiques de la circulation océanique tourbillonnaire dans l'Océan Indien Sud-Ouest} % Your thesis title, this is used in the title and abstract, print it elsewhere with \ttitle
-\supervisor{M. Pierre \textsc{Brasseur}} % Your supervisor's name, this is used in the title page, print it elsewhere with \supname
+\supervisor{Pierre \textsc{Brasseur}, \\ Lisa \textsc{Weiss}, \\ Jean-Michel \textsc{Brankart}} % Your supervisor's name, this is used in the title page, print it elsewhere with \supname
 \examiner{} % Your examiner's name, this is not currently used anywhere in the template, print it elsewhere with \examname
 \degree{Master 2 Turbulence, Méthodes et Applications} % Your degree name, this is used in the title page and abstract, print it elsewhere with \degreename
 \author{Rémy \textsc{Guillermin}} % Your name, this is used in the title page and abstract, print it elsewhere with \authorname
@@ -66,8 +72,7 @@ headsepline, % Uncomment to get a line under the header
 \subject{Physique} % Your subject area, this is not currently used anywhere in the template, print it elsewhere with \subjectname
 \keywords{} % Keywords for your thesis, this is not currently used anywhere in the template, print it elsewhere with \keywordnames
 \university{\href{https://www.univ-grenoble-alpes.fr}{Université Grenoble Alpes}} % Your university's name and URL, this is used in the title page and abstract, print it elsewhere with \univname
-\department{\href{https://phitem.univ-grenoble-alpes.fr}{PhiTEM}} % Your department's name and URL, this is used in the title page and abstract, print it elsewhere with \deptname
-\group{\href{https://meom-group.github.io}{MEOM BRIDGES}} % Your research group's name and URL, this is used in the title page, print it elsewhere with \groupname
+\group{\href{https://meom-group.github.io}{MEOM}} % Your research group's name and URL, this is used in the title page, print it elsewhere with \groupname
 \faculty{\href{https://www.univ-grenoble-alpes.fr}{Université Grenoble Alpes}} % Your faculty's name and URL, this is used in the title page and abstract, print it elsewhere with \facname
 
 \AtBeginDocument{
@@ -104,7 +109,7 @@ headsepline, % Uncomment to get a line under the header
 \end{minipage}
 \begin{minipage}[t]{0.4\textwidth}
 \begin{flushright} \large
-\emph{Superviseur:} \\
+\emph{Superviseurs:} \\
 {\supname} % Supervisor name - remove the \href bracket to remove the link  
 \end{flushright}
 \end{minipage}\\
@@ -113,7 +118,7 @@ headsepline, % Uncomment to get a line under the header
 
 \large \textit{Un rapport de stage soumis en vue de l'obtention\\  du diplôme de \degreename}\\[0.3cm] % University requirement text
 \textit{au sein de l'équipe}\\[0.4cm]
-\groupname\\\deptname\\[1cm] % Research group name and department name
+\groupname\\[1cm] % Research group name and department name
  
 
 
@@ -139,15 +144,30 @@ headsepline, % Uncomment to get a line under the header
 
 
 \begin{itemize} 
-\item This work was done wholly or mainly while in candidature for a research degree at this University.
-\item Where any part of this thesis has previously been submitted for a degree or any other qualification at this University or any other institution, this has been clearly stated.
-\item Where I have consulted the published work of others, this is always clearly attributed.
-\item Where I have quoted from the work of others, the source is always given. With the exception of such quotations, this thesis is entirely my own work.
-\item I have acknowledged all main sources of help.
-\item Where the thesis is based on work done by myself jointly with others, I have made clear exactly what was done by others and what I have contributed myself.\\
+\item Ce travail est le fruit d’un travail personnel et constitue un document original.
+	
+\textit{This paper is the result of personal work and is an original document.}
+\item Je sais que prétendre être l’auteur d’un travail écrit par une autre personne est une pratique sévèrement sanctionnée par la loi.
+
+\textit{I know that claiming authorship of a work written by another person is a practice that is severely punished by law.}
+\item Personne d’autre que moi n’a le droit de faire valoir ce travail, en totalité ou en partie, comme le sien.
+
+\textit{No one but me has the right to claim this work, in whole or in part, as their own.}
+\item Les propos repris mot à mot à d’autres auteurs figurent entre guillemets (citations).
+
+\textit{Arguments taken over identically from other authors appear in quotation marks.}
+\item Les écrits sur lesquels je m’appuie dans ce mémoire sont systématiquement références selon un système de renvoi bibliographique clair et précis.
+
+\textit{The texts on which I rely in this master thesis are systematically referenced according to a clear and precise bibliographic system.}
+\item Je déclare avoir obtenu les autorisations nécessaires pour la reproduction d’images, d’extraits, figures ou tableaux empruntés à d’autres œuvres.
+
+\textit{I declare that I have obtained the necessary authorizations for the reproduction of images, extracts, figures or tables borrowed from other works.}\\
 \end{itemize}
+
+\noindent Nom, Prénom: \\
+\rule[0.5em]{25em}{0.5pt} % This prints a line for the name
  
-\noindent Signed:\\
+\noindent Signé:\\
 \rule[0.5em]{25em}{0.5pt} % This prints a line for the signature
  
 \noindent Date:\\
@@ -156,23 +176,14 @@ headsepline, % Uncomment to get a line under the header
 
 \clearpage
 
-
-%------------------------------------------------------------------------------
-%	QUOTATION PAGE
-%------------------------------------------------------------------------------
-
-\vspace*{0.2\textheight}
-
-
-\hfill Guillermin Rémy
-
 %------------------------------------------------------------------------------
 %	ABSTRACT PAGE
 %------------------------------------------------------------------------------
 
 \begin{abstract}
 \addchaptertocentry{\abstractname} % Add the abstract to the table of contents
-The Thesis Abstract is written here (and usually kept to just this page). The page is kept centered vertically so can expand into the blank space above the title too\ldots
+
+aa
 \end{abstract}
 
 %------------------------------------------------------------------------------
@@ -192,53 +203,88 @@ The acknowledgments and the people to thank go here, don't forget to include you
 
 \listoffigures % Prints the list of figures
 
-\listoftables % Prints the list of tables
-
 %------------------------------------------------------------------------------
 %	ABBREVIATIONS
 %------------------------------------------------------------------------------
 
 \begin{abbreviations}{ll} % Include a list of abbreviations (a table of two columns)
-
+\textbf{CINES} & \textbf{C}entre \textbf{I}nformatique \textbf{N}ational (de l') \textbf{E}nseignement \textbf{S}upérieur \\
 \textbf{CROCO} & \textbf{C}oastal (and) \textbf{R}egional \textbf{O}cean \textbf{CO}mmunity (model)\\
+\textbf{ECMWF EPS } & \textbf{E}uropean \textbf{C}entre (for) \textbf{M}edium-Range \textbf{W}eather \textbf{F}orecasts \\ 
+ & \textbf{E}nsemble \textbf{P}rediction \textbf{S}ystem \\
+ \textbf{EKE} & \textbf{E}ddy \textbf{K}inetic \textbf{E}nergy \\
 \textbf{ENIAC} & \textbf{E}lectronic \textbf{N}umerical \textbf{I}ntegrator \textbf{A}nd \textbf{C}omputer\\
+\textbf{GLS} & \textbf{G}eneric \textbf{L}ength \textbf{S}cale \\
 \textbf{LIM3} & \textbf{L}ouvain-la-Neuve \textbf{I}ce \textbf{M}odel (version) \textbf{3}\\
+\textbf{MKE} & \textbf{M}ean \textbf{K}inetic \textbf{E}nergy \\
 \textbf{MOM} & \textbf{M}odular \textbf{O}cean \textbf{M}odel\\
 \textbf{NEMO} & \textbf{N}ucleus (for) \textbf{E}uropean \textbf{M}odelling (of the) \textbf{O}cean\\
 \textbf{OASIS} & \textbf{O}cean \textbf{A}tmosphere \textbf{S}ea-\textbf{I}ce (and) \textbf{S}oils\\
 \textbf{ROMS} & \textbf{R}egional \textbf{O}cean \textbf{M}odelling \textbf{S}ystem\\
+\textbf{SLA} & \textbf{S}ea \textbf{L}evel \textbf{A}nomaly \\
+\textbf{SSA} & \textbf{S}ea \textbf{S}alinity \textbf{A}nomaly \\
+\textbf{SSH} & \textbf{S}ea \textbf{S}urface \textbf{H}eight \\
+\textbf{SSS} & \textbf{S}ea \textbf{S}urface \textbf{S}alinity \\
+\textbf{SST} & \textbf{S}ea \textbf{S}urface \textbf{T}emperature \\
+\textbf{STA} & \textbf{S}ea \textbf{T}emperature \textbf{A}nomaly \\
+\textbf{TKE} & \textbf{T}urbulent \textbf{K}inetic \textbf{E}nergy \\
 
 \end{abbreviations}
 
-%------------------------------------------------------------------------------
-%	PHYSICAL CONSTANTS/OTHER DEFINITIONS
-%------------------------------------------------------------------------------
+\chapter{Constantes physiques et symboles}
 
-\begin{constants}{lr@{${}={}$}l} % The list of physical constants is a three column table
+% --------------------------------
+% PHYSICAL CONSTANTS
+% --------------------------------
+\begingroup
+\setlength{\LTpre}{0pt}  % Reduce space before the longtable
+\setlength{\LTpost}{0pt} % Reduce space after the longtable
 
-% The \SI{}{} command is provided by the siunitx package, see its documentation for instructions on how to use it
+\begin{longtable}{lr@{${}={}$}l}
+\multicolumn{3}{l}{\textbf{Constantes physiques}} \\  
+Accélération de la pesanteur & $g$ & \SI{9.81}{\meter\per\second\squared} \\
+Vitesse angulaire de rotation de la Terre & $\Omega$ & \SI{7.2e-5}{\radian\per\second} \\
+\end{longtable}
 
-Speed of Light & $c_{0}$ & \SI{2.99792458e8}{\meter\per\second} (exact)\\
-%Constant Name & $Symbol$ & $Constant Value$ with units\\
+\vspace{50pt}
 
-\end{constants}
+% --------------------------------
+% SYMBOLS
+% --------------------------------
 
-%------------------------------------------------------------------------------
-%	SYMBOLS
-%------------------------------------------------------------------------------
+\begin{longtable}{lll}
+\multicolumn{3}{l}{\textbf{Symboles}} \\  
+$\uu$ & Vitesse & \si{\meter\per\second} \\
+$T$ & Température & \si{\degreeCelsius} \\
+$S$ & Salinité & psu \\
+$k$ & TKE & \si{\meter\squared\per\second\squared} \\
 
-\begin{symbols}{lll} % Include a list of Symbols (a three column table)
+\addlinespace
+\multicolumn{3}{l}{\textit{Symboles grecs}} \\  
+$\rho$ & Masse volumique & \si{\kilogram\per\meter\cubed}\\
+$\phi$ & Pression dynamique & \si{\pascal} (\si{\kilogram\per\meter\per\second\squared}) \\
+$\varphi$ & Latitude & \si{\degree} \\
+$\varepsilon$ & Taux de dissipation d'énergie & \si{\meter\squared\per\second\cubed} \\
 
-$a$ & distance & \si{\meter} \\
-$P$ & power & \si{\watt} (\si{\joule\per\second}) \\
-%Symbol & Name & Unit \\
+\addlinespace
+\multicolumn{3}{l}{\textit{Opérateurs}} \\  
+$\bnabla$ & Gradient & \\
+$\Delta$ & Laplacaien & \\
+$\overline{\cdots}$ & Moyenne spatiale & \\
+$\overline{\overline{\cdots}}$ & Moyenne temporelle & \\
+$\langle \cdot \rangle$ & Moyenne d'ensemble & \\
 
-\addlinespace % Gap to separate the Roman symbols from the Greek
+\addlinespace
+\multicolumn{3}{l}{\textit{Indices}} \\  
+$b$ & Intégration sur la verticale & \\  
 
-$\omega$ & angular frequency & \si{\radian} \\
+\addlinespace
+\multicolumn{3}{l}{\textit{Exposants}} \\  
+$'$ & Variable turbulente & \\  
 
-\end{symbols}
+\end{longtable}
 
+\endgroup
 %------------------------------------------------------------------------------
 %	THESIS CONTENT - CHAPTERS
 %------------------------------------------------------------------------------
@@ -262,12 +308,6 @@ $\omega$ & angular frequency & \si{\radian} \\
 
 \appendix % Cue to tell LaTeX that the following "chapters" are Appendices
 
-% Include the appendices of the thesis as separate files from the Appendices folder
-% Uncomment the lines as you write the Appendices
-
-\include{Appendices/AppendixA}
-%\include{Appendices/AppendixB}
-%\include{Appendices/AppendixC}
 
 %------------------------------------------------------------------------------
 %	BIBLIOGRAPHY
@@ -276,5 +316,13 @@ $\omega$ & angular frequency & \si{\radian} \\
 \printbibliography[heading=bibintoc]
 
 %------------------------------------------------------------------------------
+
+% Include the appendices of the thesis as separate files from the Appendices folder
+% Uncomment the lines as you write the Appendices
+
+\include{Appendices/AppendixA}
+%\include{Appendices/AppendixB}
+%\include{Appendices/AppendixC}
+
 
 \end{document}
