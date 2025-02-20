@@ -49,6 +49,9 @@ Icon?
 modules/*egg-info/*
 modules/*/__pycache__/*
 
-# Fortran file
+# Fortran files
 *.f90
 *.h
+
+# Input files
+*.in

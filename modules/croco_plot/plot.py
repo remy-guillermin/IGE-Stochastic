@@ -56,7 +56,7 @@ def vel_vort_hel(data_path, start_date, end_date, figsize=(24, 8), cmap_velocity
     v_geo = u[:,:-1,:] * np.sin(angle_expand[:,:-1,:-1]) + v[:,:,:-1] * np.cos(angle_expand[:,:-1,:-1])
     print("Velocity transformed")
     
-    velocity = np.sqrt(u_geo**2 + v_geo**2 )
+    velocity = np.sqrt(u_geo**2 + v_geo**2)
 
     pm_expand = pm.data.reshape(1, pm.shape[0], pm.shape[1])
     pn_expand = pn.data.reshape(1, pn.shape[0], pn.shape[1])
@@ -78,14 +78,14 @@ def vel_vort_hel(data_path, start_date, end_date, figsize=(24, 8), cmap_velocity
     # --- Velocity Plot ---
     ax = axes[0]
     ax.set_title(f"Velocity SWIO {start_date}", size=9)
-    levels = np.linspace(0, 2.5, 19)
+    levels = np.linspace(0, 2.5, 25)
     norm = mpl.colors.BoundaryNorm(levels, cmap_velocity.N)
     plot_map(ax, lon, lat, velocity[-1,:,:], cmap_velocity, norm, levels, 'Velocity [$m.s^{-1}$]', msk, msk_inv, gridline_style)
 
     # --- Vorticity Plot ---
     ax = axes[1]
     ax.set_title(f"Vorticity SWIO {start_date}", size=9)
-    levels = np.linspace(-0.15, 0.15, 19)
+    levels = np.linspace(-0.15, 0.15, 21)
     norm = mpl.colors.BoundaryNorm(levels, cmap_vorticity.N)
     plot_map(ax, lon, lat, vorticity[-1,:,:] * 3600, cmap_vorticity, norm, levels, 'Vorticity [$h^{-1}$]', msk, msk_inv, gridline_style)
 
@@ -149,7 +149,7 @@ def velocity(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm.
     gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.3}
 
     ax.set_title(f"Velocity SWIO {start_date} to {end_date}", size=9)
-    levels = np.linspace(0, 2.5, 19)
+    levels = np.linspace(0, 2.5, 26)
     norm = mpl.colors.BoundaryNorm(levels, cmap.N)
     plot_map(ax, lon, lat, velocity[-1,:,:], cmap, norm, levels, 'Velocity [$m.s^{-1}$]', msk, msk_inv, gridline_style)
 
@@ -214,7 +214,7 @@ def vorticity(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm
     gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.3}
 
     ax.set_title(f"Vorticity SWIO {start_date} to {end_date}", size=9)
-    levels = np.linspace(-0.15, 0.15, 19)
+    levels = np.linspace(-0.15, 0.15, 21)
     norm = mpl.colors.BoundaryNorm(levels, cmap.N)
     plot_map(ax, lon, lat, vorticity[-1,:,:] * 3600, cmap, norm, levels, 'Vorticity [$h^{-1}$]', msk, msk_inv, gridline_style)
 
@@ -248,8 +248,10 @@ def helicity(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm.
     u = u[:,-1,:,:].sel(time=slice(start_date, end_date)).mean(dim='time')
     v = v[:,-1,:,:].sel(time=slice(start_date, end_date)).mean(dim='time')
     
-    # Transform velocity components
-    u_geo, v_geo = transform_3D_velocity(u, v, angle)
+    angle_expand = angle[:,:].data.reshape(1, angle.shape[0], angle.shape[1])
+    
+    u_geo = u[:,:-1,:] * np.cos(angle_expand[:,:-1,:-1]) - v[:,:,:-1] * np.sin(angle_expand[:,:-1,:-1])
+    v_geo = u[:,:-1,:] * np.sin(angle_expand[:,:-1,:-1]) + v[:,:,:-1] * np.cos(angle_expand[:,:-1,:-1])
     velocity = np.sqrt(u_geo**2 + v_geo**2)
 
     # Calculate derivatives
