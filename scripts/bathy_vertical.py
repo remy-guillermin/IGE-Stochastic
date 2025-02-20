@@ -1,54 +1,36 @@
-## LIB
 import numpy as np
-import pandas as pd
-import netCDF4 
 import xarray as xr
-import matplotlib as mpl 
 import matplotlib.pyplot as plt
-import cmocean 
-import cmcrameri
-import sys
+import matplotlib as mpl
+import cmocean
 import cartopy.crs as ccrs
-from scipy.interpolate import interp1d
-##
+from matplotlib.patches import Rectangle
 
-scratch = '/lus/scratch/CT1/c1601279/lweiss/CROCO/SWIOSE/'
-work = '/lus/work/CT1/c1601279/lweiss/CROCO/'
-path_fig = '/lus/home/CT1/c1601279/lweiss/PYTHON/FIGURES/'
-grid = '/lus/work/CT1/c1601279/lweiss/CROCO/RUN/SWIOSE/CROCO_FILES/grid/croco_grid_swiose.nc'
+# Load data (same as your existing code)
+data = '/lus/store/CT1/c1601279/lweiss/RUN_CROCO/'
+simu = 'run_swio2_deter_2017_2023_complet/'
+grid = '/lus/store/CT1/c1601279/lweiss/GRID/croco_grid_swio2.nc'
 figures = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures/'
-simu = 'run_swiose_0004'
 
-boxes = [(35,40,-23,-19)] # MoC
-
-#######################################################################################
-### open grid
-ds = xr.open_dataset(grid)
-h = ds['h'][:, :]
-lon = ds['lon_rho'][:, :]
-lat = ds['lat_rho'][:, :]
-msk = ds['mask_rho'][:, :]
-#sys.exit()
-ds.close()
+g = xr.open_dataset(grid)
+h = g['h'][:, :] # Bathymetry
+lon = g['lon_rho'][:, :]  # Longitude
+lat = g['lat_rho'][:, :]  # Latitude
+angle = g['angle'][:, :]  # Deformation
+msk = g['mask_rho'][:, :]  # Mask
+msk_inv = np.where(msk == 0, msk, np.nan)
+g.close()
 
 ### open netcdf file an variables
-ds = xr.open_dataset(scratch + simu + '/swiose_his.nc') # , engine='h5netcdf')
+ds = xr.open_dataset(data + simu + 'swio_avg_2017.nc') # , engine='h5netcdf')
 temp = ds['temp'][:, :, :, :]
-#h = ds['h'][:, :]  # bathymetry at RHO-points
-#lon = ds['lon_rho'][:, :]
-#lat = ds['lat_rho'][:, :]
-#msk = ds['mask_rho'][:, :]
 s_rho = ds['s_rho'][:] # s_rho(s_rho) S-coordinate at RHO-points
 Cs_rho = ds['Cs_rho'][:] # Cs_rho(s_rho) S-coordinate stretching curves at RHO-points
-hc = ds['hc'].values # S-coordinate parameter, critical depth
-
-# sys.exit()
+hc = ds['hc'].values
 ds.close()
 
 msk_inv = np.where(msk==0, msk, np.nan)
 
-#######################################################################################
-# Calcul z0 a nonlinear vertical transformation 
 def calc_depth(s, Cs, hc, h):
     N = len(s_rho)
     M, L = h.shape
@@ -59,14 +41,10 @@ def calc_depth(s, Cs, hc, h):
         depth[k, :, :] = z0[k, :, :] * h ## (hc * s[k] + h * Cs[k])
     return depth
 
-# Calcul de la profondeur
 depth_sigma = calc_depth(s_rho, Cs_rho, hc, h)
 
-#######################################################################################
-#### h transect
-#######################################################################################
-lat_index = 243 # 249
-lon_index = 162 # 195
+lat_index = 249
+lon_index = 195
 
 # along longitude axis
 fig, ax = plt.subplots(1, 2, figsize=(12, 5), gridspec_kw={'width_ratios': [2, 1]})
@@ -79,8 +57,10 @@ for k in range(len(s_rho)):
     ax[0].plot(lat[:, lon_index], depth_sigma[k, :, lon_index], color='grey', linestyle='-', linewidth=0.5)
 ax[0].set_xlim(-16.5, 3)
 ax[0].set_ylim(np.min(-h[:, lon_index].values), 5)
-ax[0].set_xlabel('Latitudes along ' + str(np.round(lon[lat_index, lon_index].values,2)) + '°E Longitude')
-ax[0].set_ylabel('Depth h (m)')
+#ax[0].set_xlabel('Latitudes along ' + str(np.round(lon[lat_index, lon_index].values,2)) + '°E Longitude')
+#ax[0].set_ylabel('Depth h (m)')
+ax[0].set_xlabel('Latitudes le long de la ' + str(np.round(lon[lat_index, lon_index].values,2)) + '°E Longitude')
+ax[0].set_ylabel('Profondeur h (m)')
 ax[0].grid(linestyle='--',linewidth=0.3)
 
 ### subplot
@@ -91,14 +71,13 @@ ax[1].fill_between(lat[:, lon_index], -h[:, lon_index].values, y2=min(-h[:, lon_
 # Ajouter des courbes de niveau
 for k in range(len(s_rho)):
     ax[1].plot(lat[:, lon_index], depth_sigma[k, :, lon_index], color='grey', linestyle='-', linewidth=0.5)
-ax[1].set_xlim(-13.2, -12.9)
+ax[1].set_xlim(-13.5, -12.5)
 ax[1].set_ylim(-400, 1)
 ax[1].grid(linestyle='--',linewidth=0.3)
 
 plt.savefig(figures + 'transect_zoom_h_lon_' + str(np.round(lon[lat_index, lon_index].values,2)) + '_' + simu[:-1] + '.png', dpi=300, bbox_inches='tight')
-# plt.show()
+plt.show()
 
-#######################################################################################
 # along latitude axis
 fig, ax = plt.subplots(1, 2, figsize=(12, 5), gridspec_kw={'width_ratios': [2, 1]})
 ax[0].plot(lon[lat_index,:].values, -h[lat_index,:].values, marker='o', linestyle='-', color='k', markersize=1)
@@ -108,8 +87,10 @@ for k in range(len(s_rho)):
     ax[0].plot(lon[lat_index, :], depth_sigma[k, lat_index, :], color='grey', linestyle='-', linewidth=0.5)
 ax[0].set_xlim(40, 49)
 ax[0].set_ylim(-4000, 0)
-ax[0].set_xlabel('Longitudes along ' + str(np.round(lat[lat_index, lon_index].values,2)) + '°S Latitude')
-ax[0].set_ylabel('Depth (m)')
+#ax[0].set_xlabel('Longitudes along ' + str(np.round(lat[lat_index, lon_index].values,2)) + '°S Latitude')
+#ax[0].set_ylabel('Depth (m)')
+ax[0].set_xlabel('Longitudes le long de ' + str(np.round(lat[lat_index, lon_index].values,2)) + '°S Latitude')
+ax[0].set_ylabel('Profondeur h (m)')
 ax[0].grid(linestyle='--',linewidth=0.3)
 
 ### subplot
@@ -119,10 +100,10 @@ ax[1].fill_between(lon[lat_index,:], -h[lat_index,:].values, y2=min(-h[lat_index
 # Ajouter des courbes de niveau
 for k in range(len(s_rho)):
     ax[1].plot(lon[lat_index, :], depth_sigma[k, lat_index, :], color='grey', linestyle='-', linewidth=0.5)
-ax[1].set_xlim(45, 45.3)
-ax[1].set_ylim(-100, 1)
+ax[1].set_xlim(46, 47)
+ax[1].set_ylim(-500, 1)
 ax[1].grid(linestyle='--',linewidth=0.3)
 
-plt.savefig(path_fig + 'transect_zoom_h_lat_' + str(np.round(lat[lat_index, lon_index].values,2)) + '_' + simu + '.png', dpi=300, bbox_inches='tight')
-
+plt.savefig(figures + 'transect_zoom_h_lat_' + str(np.round(lat[lat_index, lon_index].values,2)) + '_' + simu[:-1] + '.png', dpi=300, bbox_inches='tight')
+plt.show()
 plt.close()
