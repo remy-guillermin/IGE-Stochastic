@@ -76,7 +76,7 @@ def all_surf(data_path, start_date, end_date, figsize=(24, 6), sss_cmap=cmocean.
     plot_map(ax, lon, lat, temp, sst_cmap, norm, levels, 'SST [°C]', msk, msk_inv, gridline_style)
     
     plt.tight_layout()
-    save_figure(fig, f"sea_surface_{start_date}_{end_date}.png", dpi=300)
+    save_figure(fig, f"sea_surface_{start_date}_{end_date}.png")
     plt.close(fig)
     
 def all_annual_anomaly(data_path, figsize=(24, 6), sss_cmap=cmocean.cm.haline, ssh_cmap=cmcrameri.cm.roma_r, sst_cmap=cmocean.cm.thermal):
@@ -139,7 +139,7 @@ def all_annual_anomaly(data_path, figsize=(24, 6), sss_cmap=cmocean.cm.haline, s
     plot_map(ax, lon, lat, STA[-1,:,:], sst_cmap, norm, levels, 'STA [°C]', msk, msk_inv, gridline_style)
     
     plt.tight_layout()
-    save_figure(fig, f"sea_anomaly_annual_{data_path}.png", dpi=300)
+    save_figure(fig, f"sea_anomaly_annual_{data_path}.png")
     plt.close(fig)
     
 def sss(data_path, start_date, end_date, figsize=(8, 8), cmap=cmocean.cm.haline):
@@ -178,7 +178,7 @@ def sss(data_path, start_date, end_date, figsize=(8, 8), cmap=cmocean.cm.haline)
     plot_map(ax, lon, lat, salt, cmap, norm, levels, 'SSS [psu]', msk, msk_inv, gridline_style)
     
     plt.tight_layout()
-    save_figure(fig, f"sss_{start_date}_{end_date}.png", dpi=300)
+    save_figure(fig, f"sss_{start_date}_{end_date}.png")
     plt.close(fig)
 
 
@@ -219,7 +219,7 @@ def ssh(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm.roma_
     plot_map(ax, lon, lat, zeta, cmap, norm, levels, 'SSH [m]', msk, msk_inv, gridline_style)
 
     plt.tight_layout()
-    save_figure(fig, f"ssh_{start_date}_{end_date}.png", dpi=300)
+    save_figure(fig, f"ssh_{start_date}_{end_date}.png")
     plt.close(fig)
 
 
@@ -259,5 +259,5 @@ def sst(data_path, start_date, end_date, figsize=(8, 8), cmap=cmocean.cm.thermal
     plot_map(ax, lon, lat, temp, cmap, norm, levels, 'SST [°C]', msk, msk_inv, gridline_style)
 
     plt.tight_layout()
-    save_figure(fig, f"sst_{start_date}_{end_date}.png", dpi=300)
+    save_figure(fig, f"sst_{start_date}_{end_date}.png")
     plt.close(fig)
