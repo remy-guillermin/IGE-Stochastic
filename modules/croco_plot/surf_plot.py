@@ -244,7 +244,8 @@ def sst(data_path, start_date, end_date, figsize=(8, 8), cmap=cmocean.cm.thermal
     # Define common gridline styles
     gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.3}
     
-    ax.set_title(f"SWIO {start_date} to {end_date}", size=9)
+    str_sst = r'$\overline{\overline{SST}}$'
+    ax.set_title(f"{str_sst} SWIO {start_date} to {end_date}", size=9)
     levels = np.linspace(20, 30, 21)
     norm = mpl.colors.BoundaryNorm(levels, cmap.N)
     plot_map(ax, lon, lat, temp, cmap, norm, levels, r'$\overline{\overline{SST}}$ [°C]', msk, msk_inv, gridline_style)
