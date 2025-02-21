@@ -112,21 +112,24 @@ def multiple_annual(data_path,
         plt.close(fig)
         
     if 'annual_sd':
+        fig, axs = plt.subplots(1, len(variables), figsize=figsize, subplot_kw={'projection': ccrs.PlateCarree()})
+        
+        ax = axs[0]
         ax.set_title("Annual Standard Deviation", size=9)
-        levels = np.linspace(0, np.round(np.max(SSA), 1), 21)
+        levels = np.linspace(0, np.round(np.nanmax(SSA), 1), 21)
         norm = mpl.colors.BoundaryNorm(levels, sss_cmap.N)
         plot_map(ax, lon, lat, SSA, sss_cmap, norm, levels, r'$SD_{SSS}$ [psu]', msk, msk_inv, gridline_style)
         
         ax = axs[1]
-        levels = np.linspace(0, np.round(np.max(SLA), 1), 21)
+        levels = np.linspace(0, np.round(np.nanmax(SLA), 1), 21)
         norm = mpl.colors.BoundaryNorm(levels, ssh_cmap.N)
         plot_map(ax, lon, lat, SLA, ssh_cmap, norm, levels, r'$SD_{SSH}$ [m]', msk, msk_inv, gridline_style)
         
         ax = axs[2]
-        levels = np.linspace(0, np.round(np.max(STA), 1), 21)
+        levels = np.linspace(0, np.round(np.nanmax(STA), 1), 21)
         norm = mpl.colors.BoundaryNorm(levels, sst_cmap.N)
         plot_map(ax, lon, lat, STA, sst_cmap, norm, levels, r'$SD_{SST}$ [°C]', msk, msk_inv, gridline_style)
 
         plt.tight_layout()
-        save_figure(fig, f"surface_SD{start_date}_{end_date}.png")
+        save_figure(fig, f"surface_SD_{data_path}.png")
         plt.close(fig)
