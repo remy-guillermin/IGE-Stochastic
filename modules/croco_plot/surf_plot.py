@@ -43,6 +43,8 @@ def multiple_annual(data_path,
         Colormap for the SSH plot, by default cmcrameri.cm.roma_r
     sst_cmap : colormap, optional
         Colormap for the SST plot, by default cmocean.cm.thermal
+    
+    cplot.time_series.multiple_time_series(['swio_avg_2017.nc', 'swio_avg_2018.nc', 'swio_avg_2019.nc', 'swio_avg_2020.nc', 'swio_avg_2021.nc', 'swio_avg_2022.nc', 'swio_avg_2023.nc'], variables='all')
     """
     if isinstance(variables, str):
         variables = [variables]
