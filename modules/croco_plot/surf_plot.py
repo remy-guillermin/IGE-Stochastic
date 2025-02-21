@@ -13,17 +13,27 @@ import cartopy.crs as ccrs
 import xarray as xr
 from .utils import load_grid, load_data, save_figure, plot_map
 
-def all_surf(data_path, start_date, end_date, figsize=(24, 6), sss_cmap=cmocean.cm.haline, ssh_cmap=cmcrameri.cm.roma_r, sst_cmap=cmocean.cm.thermal):
+def multiple_annual(data_path, 
+                    variables='all', 
+                    start_date=None, 
+                    end_date=None, 
+                    figsize=(24, 6), 
+                    sss_cmap=cmocean.cm.haline, 
+                    ssh_cmap=cmcrameri.cm.roma_r, 
+                    sst_cmap=cmocean.cm.thermal):
     """
-    Plot SSS, SSH, and SST data on a map for a specific date range.
+    Plot multiple surface variables (SSS, SSH, SST) on a map for a specific date range or annual standard deviation.
 
     Parameters
     ----------
     data_path : str
         Path to the simulation data file.
-    start_date : str
+    variables : list of str, optional
+        List of variables to plot, by default 'all'
+        options : 'sss', 'ssh', 'sst', 'annual_sd'
+    start_date : str, optional
         Start date for the data slice in 'YYYY-MM-DD' format.
-    end_date : str
+    end_date : str, optional
         End date for the data slice in 'YYYY-MM-DD' format.
     figsize : tuple, optional
         Size of the figure, by default (24, 6)
@@ -34,222 +44,84 @@ def all_surf(data_path, start_date, end_date, figsize=(24, 6), sss_cmap=cmocean.
     sst_cmap : colormap, optional
         Colormap for the SST plot, by default cmocean.cm.thermal
     """
+    if isinstance(variables, str):
+        variables = [variables]
+        
+    if 'all' in variables:
+        variables = ['sss', 'ssh', 'sst', 'annual_sd']
+    
     # Load grid data
     lon, lat, _, _, msk, msk_inv, _, _ = load_grid()
-    
-    salt, zeta, temp = load_data(data_path, ('salt', 'zeta', 'temp'))
+    salt, zeta, temp, time = load_data(data_path, ('salt', 'zeta', 'temp', 'time'))
     
     fill_value = 9.96921e+36
-    salt = salt.where((salt != fill_value), np.nan)
+    salt = salt[:, -1, :, :].where((salt != fill_value), np.nan)
     zeta = zeta.where((zeta != fill_value), np.nan)
-    temp = temp.where((temp != fill_value), np.nan)
+    temp = temp[:, -1, :, :].where((temp != fill_value), np.nan)
     
-    salt = salt[:, -1, :, :].sel(time=slice(start_date, end_date)).mean(dim='time')
-    zeta = zeta.sel(time=slice(start_date, end_date)).mean(dim='time')
-    temp = temp[:, -1, :, :].sel(time=slice(start_date, end_date)).mean(dim='time')
+    if start_date and end_date:
+        salt = salt.sel(time=slice(start_date, end_date))
+        zeta = zeta.sel(time=slice(start_date, end_date))
+        temp = temp.sel(time=slice(start_date, end_date))
+    else:
+        start_date = time.data[0]
+        end_date = time.data[-1]
     
-    # Plotting
-    fig, axs = plt.subplots(1, 3, figsize=figsize, subplot_kw={'projection': ccrs.PlateCarree()})
-
-    # Define common gridline styles
+    if 'annual_sd' in variables:
+        salt_yr = salt.mean(dim='time')
+        zeta_yr = zeta.mean(dim='time')
+        temp_yr = temp.mean(dim='time')
+        
+        SLA = np.sqrt((zeta - zeta_yr)**2).mean(dim='time')
+        STA = np.sqrt((temp - temp_yr)**2).mean(dim='time')
+        SSA = np.sqrt((salt - salt_yr)**2).mean(dim='time')
+        
+    salt = salt.mean(dim='time')
+    zeta = zeta.mean(dim='time')
+    temp = temp.mean(dim='time')
+    
     gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.3}
     
-    ax = axs[0]
-    ax.set_title(f"SWIO {start_date} to {end_date}", size=9)
-    levels = np.linspace(34, 36, 21)
-    norm = mpl.colors.BoundaryNorm(levels, sss_cmap.N)
-    plot_map(ax, lon, lat, salt, sss_cmap, norm, levels, r'$\overline{\overline{SSS}}$ [psu]', msk, msk_inv, gridline_style)
-    
-    ax = axs[1]
-    ax.set_title(f"SWIO {start_date} to {end_date}", size=9)
-    levels = np.linspace(0, 1, 21)
-    norm = mpl.colors.BoundaryNorm(levels, ssh_cmap.N)
-    plot_map(ax, lon, lat, zeta, ssh_cmap, norm, levels, r'$\overline{\overline{SSH}}$ [m]', msk, msk_inv, gridline_style)
-    
-    ax = axs[2]
-    ax.set_title(f"SWIO {start_date} to {end_date}", size=9)
-    levels = np.linspace(20, 30, 21)
-    norm = mpl.colors.BoundaryNorm(levels, sst_cmap.N)
-    plot_map(ax, lon, lat, temp, sst_cmap, norm, levels, r'$\overline{\overline{SST}}$ [°C]', msk, msk_inv, gridline_style)
-    
-    plt.tight_layout()
-    save_figure(fig, f"sea_surface_{start_date}_{end_date}.png")
-    plt.close(fig)
-    
-def all_surf_annual_SD(data_path, figsize=(24, 6), sss_cmap=cmocean.cm.haline, ssh_cmap=cmcrameri.cm.roma_r, sst_cmap=cmocean.cm.thermal):
-    """
-    Plot annual SSS, SST, and SSH standard deviation on a map.
+    if 'sss' in variables and 'ssh' in variables and 'sst' in variables:
+        fig, axs = plt.subplots(1, len(variables), figsize=figsize, subplot_kw={'projection': ccrs.PlateCarree()})
 
-    Parameters
-    ----------
-    data_path : str
-        Path to the simulation data file.
-    figsize : tuple, optional
-        Size of the figure, by default (24, 6)
-    sss_cmap : colormap, optional
-        Colormap for the SSS plot, by default cmocean.cm.haline
-    ssh_cmap : colormap, optional
-        Colormap for the SSH plot, by default cmcrameri.cm.roma_r
-    sst_cmap : colormap, optional
-        Colormap for the SST plot, by default cmocean.cm.thermal
-    """
-    # Load grid data
-    lon, lat, _, _, msk, msk_inv, _, _ = load_grid()
-    
-    salt, zeta, temp = load_data(data_path, ('salt', 'zeta', 'temp'))
-    
-    fill_value = 9.96921e+36
-    salt = salt.where((salt != fill_value), np.nan)
-    zeta = zeta.where((zeta != fill_value), np.nan)
-    temp = temp.where((temp != fill_value), np.nan)
-    
-    salt_yr = salt[:, -1, :, :].mean(dim='time')
-    zeta_yr = zeta.mean(dim='time')
-    temp_yr = temp[:, -1, :, :].mean(dim='time')
-    
-    SLA = np.sqrt((zeta - zeta_yr)**2).mean(dim='time')
-    STA = np.sqrt((temp - temp_yr)**2).mean(dim='time')
-    SSA = np.sqrt((salt - salt_yr)**2).mean(dim='time')
-    
-    # Plotting
-    fig, axs = plt.subplots(1, 3, figsize=figsize, subplot_kw={'projection': ccrs.PlateCarree()})
+        ax = axs[0]
+        ax.set_title(f"SWIO {start_date} to {end_date}", size=9)
+        levels = np.linspace(34, 36, 21)
+        norm = mpl.colors.BoundaryNorm(levels, sss_cmap.N)
+        plot_map(ax, lon, lat, salt, sss_cmap, norm, levels, r'$\overline{\overline{SSS}}$ [psu]', msk, msk_inv, gridline_style)
+        
+        ax = axs[1]
+        ax.set_title(f"SWIO {start_date} to {end_date}", size=9)
+        levels = np.linspace(0, 1, 21)
+        norm = mpl.colors.BoundaryNorm(levels, sss_cmap.N)
+        plot_map(ax, lon, lat, zeta, ssh_cmap, norm, levels, r'$\overline{\overline{SSH}}$ [m]', msk, msk_inv, gridline_style)
+        
+        ax = axs[2]
+        ax.set_title(f"SWIO {start_date} to {end_date}", size=9)
+        levels = np.linspace(20, 30, 21)
+        norm = mpl.colors.BoundaryNorm(levels, sss_cmap.N)
+        plot_map(ax, lon, lat, temp, sst_cmap, norm, levels, r'$\overline{\overline{SST}}$ [°C]', msk, msk_inv, gridline_style)
+        
+        plt.tight_layout()
+        save_figure(fig, f"surface_all_{start_date}_{end_date}.png")
+        
+    if 'annual_sd':
+        ax.set_title("Annual Standard Deviation", size=9)
+        levels = np.linspace(0, np.round(np.max(SSA), 1), 21)
+        norm = mpl.colors.BoundaryNorm(levels, sss_cmap.N)
+        plot_map(ax, lon, lat, SSA, sss_cmap, norm, levels, r'$SD_{SSS}$ [psu]', msk, msk_inv, gridline_style)
+        
+        ax = axs[1]
+        levels = np.linspace(0, np.round(np.max(SLA), 1), 21)
+        norm = mpl.colors.BoundaryNorm(levels, ssh_cmap.N)
+        plot_map(ax, lon, lat, SLA, ssh_cmap, norm, levels, r'$SD_{SSH}$ [m]', msk, msk_inv, gridline_style)
+        
+        ax = axs[2]
+        levels = np.linspace(0, np.round(np.max(STA), 1), 21)
+        norm = mpl.colors.BoundaryNorm(levels, sst_cmap.N)
+        plot_map(ax, lon, lat, STA, sst_cmap, norm, levels, r'$SD_{SST}$ [°C]', msk, msk_inv, gridline_style)
 
-    # Define common gridline styles
-    gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.3}
-    
-    ax = axs[0]
-    levels = np.linspace(0, 1, 11)
-    norm = mpl.colors.BoundaryNorm(levels, sss_cmap.N)
-    plot_map(ax, lon, lat, SSA[-1,:,:], sss_cmap, norm, levels, r'$SD_{SSS}$ [psu]', msk, msk_inv, gridline_style)
-    
-    ax = axs[1]
-    levels = np.linspace(0, 0.2, 11)
-    norm = mpl.colors.BoundaryNorm(levels, ssh_cmap.N)
-    plot_map(ax, lon, lat, SLA, ssh_cmap, norm, levels, r'$SD_{SSH}$ [m]', msk, msk_inv, gridline_style)
-    
-    ax = axs[2]
-    levels = np.linspace(0, 5, 11)
-    norm = mpl.colors.BoundaryNorm(levels, sst_cmap.N)
-    plot_map(ax, lon, lat, STA[-1,:,:], sst_cmap, norm, levels, r'$SD_{SST}$ [°C]', msk, msk_inv, gridline_style)
-    
-    plt.tight_layout()
-    save_figure(fig, f"sea_surface_annual_SD_{data_path}.png")
-    plt.close(fig)
-    
-def sss(data_path, start_date, end_date, figsize=(8, 8), cmap=cmocean.cm.haline):
-    """
-    Plot SSS data on a map for a specific date range.
-
-    Parameters
-    ----------
-    data_path : str
-        Path to the simulation data file.
-    start_date : str
-        Start date for the data slice in 'YYYY-MM-DD' format.
-    end_date : str
-        End date for the data slice in 'YYYY-MM-DD' format.
-    figsize : tuple, optional
-        Size of the figure, by default (8, 8)
-    cmap : colormap, optional
-        Colormap for the plot, by default cmocean.cm.haline
-    """
-    # Load grid data
-    lon, lat, _, _, msk, msk_inv, _, _ = load_grid()
-
-    # Load simulation data
-    salt = load_data(data_path, ('salt',))[:, -1, :, :].sel(time=slice(start_date, end_date)).mean(dim='time')
-
-    # Plotting
-    fig, ax = plt.subplots(figsize=figsize, subplot_kw={'projection': ccrs.PlateCarree()})
-
-    # Define common gridline styles
-    gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.3}
-
-    ax.set_title(f"SWIO {start_date} to {end_date}", size=9)
-    levels = np.linspace(34, 36, 21)
-    norm = mpl.colors.BoundaryNorm(levels, cmap.N)
-    plot_map(ax, lon, lat, salt, cmap, norm, levels, r'$\overline{\overline{SSS}}$ [psu]', msk, msk_inv, gridline_style)
-    
-    plt.tight_layout()
-    save_figure(fig, f"sss_{start_date}_{end_date}.png")
-    plt.close(fig)
-
-
-
-def ssh(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm.roma_r):
-    """
-    Plot SSH data on a map for a specific date range.
-
-    Parameters
-    ----------
-    data_path : str
-        Path to the simulation data file.
-    start_date : str
-        Start date for the data slice in 'YYYY-MM-DD' format.
-    end_date : str
-        End date for the data slice in 'YYYY-MM-DD' format.
-    figsize : tuple, optional
-        Size of the figure, by default (8, 8)
-    cmap : colormap, optional
-        Colormap for the plot, by default cmcrameri.cm.roma_r
-    """
-    # Load grid data
-    lon, lat, _, _, msk, msk_inv, _, _ = load_grid()
-
-    # Load simulation data
-    zeta = load_data(data_path, ('zeta',)).sel(time=slice(start_date, end_date)).mean(dim='time')
-
-    # Plotting
-    fig, ax = plt.subplots(figsize=figsize, subplot_kw={'projection': ccrs.PlateCarree()})
-
-    # Define common gridline styles
-    gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.3}
-
-    ax.set_title(f"SWIO {start_date} to {end_date}", size=9)
-    levels = np.linspace(0, 1, 21)
-    norm = mpl.colors.BoundaryNorm(levels, cmap.N)
-    plot_map(ax, lon, lat, zeta, cmap, norm, levels, r'$\overline{\overline{SSH}}$ [m]', msk, msk_inv, gridline_style)
-
-    plt.tight_layout()
-    save_figure(fig, f"ssh_{start_date}_{end_date}.png")
-    plt.close(fig)
-
-
-def sst(data_path, start_date, end_date, figsize=(8, 8), cmap=cmocean.cm.thermal):
-    """
-    Plot SST data on a map for a specific date range.
-
-    Parameters
-    ----------
-    data_path : str
-        Path to the simulation data file.
-    start_date : str
-        Start date for the data slice in 'YYYY-MM-DD' format.
-    end_date : str
-        End date for the data slice in 'YYYY-MM-DD' format.
-    figsize : tuple, optional
-        Size of the figure, by default (8, 8)
-    cmap : colormap, optional
-        Colormap for the plot, by default cmocean.cm.thermal
-    """
-    # Load grid data
-    lon, lat, _, _, msk, msk_inv, _, _ = load_grid()
-
-    # Load simulation data
-    temp = load_data(data_path, ('temp',))[:, -1, :, :].sel(time=slice(start_date, end_date)).mean(dim='time')
-
-    # Plotting
-    fig, ax = plt.subplots(figsize=figsize, subplot_kw={'projection': ccrs.PlateCarree()})
-
-    # Define common gridline styles
-    gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.3}
-    
-    str_sst = r'$\overline{\overline{SST}}$'
-    ax.set_title(f"{str_sst} SWIO {start_date} to {end_date}", size=9)
-    levels = np.linspace(20, 30, 21)
-    norm = mpl.colors.BoundaryNorm(levels, cmap.N)
-    plot_map(ax, lon, lat, temp, cmap, norm, levels, r'$\overline{\overline{SST}}$ [°C]', msk, msk_inv, gridline_style)
-
-    plt.tight_layout()
-    save_figure(fig, f"sst_{start_date}_{end_date}.png")
-    plt.close(fig)
+        plt.tight_layout()
+        save_figure(fig, f"surface_SD{start_date}_{end_date}.png")
+        plt.close(fig)

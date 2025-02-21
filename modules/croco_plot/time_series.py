@@ -122,8 +122,6 @@ def multiple_time_series(data_files,
             vertical_ke_results.append(np.nansum(KE_integrated, axis=(1,2)))
             KE, surf_KE, KE_weighted, KE_integrated = None, None, None, None
             
-            ke_results = np.concatenate(ke_results)
-            
         if 'mke' in variables:
             print('Calculating MKE')
             MKE = 1 / 2 * (u[:,:,:-1,:] ** 2 + v[:,:,:,:-1] ** 2 + w[:,:,:-1,:-1] ** 2)
