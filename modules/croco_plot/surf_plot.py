@@ -57,9 +57,11 @@ def multiple_annual(data_path,
     salt, zeta, temp, time = load_data(data_path, ('salt', 'zeta', 'temp', 'time'))
     
     fill_value = 9.96921e+36
-    salt = salt[:, -1, :, :].where((salt != fill_value), np.nan)
+    salt = salt[:, -1, :, :]
+    salt = salt.where((salt != fill_value), np.nan)
     zeta = zeta.where((zeta != fill_value), np.nan)
-    temp = temp[:, -1, :, :].where((temp != fill_value), np.nan)
+    temp = temp[:, -1, :, :]
+    temp = temp.where((temp != fill_value), np.nan)
     
     if start_date and end_date:
         salt = salt.sel(time=slice(start_date, end_date))
@@ -107,6 +109,7 @@ def multiple_annual(data_path,
         
         plt.tight_layout()
         save_figure(fig, f"surface_all_{start_date}_{end_date}.png")
+        plt.close(fig)
         
     if 'annual_sd':
         ax.set_title("Annual Standard Deviation", size=9)
