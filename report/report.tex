@@ -214,6 +214,9 @@ The acknowledgments and the people to thank go here, don't forget to include you
  & \textbf{E}nsemble \textbf{P}rediction \textbf{S}ystem \\
  \textbf{EKE} & \textbf{E}ddy \textbf{K}inetic \textbf{E}nergy \\
 \textbf{ENIAC} & \textbf{E}lectronic \textbf{N}umerical \textbf{I}ntegrator \textbf{A}nd \textbf{C}omputer\\
+ \textbf{ERA5} & \textbf{E}CMWF \textbf{R}e\textbf{A}nalysis (version) \textbf{5} \\
+ \textbf{GEBCO} & \textbf{GE}neral \textbf{B}athymetric \textbf{C}hart (of the) \textbf{O}ceans \\
+ \textbf{GLORYS} & \textbf{GL}obal \textbf{O}cean \textbf{R}eanal\textbf{Y}sis (and) \textbf{S}imulation \\ 
 \textbf{GLS} & \textbf{G}eneric \textbf{L}ength \textbf{S}cale \\
 \textbf{LIM3} & \textbf{L}ouvain-la-Neuve \textbf{I}ce \textbf{M}odel (version) \textbf{3}\\
 \textbf{MKE} & \textbf{M}ean \textbf{K}inetic \textbf{E}nergy \\
@@ -254,10 +257,11 @@ Vitesse angulaire de rotation de la Terre & $\Omega$ & \SI{7.2e-5}{\radian\per\s
 
 \begin{longtable}{lll}
 \multicolumn{3}{l}{\textbf{Symboles}} \\  
-$\uu$ & Vitesse & \si{\meter\per\second} \\
-$T$ & Température & \si{\degreeCelsius} \\
-$S$ & Salinité & psu \\
 $k$ & TKE & \si{\meter\squared\per\second\squared} \\
+$S$ & Salinité & psu \\
+$T$ & Température & \si{\degreeCelsius} \\
+$\uu$ & Vitesse & \si{\meter\per\second} \\
+$Q$ & Flux de chaleur sensible & \si{\joule\per\second\per\meter\squared} \\
 
 \addlinespace
 \multicolumn{3}{l}{\textit{Symboles grecs}} \\  
@@ -276,7 +280,8 @@ $\langle \cdot \rangle$ & Moyenne d'ensemble & \\
 
 \addlinespace
 \multicolumn{3}{l}{\textit{Indices}} \\  
-$b$ & Intégration sur la verticale & \\  
+$b$ & Restriction à une boite & \\  
+$v$ & Intégration sur la verticale & \\
 
 \addlinespace
 \multicolumn{3}{l}{\textit{Exposants}} \\  

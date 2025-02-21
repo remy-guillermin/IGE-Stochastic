@@ -1,4 +1,4 @@
-\documentclass{report}
+\documentclass[11pt,oneside]{report}
 
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -7,10 +7,34 @@
 \addbibresource{references.bib}
 \usepackage{wrapfig}
 \usepackage{graphicx}
+\graphicspath{{Figures/}{./}}
 \usepackage{amsmath}
 \usepackage{hyperref}
 \usepackage{tikz}
 \usepackage{subfigure}
+\usepackage{caption}
+\captionsetup{justification=centerlast,font=small,labelfont=sc,margin=50pt}
+\usepackage[markcase=used]{scrlayer-scrpage}
+\usepackage{xcolor}
+
+
+\providepairofpagestyles{thesisSimple}{%
+	\clearpairofpagestyles%
+	\automark[chapter]{chapter}
+	\ihead{\headmark}% Inner header
+	\ohead[\pagemark]{\pagemark}% Outer header
+}
+\ifoot{}% Inner footer
+\ofoot{}% Outer footer
+\pagestyle{thesisSimple}
+\providepairofpagestyles[thesisSimple]{thesis}{%
+	\automark*[section]{}%
+}
+\providepairofpagestyles[thesisSimple]{review}{%
+	\ofoot[\shorttitle/\authorname]{\shorttitle/\authorname}
+	\ifoot[\today]{\today}
+}
+\pagestyle{thesis}
 
 % Definition des nouvelles commandes pour les dérivées partielles
 \newcommand{\pd}[2]{\frac{\partial #1}{\partial #2}}
@@ -31,15 +55,44 @@
 	top=1cm, % Top margin
 	bottom=1cm, % Bottom margin
 	%showframe, % Uncomment to show how the type block is set on the page
+	headheight=4ex,
+	includehead,
+	includefoot
 }
 
+\raggedbottom
+
+\setcounter{tocdepth}{3}
+
+\colorlet{mdtRed}{red!50!black}
+
+\hypersetup{pdfpagemode={UseOutlines},
+bookmarksopen=true,
+bookmarksopenlevel=0,
+hypertexnames=false,
+colorlinks=true,% Set to false to disable coloring links
+citecolor=magenta,% The color of citations
+linkcolor=red,% The color of references to document elements (sections, figures, etc)
+urlcolor=mdtRed,% The color of hyperlinks (URLs)
+pdfstartview={FitV},
+unicode,
+breaklinks=true,
+}
+
+\doublehyphendemerits=10000 % No consecutive line hyphens
+\brokenpenalty=10000 % No broken words across columns/pages
+\widowpenalty=9999 % Almost no widows at bottom of page
+\clubpenalty=9999 % Almost no orphans at top of page
+\interfootnotelinepenalty=9999 % Almost never break footnotes
 
 \begin{document}
 
 \tableofcontents
+\listoffigures
 
 \include{Chapters/Chapter1}
 \include{Chapters/Chapter2}
+\include{Chapters/Chapter3}
 
 \appendix
 

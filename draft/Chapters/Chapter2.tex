@@ -20,8 +20,15 @@ $Cs(\sigma)$ est défini avec trois autres paramètres, $\theta_s$ et $\theta_b$
   sc  = \frac{\sigma-N}{N} && csf = \frac{1 - \cosh(\theta_s  \ sc)}{\cosh(\theta_s) - 1} && Cs(\sigma) = \frac{e^{\theta_b csf} - 1}{1 - e^{1 - \theta_b}}
 \end{align}
 
+Dans nos simulations, nous aurons $\theta_s = 8.0, \theta_b = 2.0$ et $h_c = 100$
 
-On peut voir en \autoref{fig:} l'avantage que procure cette résolution variables dans les zones a faible profondeur. Si nous n'avions pas cette résolution, nous ne pourrions pas simuler correctement les phénomènes apparaissant dans ces zones dite \textit{shallow waterss} (eaux peu profondes). Toutes ces expressions sont gérées au sein de \textbf{CROCO}, nous donnons juste en entrée les différents paramètres que nous souhaitons. 
+On peut voir en \autoref{fig:level} l'avantage que procure cette résolution variables dans les zones a faible profondeur. Si nous n'avions pas cette résolution, nous ne pourrions pas simuler correctement les phénomènes apparaissant dans ces zones dite \textit{shallow waters} (eaux peu profondes). Toutes ces expressions sont gérées au sein de \textbf{CROCO}, nous donnons juste en entrée les différents paramètres que nous souhaitons. 
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=\textwidth]{Figures/transect_zoom_h_lat.png}
+	\caption{Niveau de la grille verticale pour une latitude donnée}
+	\label{fig:level}
+\end{figure}
 
 \subsubsection{Grille horizontale}
 Dans le cas de simulation à grande échelle des océans, il n'est plus possible d'utiliser les simples coordonnées $x$ et $y$ formant un repère orthonormé, il est nécessaire de prendre en compte la courbure de la Terre ce qui introduit deux nouvelles coordonnées $\xi$ et $\eta$, alignées respectivement selon la latitude et la longitude, ainsi que la métrique terrestre que nous allons définir avec $m$ et $n$. On peut donc écrire les relations entre la longueur d'un arc horizontal $ds$ et les distances différentielles $d\xi$ et $d\eta$
@@ -76,7 +83,7 @@ Cela signifie que les processus non hydrostatiques, comme la convection, doivent
       \end{equation}  
 
 \item \textbf{Approximation de Terre sphérique :}  
-      On suppose que les surfaces géopotentielles sont des sphères, ce qui oriente la gravité et la verticale locale parallèlement au rayon terrestre.  
+      On suppose que les surfaces géopotentielles sont des sphères, ce qui oriente la gravité, et la verticale locale, parallèlement au rayon terrestre.  
 
 \item \textbf{Approximation en coque mince :}  
       L'océan est considéré comme ayant une épaisseur négligeable par rapport au rayon de la Terre.  
@@ -98,13 +105,19 @@ Ce qui nous donne donc le système d'équations résolues par \textbf{CROCO}, en
 
 Avec les termes de diffusion $\mathcal{D}_i$, les termes de forçage $\mathcal{F}_i$, le paramètre de Coriolis $f(x,y) = 2 \Omega \sin{\varphi}$, l'accélération de la pesanteur $g$, la pression dynamique $\phi = P/ \rho_0$, la densité locale $\rho_0 + \rho(x,y,z,t)$ et $u,v,w$ les composantes de la vitesse $\uu$. Ces équations doivent ensuite être adaptées à la coordonnée verticale variable du modèle (en \autoref{sec:eq adapte}). La densité suit une équation d'état en $\rho = \rho(T,S,P)$.
 
-\subsection{Forçages}
+\subsection{Bathymétrie et forçages}
+\subsubsection{Bathymétrie}
+La bathymétrie de notre zone provient des données de \textbf{GEBCO}, qui offrent une résolution de 30''.
+
 \subsubsection{Forçage atmosphérique}
-Concernant le forçage atmosphérique, au premier ordre l'atmosphere a un plus grand impact sur l'océan que l'inverse, nous ne considérerons donc pas un modèle couplé océan-atmosphère mais un modèle océan avec un forçage atmosphérique. Ce forçage est en réalité les données issues d'un modèle atmosphérique générées au préalable qui seront appliquées à chaque itération temporelle comme une condition limite. Les divergences, notamment entre la vitesse du vent et celle de la surface libre ou celles dans le transfert de chaleur seront sauvegardées en tant que contraintes à la surface. Il est donc tout à fait possible d'injecter les données atmosphérique in situ comme forçage si nous en avions a notre disposition couvrant la zone d'étude.
+Concernant le forçage atmosphérique, au premier ordre l'atmosphere a un plus grand impact sur l'océan que l'inverse, nous ne considérerons donc pas un modèle couplé océan-atmosphère mais un modèle océan avec un forçage atmosphérique. Ce forçage est en réalité les données issues du modèle atmosphérique \textbf{ERA5} \cite{hersbach_era5_2020} qui seront appliquées à chaque itération temporelle comme une condition limite. Les données utilisées sont le flux de chaleur sensible $Q$, la température de surface de l'océan, la température de l'atmosphère à $2$ m de la surface et les vitesses horizontales $u$ et $v$ à $10$ m de la surface. 
+
+Les divergences, notamment entre la vitesse du vent et celle de la surface libre ou celles dans le transfert de chaleur seront sauvegardées en tant que contraintes à la surface. Il est donc tout à fait possible d'injecter les données atmosphérique in situ comme forçage si nous en avions a notre disposition couvrant la zone d'étude.
 \subsubsection{Forçage aux frontières}
-Comme nous étudions une zone spécifique de l'océan indien, nous avons besoin de condition aux limites de notre boîte, nous nous plaçons donc en conditions aux limites ouvertes et nous avons besoin de données correspondant à ces zones frontières. Ces conditions concernent les flux de masses ainsi que les traceurs passifs comme la température et la salinité.
+Comme nous étudions une zone spécifique de l'océan indien, nous avons besoin de condition aux limites de notre boîte, nous nous plaçons donc en conditions aux limites ouvertes et nous avons besoin de données correspondant à ces zones frontières. Ces données sont issues du modèle \textbf{GLORYS} et permettent de fixer les flux de masses et les traceurs passifs (température, salinité).
+
 \subsubsection{Marées}
-\textbf{CROCO} dispose d'un module permettant la prise en compte des marées que nous allons utiliser pour reproduire au mieux les conditions réelles.
+\textbf{CROCO} dispose d'un module permettant la prise en compte des marées que nous allons utiliser pour reproduire au mieux les conditions réelles avec les 8 premières harmoniques de marée.
 
 \subsection{Paramétrisation}
 \subsubsection{Mélange vertical}
@@ -155,6 +168,11 @@ Nous pouvons donc initialiser $a = \exp{\left(-1/\tau^{(i)} \right)}$ et $b = \s
 
 \subsection{Champs d'étude}
 Nous allons étudier différentes sources d'incertitudes du modèle. La première, et la plus importante, est la variabilité du champ de conditions initiales. Ce premier ensemble permettra de quantifier la variabilité intrinsèque du modèle qui sera toujours présente dans les ensembles suivants. D'autres pistes seront étudiées par Lisa notamment la variabilité due au forçage atmosphérique ainsi que celle crée par les conditions aux frontières. Une autre voie d'étude est la variabilité induite par la paramétrisation du mélange verticale.
+
+\subsection{Méthodes d'analyse}
+\subsubsection{Histogramme de rang} 
+????
+\subsubsection{Autres méthodes ????}
 
 
 
