@@ -76,9 +76,9 @@ def all_surf(data_path, start_date, end_date, figsize=(24, 6), sss_cmap=cmocean.
     save_figure(fig, f"sea_surface_{start_date}_{end_date}.png")
     plt.close(fig)
     
-def all_annual_anomaly(data_path, figsize=(24, 6), sss_cmap=cmocean.cm.haline, ssh_cmap=cmcrameri.cm.roma_r, sst_cmap=cmocean.cm.thermal):
+def all_surface_annual_SD(data_path, figsize=(24, 6), sss_cmap=cmocean.cm.haline, ssh_cmap=cmcrameri.cm.roma_r, sst_cmap=cmocean.cm.thermal):
     """
-    Plot annual SLA, STA, and SSA data on a map.
+    Plot annual SSS, SST, and SSH standard deviation on a map.
 
     Parameters
     ----------
@@ -120,20 +120,20 @@ def all_annual_anomaly(data_path, figsize=(24, 6), sss_cmap=cmocean.cm.haline, s
     ax = axs[0]
     levels = np.linspace(0, 1, 11)
     norm = mpl.colors.BoundaryNorm(levels, sss_cmap.N)
-    plot_map(ax, lon, lat, SSA[-1,:,:], sss_cmap, norm, levels, r'$\overline{\overline{SSA}}$ [psu]', msk, msk_inv, gridline_style)
+    plot_map(ax, lon, lat, SSA[-1,:,:], sss_cmap, norm, levels, r'$SD_{SSS}$ [psu]', msk, msk_inv, gridline_style)
     
     ax = axs[1]
     levels = np.linspace(0, 0.2, 11)
     norm = mpl.colors.BoundaryNorm(levels, ssh_cmap.N)
-    plot_map(ax, lon, lat, SLA, ssh_cmap, norm, levels, r'$\overline{\overline{SLA}}$ [m]', msk, msk_inv, gridline_style)
+    plot_map(ax, lon, lat, SLA, ssh_cmap, norm, levels, r'$SD_{SSH}$ [m]', msk, msk_inv, gridline_style)
     
     ax = axs[2]
     levels = np.linspace(0, 5, 11)
     norm = mpl.colors.BoundaryNorm(levels, sst_cmap.N)
-    plot_map(ax, lon, lat, STA[-1,:,:], sst_cmap, norm, levels, r'$\overline{\overline{STA}}$ SWIO [°C]', msk, msk_inv, gridline_style)
+    plot_map(ax, lon, lat, STA[-1,:,:], sst_cmap, norm, levels, r'$SD_{SST}$ [°C]', msk, msk_inv, gridline_style)
     
     plt.tight_layout()
-    save_figure(fig, f"sea_anomaly_annual_{data_path}.png")
+    save_figure(fig, f"sea_surface_annual_SD_{data_path}.png")
     plt.close(fig)
     
 def sss(data_path, start_date, end_date, figsize=(8, 8), cmap=cmocean.cm.haline):
