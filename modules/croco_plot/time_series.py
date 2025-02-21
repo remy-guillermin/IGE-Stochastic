@@ -12,11 +12,7 @@ import cmocean
 import cartopy.crs as ccrs
 from .utils import load_grid, load_data, save_figure
 
-def global_ke(data_files, 
-               y_min=8e3, 
-               y_max=2e4,
-               vertical_y_min=1e7,
-               vertical_y_max=3e7):
+def global_ke(data_files):
     """
     Calculate and plot the time series of KE for the whole domain.
 
@@ -24,14 +20,6 @@ def global_ke(data_files,
     ----------
     data_files : list of str
         List of paths to the simulation data files.
-    y_min : float, optional
-        Minimum y-axis value for the plot.
-    y_max : float, optional
-        Maximum y-axis value for the plot.
-    vertical_y_min : float, optional
-        Minimum y-axis value for the vertical plot.
-    vertical_y_max : float, optional
-        Maximum y-axis value for the vertical plot.
     """
     if isinstance(data_files, str):
         data_files = [data_files]
@@ -84,12 +72,10 @@ def global_ke(data_files,
     ax = axes[0]
     ax.semilogy(time_results, ke_results, color='black')
     ax.set_ylabel('KE [$m^2/s^2$]')
-    ax.set_ylim(y_min, y_max)
     
     ax = axes[1]
     ax.semilogy(time_results, vertical_ke_results, color='black')
     ax.set_ylabel('[$m^3/s^2$]')
-    ax.set_ylim(vertical_y_min, vertical_y_max)
     
     axes[-1].set_xlabel('Time')
     fig.suptitle('KE Over Time for the Whole Domain')
@@ -99,11 +85,7 @@ def global_ke(data_files,
 def box_eke(data_files, 
         boxes=[(48, 60, -4, 3), (41, 47, -15, -8), (36.5, 42.5, -28, -19), (52, 60, -24, -16)], 
         names=['Equator', 'Mayotte-Comores', 'South-Moz', 'Mascarene'], 
-        colors=['saddlebrown', 'darkorchid', 'navy', 'teal'], 
-        y_min=1e2, 
-        y_max=1e4, 
-        vertical_y_min=1e-3, 
-        vertical_y_max=1e-1):
+        colors=['saddlebrown', 'darkorchid', 'navy', 'teal']):
     """
     Calculate and plot the time series of EKE for specified regions.
 
@@ -117,14 +99,6 @@ def box_eke(data_files,
         Names of the regions.
     colors : list of str
         Colors for the plot lines.
-    y_min : float, optional
-        Minimum y-axis value for the plot.
-    y_max : float, optional
-        Maximum y-axis value for the plot.
-    vertical_y_min : float, optional
-        Minimum y-axis value for the vertical plot.
-    vertical_y_max : float, optional
-        Maximum y-axis value for the vertical plot.
     """
     if isinstance(data_files, str):
         data_files = [data_files]
@@ -138,6 +112,8 @@ def box_eke(data_files,
     for data_file in data_files:
         # Load simulation data
         u, v, w, time, s_rho = load_data(data_file, ('u', 'v', 'w', 'time', 's_rho'))
+        
+        time_results.append(time.data)
 
         depth = h * s_rho # Profondeur
         depth = np.transpose(depth.data, (2, 0, 1)) # Transpose depth to match u, v, w shape
@@ -157,9 +133,12 @@ def box_eke(data_files,
         ut = (u_yr - u).data
         vt = (v_yr - v).data
         wt = (w_yr - w).data
+        
+        u, v, w, time, s_rho = None, None, None, None, None
 
         # Calculating EKE
         EKE = 1 / 2 * (ut[:,:,:-1,:] ** 2 + vt[:,:,:,:-1] ** 2 + wt[:,:,:-1,:-1] ** 2)
+        ut, vt, wt = None, None, None
         
         # Integrating EKE over depth
         ddepth_expand = ddepth[:,:-1,:-1].reshape(EKE.shape[0]-1, EKE.shape[1], EKE.shape[2], 1)
@@ -170,7 +149,6 @@ def box_eke(data_files,
         for (lon1, lon2, lat1, lat2), name, color in zip(boxes, names, colors):
             box_mask = np.array((lon >= lon1) & (lon <= lon2) & (lat >= lat1) & (lat <= lat2))[:-1,:-1]
             EKE_box = EKE[:,box_mask,:]
-            ddepth_box = ddepth[:,:-1,:-1][:,box_mask]
             EKE_integrated_box = EKE_integrated[box_mask]
 
             # Calculate the spatial mean of EKE_box over time
@@ -178,8 +156,8 @@ def box_eke(data_files,
             EKE_integrated_box_sum = np.nansum(EKE_integrated_box, axis=0)
             eke_results[name].append(EKE_box_sum.T)
             vertical_eke_results[name].append(EKE_integrated_box_sum.T)
-
-        time_results.append(time.data)
+        
+        EKE, EKE_weighted, EKE_integrated = None, None, None
 
     # Concatenate results
     for name in names:
@@ -194,7 +172,6 @@ def box_eke(data_files,
         ax.semilogy(time_results, eke_results[name][:,-1], label=name, color=color)
         ax.set_ylabel('EKE [$m^2/s^2$]')
         ax.legend()
-        ax.set_ylim(y_min, y_max)
 
     axes[-1].set_xlabel('Time')
     fig.suptitle('EKE Over Time for Different Boxes')
@@ -208,7 +185,6 @@ def box_eke(data_files,
         ax.semilogy(time_results, vertical_eke_results[name], label=name, color=color)
         ax.set_ylabel('[$m^3/s^2$]')
         ax.legend()
-        ax.set_ylim(vertical_y_min, vertical_y_max)
 
     axes[-1].set_xlabel('Time')
     fig.suptitle('Vertically integrated EKE Over Time for Different Boxes')
@@ -218,11 +194,7 @@ def box_eke(data_files,
 def box_mke(data_files, 
         boxes=[(48, 60, -4, 3), (41, 47, -15, -8), (36.5, 42.5, -28, -19), (52, 60, -24, -16)], 
         names=['Equator', 'Mayotte-Comores', 'South-Moz', 'Mascarene'], 
-        colors=['saddlebrown', 'darkorchid', 'navy', 'teal'], 
-        y_min=1e2, 
-        y_max=1e4, 
-        vertical_y_min=1e5, 
-        vertical_y_max=1e7):
+        colors=['saddlebrown', 'darkorchid', 'navy', 'teal']):
     """
     Calculate and plot the time series of MKE for specified regions.
 
@@ -236,14 +208,6 @@ def box_mke(data_files,
         Names of the regions.
     colors : list of str
         Colors for the plot lines.
-    y_min : float, optional
-        Minimum y-axis value for the plot.
-    y_max : float, optional
-        Maximum y-axis value for the plot.
-    vertical_y_min : float, optional
-        Minimum y-axis value for the vertical plot.
-    vertical_y_max : float, optional
-        Maximum y-axis value for the vertical plot.
     """
     if isinstance(data_files, str):
         data_files = [data_files]
@@ -258,6 +222,7 @@ def box_mke(data_files,
         # Load simulation data
         u, v, w, time, s_rho = load_data(data_file, ('u', 'v', 'w', 'time', 's_rho'))
 
+        time_results.append(time.data)
         depth = h * s_rho # Profondeur
         depth = np.transpose(depth.data, (2, 0, 1)) # Transpose depth to match u, v, w shape
         ddepth = np.diff(depth, axis=0)
@@ -269,6 +234,8 @@ def box_mke(data_files,
 
         # Calculating MKE
         MKE = 1 / 2 * (u[:,:,:-1,:] ** 2 + v[:,:,:,:-1] ** 2 + w[:,:,:-1,:-1] ** 2)
+        
+        u, v, w, time, s_rho = None, None, None, None, None
 
         # Extracting EKE for each box
         for (lon1, lon2, lat1, lat2), name, color in zip(boxes, names, colors):
@@ -283,8 +250,8 @@ def box_mke(data_files,
             MKE_integrated_box_sum = np.nansum(MKE_integrated, axis=1)
             mke_results[name].append(MKE_box_sum)
             vertical_mke_results[name].append(MKE_integrated_box_sum)
-
-        time_results.append(time.data)
+            
+        MKE, MKE_weighted, MKE_integrated = None, None, None
 
     # Concatenate results
     for name in names:
@@ -299,7 +266,6 @@ def box_mke(data_files,
         ax.semilogy(time_results, mke_results[name][:], label=name, color=color)
         ax.set_ylabel('MKE [$m^2/s^2$]')
         ax.legend()
-        ax.set_ylim(y_min, y_max)
 
     axes[-1].set_xlabel('Time')
     fig.suptitle('MKE Over Time for Different Boxes')
@@ -313,7 +279,6 @@ def box_mke(data_files,
         ax.semilogy(time_results, vertical_mke_results[name], label=name, color=color)
         ax.set_ylabel('[$m^3/s^2$]')
         ax.legend()
-        ax.set_ylim(vertical_y_min, vertical_y_max)
 
     axes[-1].set_xlabel('Time')
     fig.suptitle('Vertically integrated EKE Over Time for Different Boxes')
@@ -365,6 +330,9 @@ def box_sla(data_files,
         
         SLA = np.array(zeta - zeta_yr)
         
+        time_results.append(time.data)
+        zeta, time = None, None
+        
         for (lon1, lon2, lat1, lat2), name, color in zip(boxes, names, colors):
             box_mask = np.array((lon >= lon1) & (lon <= lon2) & (lat >= lat1) & (lat <= lat2))
             SLA_box = SLA[:,box_mask]
@@ -373,7 +341,9 @@ def box_sla(data_files,
             SLA_box_mean = np.nanmean(SLA_box, axis=1)
             sla_results[name].append(SLA_box_mean)
 
-        time_results.append(time.data)
+        
+        SLA = None
+        
         
     for name in names:
         sla_results[name] = np.concatenate(sla_results[name])
@@ -442,6 +412,9 @@ def box_sta(data_files,
         
         STA = np.array(temp - temp_yr)
         
+        time_results.append(time.data)
+        temp, time = None, None
+        
         for (lon1, lon2, lat1, lat2), name, color in zip(boxes, names, colors):
             box_mask = np.array((lon >= lon1) & (lon <= lon2) & (lat >= lat1) & (lat <= lat2))
             STA_box = STA[:,box_mask]
@@ -450,7 +423,7 @@ def box_sta(data_files,
             STA_box_mean = np.nanmean(STA_box, axis=1)
             sta_results[name].append(STA_box_mean)
 
-        time_results.append(time.data)
+        STA = None        
         
     for name in names:
         sta_results[name] = np.concatenate(sta_results[name])
@@ -519,6 +492,9 @@ def box_ssa(data_files,
         
         SSA = np.array(salt - salt_yr)
         
+        time_results.append(time.data)
+        salt, time = None, None
+        
         for (lon1, lon2, lat1, lat2), name, color in zip(boxes, names, colors):
             box_mask = np.array((lon >= lon1) & (lon <= lon2) & (lat >= lat1) & (lat <= lat2))
             SSA_box = SSA[:,box_mask]
@@ -526,8 +502,7 @@ def box_ssa(data_files,
             # Calculate the spatial mean of SSA_box over time
             SSA_box_mean = np.nanmean(SSA_box, axis=1)
             ssa_results[name].append(SSA_box_mean)
-
-        time_results.append(time.data)
+        SSA = None
         
     for name in names:
         ssa_results[name] = np.concatenate(ssa_results[name])
@@ -691,7 +666,7 @@ def box_sst(data_files,
 
     axes[-1].set_xlabel('Time')
     fig.suptitle('Sea Surface Temperature Over Time for Different Boxes')
-    save_figure(fig, f"sta_boxes_time_series.png")
+    save_figure(fig, f"sst_boxes_time_series.png")
     plt.close(fig)
     
 def box_sss(data_files, 
