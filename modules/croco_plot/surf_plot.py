@@ -87,7 +87,7 @@ def multiple_annual(data_path,
     gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.3}
     
     if 'sss' in variables and 'ssh' in variables and 'sst' in variables:
-        fig, axs = plt.subplots(1, len(variables), figsize=figsize, subplot_kw={'projection': ccrs.PlateCarree()})
+        fig, axs = plt.subplots(1, 3, figsize=figsize, subplot_kw={'projection': ccrs.PlateCarree()})
 
         ax = axs[0]
         ax.set_title(f"SWIO {start_date} to {end_date}", size=9)
@@ -108,11 +108,11 @@ def multiple_annual(data_path,
         plot_map(ax, lon, lat, temp, sst_cmap, norm, levels, r'$\overline{\overline{SST}}$ [°C]', msk, msk_inv, gridline_style)
         
         plt.tight_layout()
-        save_figure(fig, f"surface_all_{start_date}_{end_date}.png")
+        save_figure(fig, f"surface_all_{data_path}.png")
         plt.close(fig)
         
     if 'annual_sd':
-        fig, axs = plt.subplots(1, len(variables), figsize=figsize, subplot_kw={'projection': ccrs.PlateCarree()})
+        fig, axs = plt.subplots(1, 3, figsize=figsize, subplot_kw={'projection': ccrs.PlateCarree()})
         
         ax = axs[0]
         ax.set_title("Annual Standard Deviation", size=9)
