@@ -12,6 +12,90 @@ import cmocean
 import cartopy.crs as ccrs
 from .utils import load_grid, load_data, save_figure
 
+def global_ke(data_files, 
+               y_min=8e3, 
+               y_max=2e4,
+               vertical_y_min=1e7,
+               vertical_y_max=3e7):
+    """
+    Calculate and plot the time series of KE for the whole domain.
+
+    Parameters
+    ----------
+    data_files : list of str
+        List of paths to the simulation data files.
+    y_min : float, optional
+        Minimum y-axis value for the plot.
+    y_max : float, optional
+        Maximum y-axis value for the plot.
+    vertical_y_min : float, optional
+        Minimum y-axis value for the vertical plot.
+    vertical_y_max : float, optional
+        Maximum y-axis value for the vertical plot.
+    """
+    if isinstance(data_files, str):
+        data_files = [data_files]
+        
+    ke_results = []
+    vertical_ke_results = []
+    time_results = []
+        
+    _, _, _, _, _, _, _, h = load_grid()
+    
+    for data_file in data_files:
+        # Load simulation data
+        u, v, w, time, s_rho = load_data(data_file, ('u', 'v', 'w', 'time', 's_rho'))
+        
+        time_results.append(time.data)
+        time = None
+        
+        depth = h * s_rho # Profondeur
+        depth = np.transpose(depth.data, (2, 0, 1)) # Transpose depth to match u, v, w shape
+        ddepth = np.diff(depth, axis=0)
+        ddepth = ddepth.reshape(1,ddepth.shape[0], ddepth.shape[1], ddepth.shape[2])
+        depth = None
+        
+        fill_value = 9.96921e+36
+        u = u.where((u != fill_value), np.nan).data
+        v = v.where((v != fill_value), np.nan).data
+        w = w.where((w != fill_value), np.nan).data
+        
+        # Calculating EKE
+        KE = 1 / 2 * (u[:,:,:-1,:] ** 2 + v[:,:,:,:-1] ** 2 + w[:,:,:-1,:-1] ** 2)
+        
+        u,v,w = None, None, None
+        
+        surf_KE = np.nansum(KE[:,-1,:,:], axis=(1, 2))
+        KE_weighted = KE[:,1:,:,:] * ddepth[:,:,:-1,:-1]
+        KE_integrated = np.nansum(KE_weighted, axis=1)
+        
+        ke_results.append(surf_KE)
+        vertical_ke_results.append(np.nansum(KE_integrated, axis=(1,2)))
+        
+        KE, surf_KE, KE_weighted, KE_integrated = None, None, None, None
+        
+           
+    ke_results = np.concatenate(ke_results)
+    vertical_ke_results = np.concatenate(vertical_ke_results)
+    time_results = np.concatenate(time_results)
+    
+    fig, axes = plt.subplots(2, 1, figsize = (12, 4), sharex= True)
+    
+    ax = axes[0]
+    ax.semilogy(time_results, ke_results, color='black')
+    ax.set_ylabel('KE [$m^2/s^2$]')
+    ax.set_ylim(y_min, y_max)
+    
+    ax = axes[1]
+    ax.semilogy(time_results, vertical_ke_results, color='black')
+    ax.set_ylabel('[$m^3/s^2$]')
+    ax.set_ylim(vertical_y_min, vertical_y_max)
+    
+    axes[-1].set_xlabel('Time')
+    fig.suptitle('KE Over Time for the Whole Domain')
+    save_figure(fig, f"ke_global_time_series.png")
+    plt.close(fig)
+
 def box_eke(data_files, 
         boxes=[(48, 60, -4, 3), (41, 47, -15, -8), (36.5, 42.5, -28, -19), (52, 60, -24, -16)], 
         names=['Equator', 'Mayotte-Comores', 'South-Moz', 'Mascarene'], 
@@ -25,23 +109,27 @@ def box_eke(data_files,
 
     Parameters
     ----------
-    data_path : str
-        Path to the simulation data directory.
-    simu : str
-        Simulation subdirectory.
-    grid_path : str
-        Path to the grid file.
-    boxes : list of tuplesda
+    data_files : list of str
+        List of paths to the simulation data files.
+    boxes : list of tuples
         List of tuples defining the regions (lon1, lon2, lat1, lat2).
     names : list of str
         Names of the regions.
     colors : list of str
         Colors for the plot lines.
+    y_min : float, optional
+        Minimum y-axis value for the plot.
+    y_max : float, optional
+        Maximum y-axis value for the plot.
+    vertical_y_min : float, optional
+        Minimum y-axis value for the vertical plot.
+    vertical_y_max : float, optional
+        Maximum y-axis value for the vertical plot.
     """
     if isinstance(data_files, str):
         data_files = [data_files]
     # Load grid data
-    lon, lat, _, _, msk, msk_inv, angle, h = load_grid()
+    lon, lat, _, _, _, _, _, h = load_grid()
 
     eke_results = {name: [] for name in names}
     vertical_eke_results = {name: [] for name in names}
@@ -66,19 +154,12 @@ def box_eke(data_files,
         w_yr = np.mean(w, axis = 0)
 
         # Vitesse turbulente
-        ut = u_yr - u
-        vt = v_yr - v
-        wt = w_yr - w
-
-        # Transformation des composantes de vent (grille déformée -> grille géographique) pour chaque time index
-        angle_expand = angle[:,:].data.reshape(1, angle.shape[0], angle.shape[1], 1)
-        
-        ut_geo = ut[:,:-1,:,:].data * np.cos(angle_expand[:,:-1,:-1:,]) - vt[:,:,:-1,:].data * np.sin(angle_expand[:,:-1,:-1,:])
-        vt_geo = ut[:,:-1,:,:].data * np.sin(angle_expand[:,:-1,:-1:,]) + vt[:,:,:-1,:].data * np.cos(angle_expand[:,:-1,:-1,:])
-        wt_geo = wt[:,:-1,:-1,:].data
+        ut = (u_yr - u).data
+        vt = (v_yr - v).data
+        wt = (w_yr - w).data
 
         # Calculating EKE
-        EKE = 1 / 2 * (ut_geo ** 2 + vt_geo ** 2 + wt_geo ** 2)
+        EKE = 1 / 2 * (ut[:,:,:-1,:] ** 2 + vt[:,:,:,:-1] ** 2 + wt[:,:,:-1,:-1] ** 2)
         
         # Integrating EKE over depth
         ddepth_expand = ddepth[:,:-1,:-1].reshape(EKE.shape[0]-1, EKE.shape[1], EKE.shape[2], 1)
@@ -143,27 +224,31 @@ def box_mke(data_files,
         vertical_y_min=1e5, 
         vertical_y_max=1e7):
     """
-    Calculate and plot the time series of EKE for specified regions.
+    Calculate and plot the time series of MKE for specified regions.
 
     Parameters
     ----------
-    data_path : str
-        Path to the simulation data directory.
-    simu : str
-        Simulation subdirectory.
-    grid_path : str
-        Path to the grid file.
-    boxes : list of tuplesda
+    data_files : list of str
+        List of paths to the simulation data files.
+    boxes : list of tuples
         List of tuples defining the regions (lon1, lon2, lat1, lat2).
     names : list of str
         Names of the regions.
     colors : list of str
         Colors for the plot lines.
+    y_min : float, optional
+        Minimum y-axis value for the plot.
+    y_max : float, optional
+        Maximum y-axis value for the plot.
+    vertical_y_min : float, optional
+        Minimum y-axis value for the vertical plot.
+    vertical_y_max : float, optional
+        Maximum y-axis value for the vertical plot.
     """
     if isinstance(data_files, str):
         data_files = [data_files]
     # Load grid data
-    lon, lat, _, _, msk, msk_inv, angle, h = load_grid()
+    lon, lat, _, _, _, _, _, h = load_grid()
 
     mke_results = {name: [] for name in names}
     vertical_mke_results = {name: [] for name in names}
@@ -178,19 +263,12 @@ def box_mke(data_files,
         ddepth = np.diff(depth, axis=0)
         
         fill_value = 9.96921e+36
-        u = u.where((u != fill_value), np.nan)
-        v = v.where((v != fill_value), np.nan)
-        w = w.where((w != fill_value), np.nan)
+        u = u.where((u != fill_value), np.nan).data
+        v = v.where((v != fill_value), np.nan).data
+        w = w.where((w != fill_value), np.nan).data
 
-        # Transformation des composantes de vent (grille déformée -> grille géographique) pour chaque time index
-        angle_expand = angle[:,:].data.reshape(1, 1, angle.shape[0], angle.shape[1])
-        
-        u_geo = u[:,:,:-1,:].data * np.cos(angle_expand[:,:,:-1:,:-1]) - v[:,:,:,:-1].data * np.sin(angle_expand[:,:,:-1,:-1])
-        v_geo = u[:,:,:-1,:].data * np.sin(angle_expand[:,:,:-1:,:-1]) + v[:,:,:,:-1].data * np.cos(angle_expand[:,:,:-1,:-1])
-        w_geo = w[:,:,:-1,:-1].data
-
-        # Calculating EKE
-        MKE = 1 / 2 * (u_geo ** 2 + v_geo ** 2 + w_geo ** 2)
+        # Calculating MKE
+        MKE = 1 / 2 * (u[:,:,:-1,:] ** 2 + v[:,:,:,:-1] ** 2 + w[:,:,:-1,:-1] ** 2)
 
         # Extracting EKE for each box
         for (lon1, lon2, lat1, lat2), name, color in zip(boxes, names, colors):
@@ -262,16 +340,16 @@ def box_sla(data_files,
         Names of the regions.
     colors : list of str
         Colors for the plot lines.
-    roll : int
+    roll : int, optional
         Window size for the centered rolling mean.
-    y_min : float
+    y_min : float, optional
         Minimum y-axis value for the plot.
-    y_max : float
+    y_max : float, optional
         Maximum y-axis value for the plot.
     """
     if isinstance(data_files, str):
         data_files = [data_files]
-    lon, lat, _, _, msk, msk_inv, _, _ = load_grid()
+    lon, lat, _, _, _, _, _, _ = load_grid()
     
     sla_results = {name: [] for name in names}
     time_results = []
@@ -307,7 +385,7 @@ def box_sla(data_files,
         ax.plot(time_results, sla_results[name], color=color, linestyle='--', linewidth=1)
         # Apply centered rolling mean
         sla_rolling_mean = np.convolve(sla_results[name], np.ones(roll)/roll, mode='same')
-        valid_indices = ~np.isnan(sla_rolling_mean)
+
         ax.plot(time_results[int((roll-1)/2):-int((roll-1)/2)], sla_rolling_mean[int((roll-1)/2):-int((roll-1)/2)], color=color, linestyle='-', linewidth=1.5, alpha=0.8)
         ax.set_ylabel('SLA [m]')
         ax.set_ylim(y_min, y_max)
@@ -338,16 +416,16 @@ def box_sta(data_files,
         Names of the regions.
     colors : list of str
         Colors for the plot lines.
-    roll : int
+    roll : int, optional
         Window size for the centered rolling mean.
-    y_min : float
+    y_min : float, optional
         Minimum y-axis value for the plot.
-    y_max : float
+    y_max : float, optional
         Maximum y-axis value for the plot.
     """
     if isinstance(data_files, str):
         data_files = [data_files]
-    lon, lat, _, _, msk, msk_inv, _, _ = load_grid()
+    lon, lat, _, _, _, _, _, _ = load_grid()
     
     sta_results = {name: [] for name in names}
     time_results = []
@@ -384,7 +462,7 @@ def box_sta(data_files,
         ax.plot(time_results, sta_results[name], color=color, linestyle='--', linewidth=1)
         # Apply centered rolling mean
         sta_rolling_mean = np.convolve(sta_results[name], np.ones(roll)/roll, mode='same')
-        valid_indices = ~np.isnan(sta_rolling_mean)
+
         ax.plot(time_results[int((roll-1)/2):-int((roll-1)/2)], sta_rolling_mean[int((roll-1)/2):-int((roll-1)/2)], color=color, linestyle='-', linewidth=1.5, alpha=0.8)
         ax.set_ylabel('STA [°C]')
         ax.set_ylim(y_min, y_max)
@@ -415,11 +493,11 @@ def box_ssa(data_files,
         Names of the regions.
     colors : list of str
         Colors for the plot lines.
-    roll : int
+    roll : int, optional
         Window size for the centered rolling mean.
-    y_min : float
+    y_min : float, optional
         Minimum y-axis value for the plot.
-    y_max : float
+    y_max : float, optional
         Maximum y-axis value for the plot.
     """
     if isinstance(data_files, str):
@@ -492,16 +570,16 @@ def box_ssh(data_files,
         Names of the regions.
     colors : list of str
         Colors for the plot lines.
-    roll : int
+    roll : int, optional
         Window size for the centered rolling mean.
-    y_min : float
+    y_min : float, optional
         Minimum y-axis value for the plot.
-    y_max : float
+    y_max : float, optional
         Maximum y-axis value for the plot.
     """
     if isinstance(data_files, str):
         data_files = [data_files]
-    lon, lat, _, _, msk, msk_inv, _, _ = load_grid()
+    lon, lat, _, _, _, _, _, _ = load_grid()
     
     ssh_results = {name: [] for name in names}
     time_results = []
@@ -533,7 +611,7 @@ def box_ssh(data_files,
         ax.plot(time_results, ssh_results[name], color=color, linestyle='--', linewidth=1)
         # Apply centered rolling mean
         ssh_rolling_mean = np.convolve(ssh_results[name], np.ones(roll)/roll, mode='same')
-        valid_indices = ~np.isnan(ssh_rolling_mean)
+        
         ax.plot(time_results[int((roll-1)/2):-int((roll-1)/2)], ssh_rolling_mean[int((roll-1)/2):-int((roll-1)/2)], color=color, linestyle='-', linewidth=1.5, alpha=0.8)
         ax.set_ylabel('SSH [m]')
         ax.set_ylim(y_min, y_max)
@@ -564,16 +642,16 @@ def box_sst(data_files,
         Names of the regions.
     colors : list of str
         Colors for the plot lines.
-    roll : int
+    roll : int, optional
         Window size for the centered rolling mean.
-    y_min : float
+    y_min : float, optional
         Minimum y-axis value for the plot.
-    y_max : float
+    y_max : float, optional
         Maximum y-axis value for the plot.
     """
     if isinstance(data_files, str):
         data_files = [data_files]
-    lon, lat, _, _, msk, msk_inv, _, _ = load_grid()
+    lon, lat, _, _, _, _, _, _ = load_grid()
     
     sst_results = {name: [] for name in names}
     time_results = []
@@ -636,16 +714,16 @@ def box_sss(data_files,
         Names of the regions.
     colors : list of str
         Colors for the plot lines.
-    roll : int
+    roll : int, optional
         Window size for the centered rolling mean.
-    y_min : float
+    y_min : float, optional
         Minimum y-axis value for the plot.
-    y_max : float
+    y_max : float, optional
         Maximum y-axis value for the plot.
     """
     if isinstance(data_files, str):
         data_files = [data_files]
-    lon, lat, _, _, msk, msk_inv, _, _ = load_grid()
+    lon, lat, _, _, _, _, _, _ = load_grid()
     
     sss_results = {name: [] for name in names}
     time_results = []

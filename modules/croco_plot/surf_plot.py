@@ -76,7 +76,7 @@ def all_surf(data_path, start_date, end_date, figsize=(24, 6), sss_cmap=cmocean.
     save_figure(fig, f"sea_surface_{start_date}_{end_date}.png")
     plt.close(fig)
     
-def all_surface_annual_SD(data_path, figsize=(24, 6), sss_cmap=cmocean.cm.haline, ssh_cmap=cmcrameri.cm.roma_r, sst_cmap=cmocean.cm.thermal):
+def all_surf_annual_SD(data_path, figsize=(24, 6), sss_cmap=cmocean.cm.haline, ssh_cmap=cmcrameri.cm.roma_r, sst_cmap=cmocean.cm.thermal):
     """
     Plot annual SSS, SST, and SSH standard deviation on a map.
 
