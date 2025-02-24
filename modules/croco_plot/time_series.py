@@ -142,6 +142,7 @@ def multiple_time_series(data_files,
                         box_sum = np.nansum(weighted_data[:,-1,:], axis=1)
                     else:
                         box_sum = np.nanmean(box_data, axis=1)
+                        weighted_data = None
                     results[var][name].append(box_sum)
                 del var_data, box_data, weighted_data
 
