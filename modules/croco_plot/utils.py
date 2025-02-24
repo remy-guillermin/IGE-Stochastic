@@ -11,7 +11,7 @@ import subprocess
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 
-def load_grid(is_Velocity=False):
+def load_grid(path=None, is_Velocity=False):
     """
     Load the grid file into this iPython instance
 
@@ -27,7 +27,8 @@ def load_grid(is_Velocity=False):
         - angle: Grid angle values representing the grid's orientation.
         - h: Bathymetric depth values.
     """
-    path = '/lus/store/CT1/c1601279/lweiss/GRID/croco_grid_swio2.nc'
+    if path is None:
+        path = '/lus/store/CT1/c1601279/lweiss/GRID/croco_grid_swio2.nc'
     g = xr.open_dataset(path)
     if is_Velocity:
         lon = g['lon_rho'][:-1, :-1]
@@ -132,21 +133,58 @@ def plot_map(ax, lon, lat, data, cmap, norm, label, msk, msk_inv, gridline_style
     gridline_style : dict
         Style for gridlines.
     """
-    pcm = ax.pcolormesh(lon[:, :], lat[:, :], data, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
-    ax.contour(lon, lat, msk, colors='k', linewidths=0.1)
-    ax.contourf(lon, lat, msk_inv, colors='lightgray')
+    try:
+        pcm = ax.pcolormesh(lon[:, :], lat[:, :], data, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
+        ax.contour(lon, lat, msk, colors='k', linewidths=0.1)
+        ax.contourf(lon, lat, msk_inv, colors='lightgray')
 
-    gl = ax.gridlines(crs=ccrs.PlateCarree(), **gridline_style)
-    gl.top_labels = False
-    gl.right_labels = False
-    gl.xlabel_style = gl.ylabel_style = {'size': 8, 'color': 'k'}
+        gl = ax.gridlines(crs=ccrs.PlateCarree(), **gridline_style)
+        gl.top_labels = False
+        gl.right_labels = False
+        gl.xlabel_style = gl.ylabel_style = {'size': 8, 'color': 'k'}
 
-    cb = plt.colorbar(pcm, ax=ax, label=label, orientation='vertical')
-    if levels is not None:
-        ticks = levels
-        cb.set_ticks(ticks)
-        cb.ax.set_yticklabels(np.round(ticks, 2), fontsize=8)
+        cb = plt.colorbar(pcm, ax=ax, label=label, orientation='vertical')
+        if levels is not None:
+            ticks = levels
+            cb.set_ticks(ticks)
+            cb.ax.set_yticklabels(np.round(ticks, 2), fontsize=8)
+    except Exception as e:
+        print(f"Error in plot_map: {e}")
+        
+def plot_time_series(time_results, results, ylabel, roll, names, colors, filename, title):
+    """
+    Plot time series data with rolling mean for multiple variables.
 
+    Parameters
+    ----------
+    time_results : array-like
+        Array of time points corresponding to the results.
+    results : dict
+        Dictionary containing the results to plot, with keys as variable names and values as arrays of data.
+    ylabel : str
+        Label for the y-axis.
+    roll : int
+        Window size for computing the rolling mean.
+    names : list of str
+        List of variable names to plot.
+    colors : list of str
+        List of colors for each variable plot.
+    filename : str
+        Filename to save the plot.
+    title : str
+        Title of the plot.
+    """
+    fig, axes = plt.subplots(len(names), 1, figsize=(12, 2 * len(names)), sharex=True)
+    for ax, (name, color) in zip(axes, zip(names, colors)):
+        ax.plot(time_results, results[name], color=color, linestyle='--', linewidth=1)
+        rolling_mean = np.convolve(results[name], np.ones(roll)/roll, mode='same')
+        ax.plot(time_results[int((roll-1)/2):-int((roll-1)/2)], rolling_mean[int((roll-1)/2):-int((roll-1)/2)], color=color, linestyle='-', linewidth=1.5, alpha=0.8)
+        ax.set_ylabel(ylabel)
+        ax.set_title(name)
+    axes[-1].set_xlabel('Time')
+    fig.suptitle(title)
+    save_figure(fig, filename)
+    plt.close(fig)
 
 def save_figure(fig, filename):
     """
