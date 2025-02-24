@@ -17,7 +17,8 @@ def multiple_time_series(data_files,
                          boxes=[(48, 60, -4, 3), (41, 47, -15, -8), (36.5, 42.5, -28, -19), (52, 60, -24, -16)], 
                          names=['Equator', 'Mayotte-Comores', 'South-Moz', 'Mascarene'], 
                          colors=['saddlebrown', 'darkorchid', 'navy', 'teal'],
-                         roll = 9):
+                         roll = 9,
+                         grid_path=None):
     """
     Calculate and plot multiple time series for specified regions.
 
@@ -49,7 +50,10 @@ def multiple_time_series(data_files,
     ke_results = []
 
     # Load grid data
-    lon, lat, pm, pn, msk, _, _, h = load_grid()
+    if grid_path is not None:
+        lon, lat, pm, pn, msk, _, _, h = load_grid(grid_path)
+    else:
+        lon, lat, pm, pn, msk, _, _, h = load_grid()
     
     fill_value = 9.96921e+36
     
