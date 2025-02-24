@@ -35,6 +35,8 @@ def multiple_time_series(data_files,
        Names of the regions.
     colors : list, optional
         Colors for the plot lines.
+    grid_path : str, optional
+        Path to the grid file, by default None
     """
     if isinstance(data_files, str):
         data_files = [data_files]
@@ -99,7 +101,7 @@ def multiple_time_series(data_files,
             KE = 1 / 2 * (u[:,:,:-1,:] ** 2 + v[:,:,:,:-1] ** 2 + w[:,:,:-1,:-1] ** 2)
             surf_KE = np.nansum(KE[:,-1,:,:], axis=(1, 2))
             KE_weighted = KE[:,1:,:,:] * cell_volume[:,:,:-1,:-1] / domain_volume
-            ke_results.append(KE_weighted)
+            ke_results.append(np.sum(KE_weighted, axis=(1, 2, 3)))
             del KE, surf_KE, KE_weighted
         
         for var in ['mke', 'eke', 'sla', 'ssa', 'sta', 'ssh', 'sss', 'sst']:
