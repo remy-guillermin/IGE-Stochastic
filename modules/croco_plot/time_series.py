@@ -132,7 +132,10 @@ def multiple_time_series(data_files,
                     box_mask = np.array((lon >= lon1) & (lon <= lon2) & (lat >= lat1) & (lat <= lat2))
                     if var in ['mke', 'eke']:
                         box_mask = box_mask[:-1,:-1]
-                    box_data = var_data[:,:,box_mask]
+                    if var in ['sla', 'ssh']:
+                        box_data = var_data[:,box_mask]
+                    else:
+                        box_data = var_data[:,:,box_mask]
                     if var in ['mke', 'eke']:
                         volume_box = cell_volume[:,:,:-1,:-1][:,:,box_mask]
                         weighted_data = box_data[:,1:,:] * volume_box / domain_volume
