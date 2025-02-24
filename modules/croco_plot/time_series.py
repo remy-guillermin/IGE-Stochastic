@@ -94,7 +94,7 @@ def multiple_time_series(data_files,
         ddepth = ddepth.reshape(1,ddepth.shape[0], ddepth.shape[1], ddepth.shape[2])
         cell_volume = ddepth * cell_surface
         domain_volume = np.nansum(cell_volume)
-        depth, ddepth, cell_surface, pm, pn, s_rho = None, None, None, None, None, None
+        depth, ddepth, cell_surface, s_rho = None, None, None, None
         
         if 'ke' in variables:
             print('Calculating KE')
