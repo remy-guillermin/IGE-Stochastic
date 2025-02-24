@@ -132,7 +132,7 @@ def multiple_time_series(data_files,
                     box_mask = np.array((lon >= lon1) & (lon <= lon2) & (lat >= lat1) & (lat <= lat2))
                     if var in ['mke', 'eke']:
                         box_mask = box_mask[:-1,:-1]
-                    if var in ['sla', 'ssh']:
+                    if var in ['sla', 'ssh', 'sta', 'ssa', 'sss', 'sst']:
                         box_data = var_data[:,box_mask]
                     else:
                         box_data = var_data[:,:,box_mask]
