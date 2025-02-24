@@ -10,96 +10,7 @@ import matplotlib as mpl
 import cmocean
 import cmcrameri
 import cartopy.crs as ccrs
-import xarray as xr
 from .utils import load_grid, load_data, save_figure, plot_map
-
-def vel_vort_hel(data_path, start_date, end_date, figsize=(24, 8), cmap_velocity=cmcrameri.cm.oslo, cmap_vorticity=cmcrameri.cm.vik, cmap_helicity=cmcrameri.cm.vik):
-    """
-    Plot velocity, vorticity, and helicity data on a map.
-
-    Parameters
-    ----------
-    data_path : str
-        Path to the simulation data file.
-    start_date : str
-        Start time for the data slice.
-    end_date : str
-        End time for the data slice.
-    figsize : tuple, optional
-        Size of the figure, by default (24, 8)
-    cmap_velocity : colormap, optional
-        Colormap for velocity, by default cmcrameri.cm.oslo
-    cmap_vorticity : colormap, optional
-        Colormap for vorticity, by default cmcrameri.cm.vik
-    cmap_helicity : colormap, optional
-        Colormap for helicity, by default cmcrameri.cm.vik
-    """
-    # Load grid data
-    lon, lat, pm, pn, msk, msk_inv, angle, _ = load_grid(is_Velocity=True)
-
-    # Load simulation data
-    u, v = load_data(data_path, ('u', 'v'))
-    
-    u = u[:,:,:,:].sel(time=slice(start_date, end_date)).mean(dim='time')
-    v = v[:,:,:,:].sel(time=slice(start_date, end_date)).mean(dim='time')
-    print("Data selected")
-    
-    fill_value = 9.96921e+36
-    u = u.where((u != fill_value), np.nan).data
-    v = v.where((v != fill_value), np.nan).data
-    print("NaN values added")
-    
-    # Transformation des composantes de vent (grille déformée -> grille géographique) pour chaque time index
-    angle_expand = angle[:,:].data.reshape(1, angle.shape[0], angle.shape[1])
-    
-    u_geo = u[:,:-1,:] * np.cos(angle_expand[:,:-1,:-1]) - v[:,:,:-1] * np.sin(angle_expand[:,:-1,:-1])
-    v_geo = u[:,:-1,:] * np.sin(angle_expand[:,:-1,:-1]) + v[:,:,:-1] * np.cos(angle_expand[:,:-1,:-1])
-    print("Velocity transformed")
-    
-    velocity = np.sqrt(u_geo**2 + v_geo**2)
-
-    pm_expand = pm.data.reshape(1, pm.shape[0], pm.shape[1])
-    pn_expand = pn.data.reshape(1, pn.shape[0], pn.shape[1])
-    
-    # Calculate derivatives
-    dv_dlon = np.gradient(v_geo, axis=2) * pm_expand
-    du_dlat = np.gradient(u_geo, axis=1) * pn_expand
-
-    # Calculate vorticity and helicity
-    vorticity = dv_dlon - du_dlat
-    helicity = velocity * vorticity
-
-    # Plotting
-    fig, axes = plt.subplots(1, 3, figsize=figsize, subplot_kw={'projection': ccrs.PlateCarree()})
-
-    # Define common gridline styles
-    gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.3}
-
-    # --- Velocity Plot ---
-    ax = axes[0]
-    ax.set_title(f"Velocity SWIO {start_date}", size=9)
-    levels = np.linspace(0, 2.5, 11)
-    norm = mpl.colors.BoundaryNorm(levels, cmap_velocity.N)
-    plot_map(ax, lon, lat, velocity[-1,:,:], cmap_velocity, norm, levels, 'Velocity [$m.s^{-1}$]', msk, msk_inv, gridline_style)
-
-    # --- Vorticity Plot ---
-    ax = axes[1]
-    ax.set_title(f"Vorticity SWIO {start_date}", size=9)
-    levels = np.linspace(-0.15, 0.15, 11)
-    norm = mpl.colors.BoundaryNorm(levels, cmap_vorticity.N)
-    plot_map(ax, lon, lat, vorticity[-1,:,:] * 3600, cmap_vorticity, norm, levels, 'Vorticity [$h^{-1}$]', msk, msk_inv, gridline_style)
-
-    # --- Helicity Plot ---
-    ax = axes[2]
-    ax.set_title(f"Helicity SWIO {start_date}", size=9)
-    levels = np.linspace(-0.5, 0.5, 11)
-    norm = mpl.colors.BoundaryNorm(levels, cmap_helicity.N)
-    plot_map(ax, lon, lat, helicity[-1,:,:] * 3600 ** 2 / 1000, cmap_helicity, norm, levels, 'Helicity [$km.h^{-2}$]', msk, msk_inv, gridline_style)
-
-    plt.tight_layout()
-    save_figure(fig, f"vel_vort_hel_{start_date}_{end_date}.png")
-    plt.close(fig)
-
 
 def velocity(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm.oslo):
     """
@@ -221,65 +132,10 @@ def vorticity(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm
     plt.tight_layout()
     save_figure(fig, f"vorticity_{start_date}_{end_date}.png")
     plt.close(fig)
-
-
-def helicity(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm.vik):
-    """
-    Plot helicity data on a map for a specific date range.
-
-    Parameters
-    ----------
-    data_path : str
-        Path to the simulation data file.
-    start_date : str
-        Start date for the data slice in 'YYYY-MM-DD' format.
-    end_date : str
-        End date for the data slice in 'YYYY-MM-DD' format.
-    figsize : tuple, optional
-        Size of the figure, by default (8, 8)
-    cmap : colormap, optional
-        Colormap for helicity, by default cmcrameri.cm.vik
-    """
-    # Load grid data
-    lon, lat, pm, pn, msk, msk_inv, angle, _ = load_grid(is_Velocity=True)
-
-    # Load simulation data
-    u, v = load_data(data_path, ('u', 'v'))
-    u = u[:,-1,:,:].sel(time=slice(start_date, end_date)).mean(dim='time')
-    v = v[:,-1,:,:].sel(time=slice(start_date, end_date)).mean(dim='time')
-    
-    angle_expand = angle[:,:].data.reshape(1, angle.shape[0], angle.shape[1])
-    
-    u_geo = u[:,:-1,:] * np.cos(angle_expand[:,:-1,:-1]) - v[:,:,:-1] * np.sin(angle_expand[:,:-1,:-1])
-    v_geo = u[:,:-1,:] * np.sin(angle_expand[:,:-1,:-1]) + v[:,:,:-1] * np.cos(angle_expand[:,:-1,:-1])
-    velocity = np.sqrt(u_geo**2 + v_geo**2)
-
-    # Calculate derivatives
-    dv_dlon = np.gradient(v_geo, axis=1) * pm
-    du_dlat = np.gradient(u_geo, axis=0) * pn
-
-    # Calculate vorticity and helicity
-    vorticity = dv_dlon - du_dlat
-    helicity = velocity * vorticity
-
-    # Plotting
-    fig, ax = plt.subplots(figsize=figsize, subplot_kw={'projection': ccrs.PlateCarree()})
-
-    # Define common gridline styles
-    gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.3}
-
-    ax.set_title(f"Helicity SWIO {start_date} to {end_date}", size=9)
-    levels = np.linspace(-0.5, 0.5, 11)
-    norm = mpl.colors.BoundaryNorm(levels, cmap.N)
-    plot_map(ax, lon, lat, helicity[-1,:,:] * 3600 ** 2 / 1000, cmap, norm, levels, 'Helicity [$km.h^{-2}$]', msk, msk_inv, gridline_style)
-
-    plt.tight_layout()
-    save_figure(fig, f"helicity_{start_date}_{end_date}.png")
-    plt.close(fig)
     
 def eke(data_path, date, figsize=(8, 8), cmap=cmcrameri.cm.lapaz):
     """
-    Plot EKE data on a map for a specific date range.
+    Plot EKE data on a map for a specific date.
 
     Parameters
     ----------
@@ -292,12 +148,17 @@ def eke(data_path, date, figsize=(8, 8), cmap=cmcrameri.cm.lapaz):
     cmap : colormap, optional
         Colormap for EKE, by default cmcrameri.cm.lapaz
     """
-    
     # Load grid data
-    lon, lat, _, _, msk, msk_inv, angle, _ = load_grid(is_Velocity=True)
+    lon, lat, pm, pn, msk, msk_inv, angle, h = load_grid(is_Velocity=True)
 
     # Load simulation data
-    u, v, w = load_data(data_path, ('u', 'v', 'w'))
+    u, v, w, s_rho = load_data(data_path, ('u', 'v', 'w', 's_rho'))
+    
+    depth = h * s_rho # Profondeur
+    cell_volume = -(depth[:,:,-1] * 1 / pn * 1 / pm).data # Volumes des cellules de surface
+    surface_volume = - np.sum(depth[:,:,-1].data[h.data != 50] * 1 / pn.data[h.data != 50] * 1 / pm.data[h.data != 50])
+    domain_volume = np.sum(h.data[h.data != 50] * 1/ pn.data[h.data != 50] * 1 / pm.data[h.data != 50]) # Volume du domaine
+    depth, h ,s_rho, pm, pn = None, None, None, None, None 
     
     fill_value = 9.96921e+36
     u = u.where((u != fill_value), np.nan)
@@ -329,7 +190,7 @@ def eke(data_path, date, figsize=(8, 8), cmap=cmcrameri.cm.lapaz):
     wt_geo = wt[:,:,:-1,:-1]
     print("Turbulent velocity transformed")
     
-    EKE = 1 / 2 * (ut_geo[0,:,:,:] ** 2 + vt_geo[0,:,:,:] ** 2 + wt_geo[0,:,:,:] ** 2)
+    EKE = 1 / 2 * (ut_geo[0,-1,:,:] ** 2 + vt_geo[0,-1,:,:] ** 2 + wt_geo[0,-1,:,:] ** 2) * cell_volume / surface_volume
     print("EKE calculated")
     
     # Plotting
@@ -339,12 +200,10 @@ def eke(data_path, date, figsize=(8, 8), cmap=cmcrameri.cm.lapaz):
     gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.3}
 
     ax.set_title(f"EKE SWIO {date}", size=9)
-    a = -2
-    b = 1
-    c = 10
-    levels = np.logspace(np.log10(a), np.log10(b), c * 2 - 1)
-    norm = mpl.colors.BoundaryNorm(levels, cmap.N)
-    plot_map(ax, lon, lat, EKE[-1,:,:], cmap, norm, levels, 'EKE [$m^2.s^{-2}$]', msk, msk_inv, gridline_style)
+    a = -7
+    b = -5
+    norm = mpl.colors.LogNorm(vmin=a, vmax=b)
+    plot_map(ax, lon, lat, EKE, cmap, norm, 'EKE [$m^2.s^{-2}$]', msk, msk_inv, gridline_style)
 
     plt.tight_layout()
     save_figure(fig, f"eke_{date}.png")
@@ -405,10 +264,8 @@ def mke(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm.lapaz
     ax.set_title(f"MKE SWIO {start_date} to {end_date}", size=9)
     a = -2
     b = 1
-    c = 10
-    levels = np.logspace(np.log10(a), np.log10(b), c * 2 - 1)
-    norm = mpl.colors.BoundaryNorm(levels, cmap.N)
-    plot_map(ax, lon, lat, MKE[-1,:,:], cmap, norm, levels, 'MKE [$m^2.s^{-2}$]', msk, msk_inv, gridline_style)
+    norm = mpl.colors.LogNorm(vmin=a, vmax=b)
+    plot_map(ax, lon, lat, MKE[-1,:,:], cmap, norm, 'MKE [$m^2.s^{-2}$]', msk, msk_inv, gridline_style)
 
     plt.tight_layout()
     save_figure(fig, f"mke_{start_date}_{end_date}.png")

@@ -11,6 +11,7 @@ import cmocean
 import cmcrameri
 import cartopy.crs as ccrs
 import xarray as xr
+import os
 from .utils import load_grid, load_data, save_figure, plot_map
 
 def multiple_annual(data_path, 
@@ -93,22 +94,22 @@ def multiple_annual(data_path,
         ax.set_title(f"SWIO {start_date} to {end_date}", size=9)
         levels = np.linspace(34, 36, 21)
         norm = mpl.colors.BoundaryNorm(levels, sss_cmap.N)
-        plot_map(ax, lon, lat, salt, sss_cmap, norm, levels, r'$\overline{\overline{SSS}}$ [psu]', msk, msk_inv, gridline_style)
+        plot_map(ax, lon, lat, salt, sss_cmap, norm, r'$\overline{\overline{SSS}}$ [psu]', msk, msk_inv, gridline_style, levels = levels)
         
         ax = axs[1]
         ax.set_title(f"SWIO {start_date} to {end_date}", size=9)
         levels = np.linspace(0, 1, 21)
         norm = mpl.colors.BoundaryNorm(levels, sss_cmap.N)
-        plot_map(ax, lon, lat, zeta, ssh_cmap, norm, levels, r'$\overline{\overline{SSH}}$ [m]', msk, msk_inv, gridline_style)
+        plot_map(ax, lon, lat, zeta, ssh_cmap, norm, r'$\overline{\overline{SSH}}$ [m]', msk, msk_inv, gridline_style, levels = levels)
         
         ax = axs[2]
         ax.set_title(f"SWIO {start_date} to {end_date}", size=9)
         levels = np.linspace(20, 30, 21)
         norm = mpl.colors.BoundaryNorm(levels, sss_cmap.N)
-        plot_map(ax, lon, lat, temp, sst_cmap, norm, levels, r'$\overline{\overline{SST}}$ [°C]', msk, msk_inv, gridline_style)
+        plot_map(ax, lon, lat, temp, sst_cmap, norm, r'$\overline{\overline{SST}}$ [°C]', msk, msk_inv, gridline_style, levels = levels)
         
         plt.tight_layout()
-        save_figure(fig, f"surface_all_{data_path}.png")
+        save_figure(fig, f"surface_all_{os.path.splitext(data_path)[0]}.png")
         plt.close(fig)
         
     if 'annual_sd':
@@ -118,18 +119,18 @@ def multiple_annual(data_path,
         ax.set_title("Annual Standard Deviation", size=9)
         levels = np.linspace(0, np.round(np.nanmax(SSA), 1), 21)
         norm = mpl.colors.BoundaryNorm(levels, sss_cmap.N)
-        plot_map(ax, lon, lat, SSA, sss_cmap, norm, levels, r'$SD_{SSS}$ [psu]', msk, msk_inv, gridline_style)
+        plot_map(ax, lon, lat, SSA, sss_cmap, norm, r'$SD_{SSS}$ [psu]', msk, msk_inv, gridline_style, levels = levels)
         
         ax = axs[1]
         levels = np.linspace(0, np.round(np.nanmax(SLA), 1), 21)
         norm = mpl.colors.BoundaryNorm(levels, ssh_cmap.N)
-        plot_map(ax, lon, lat, SLA, ssh_cmap, norm, levels, r'$SD_{SSH}$ [m]', msk, msk_inv, gridline_style)
+        plot_map(ax, lon, lat, SLA, ssh_cmap, norm, r'$SD_{SSH}$ [m]', msk, msk_inv, gridline_style, levels = levels)
         
         ax = axs[2]
         levels = np.linspace(0, np.round(np.nanmax(STA), 1), 21)
         norm = mpl.colors.BoundaryNorm(levels, sst_cmap.N)
-        plot_map(ax, lon, lat, STA, sst_cmap, norm, levels, r'$SD_{SST}$ [°C]', msk, msk_inv, gridline_style)
+        plot_map(ax, lon, lat, STA, sst_cmap, norm, r'$SD_{SST}$ [°C]', msk, msk_inv, gridline_style, levels = levels)
 
         plt.tight_layout()
-        save_figure(fig, f"surface_SD_{data_path}.png")
+        save_figure(fig, f"surface_SD_{os.path.splitext(data_path)[0]}.png")
         plt.close(fig)

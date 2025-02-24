@@ -105,7 +105,7 @@ def calc_depth(s, Cs, hc, h):
         depth[k, :, :] = z0[k, :, :] * h
     return depth
 
-def plot_map(ax, lon, lat, data, cmap, norm, levels, label, msk, msk_inv, gridline_style):
+def plot_map(ax, lon, lat, data, cmap, norm, label, msk, msk_inv, gridline_style, levels = None):
     """
     Helper function to plot data on a given axis.
 
@@ -142,9 +142,10 @@ def plot_map(ax, lon, lat, data, cmap, norm, levels, label, msk, msk_inv, gridli
     gl.xlabel_style = gl.ylabel_style = {'size': 8, 'color': 'k'}
 
     cb = plt.colorbar(pcm, ax=ax, label=label, orientation='vertical')
-    ticks = levels
-    cb.set_ticks(ticks)
-    cb.ax.set_yticklabels(np.round(ticks, 2), fontsize=8)
+    if levels:
+        ticks = levels
+        cb.set_ticks(ticks)
+        cb.ax.set_yticklabels(np.round(ticks, 2), fontsize=8)
 
 
 def save_figure(fig, filename):
