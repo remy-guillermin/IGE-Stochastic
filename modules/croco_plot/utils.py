@@ -142,7 +142,7 @@ def plot_map(ax, lon, lat, data, cmap, norm, label, msk, msk_inv, gridline_style
     gl.xlabel_style = gl.ylabel_style = {'size': 8, 'color': 'k'}
 
     cb = plt.colorbar(pcm, ax=ax, label=label, orientation='vertical')
-    if levels:
+    if levels is not None:
         ticks = levels
         cb.set_ticks(ticks)
         cb.ax.set_yticklabels(np.round(ticks, 2), fontsize=8)
