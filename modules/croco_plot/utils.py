@@ -14,7 +14,10 @@ from matplotlib.colors import Colormap, Normalize
 import cartopy.crs as ccrs
 from typing import Optional, Tuple, Union, Dict, List
 
-def load_grid(path: Optional[str] = None, is_Velocity: bool = False) -> Tuple[
+def load_grid(
+    path: Optional[str] = None, 
+    is_Velocity: bool = False
+) -> Tuple[
     np.ndarray,  # lon
     np.ndarray,  # lat
     np.ndarray,  # pm
@@ -63,7 +66,10 @@ def load_grid(path: Optional[str] = None, is_Velocity: bool = False) -> Tuple[
     print("Grid loaded.")
     return lon, lat, pm, pn, msk, msk_inv, angle, h
 
-def load_data(path: str, fields: Tuple[str, ...]) -> Union[Tuple[xr.DataArray, ...], xr.DataArray]:
+def load_data(
+    path: str, 
+    fields: Tuple[str, ...]
+) -> Union[Tuple[xr.DataArray, ...], xr.DataArray]:
     """
     Load the specified fields from the simulation data file.
 
@@ -89,7 +95,12 @@ def load_data(path: str, fields: Tuple[str, ...]) -> Union[Tuple[xr.DataArray, .
     print(f"Data in {path} loaded.")
     return data
 
-def calc_depth(s: xr.DataArray, Cs: xr.DataArray, hc: float, h: xr.DataArray) -> xr.DataArray:
+def calc_depth(
+    s: xr.DataArray, 
+    Cs: xr.DataArray, 
+    hc: float, 
+    h: xr.DataArray
+) -> xr.DataArray:
     """
     Compute the depth of the mask using the S-coordinate transformation.
 
@@ -215,7 +226,7 @@ def plot_zoom(
         Style for gridlines.
     """
     try:
-        x1, x2, y1, y2 = np.min(lon.data) + 1 , 40.0, np.min(lat.data) + 1, - 15.0
+        x1, x2, y1, y2 = np.min(lon.data) + 1 , 39.5, np.min(lat.data) + 1, - 15.0
 
         pcm = ax.pcolormesh(lon[:, :], lat[:, :], data, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
         ax.contour(lon, lat, msk, colors='k', linewidths=0.1)
@@ -238,12 +249,6 @@ def plot_zoom(
         gl.top_labels = False
         gl.right_labels = False
         gl.xlabel_style = gl.ylabel_style = {'size': 8, 'color': 'k'}
-        
-        glins = axins.gridlines(crs=ccrs.PlateCarree(), **gridline_style)
-        glins.top_labels = False
-        glins.right_labels = False
-        glins.bottom_labels = False
-        glins.left_labels = False
         
         ax.plot([x1, x2], [y1, y1], "k--")
         ax.plot([x2, x2], [y1, y2], "k--")
@@ -302,7 +307,10 @@ def plot_time_series(
     save_figure(fig, filename)
     plt.close(fig)
 
-def save_figure(fig: plt.Figure, filename: str) -> None:
+def save_figure(
+    fig: plt.Figure, 
+    filename: str
+) -> None:
     """
     Save the figure to the specified filename.
 
@@ -321,8 +329,9 @@ Figure saved as {filename}.
 To open the figure, run: cplot.utils.open_figure('{filename}')
 """)
 
-
-def open_figure(filenames: Union[str, List[str]]) -> None:
+def open_figure(
+    filenames: Union[str, List[str]]
+) -> None:
     """
     Open the saved figure(s) using a terminal command without blocking the IPython session.
 

@@ -10,6 +10,7 @@ Modules :
 - plot.py : Contient des fonctions pour l'affichage des données CROCO.
 - surf_plot.py : Contient des fonctions pour l'affichage des données de surface CROCO.
 - time_series.py : Contient des fonctions pour calculer et afficher les séries temporelles de l'énergie cinétique turbulente (EKE).
+- agulhas.py : Contient des fonctions pour afficher des valeurs zoomées sur la région du courant des Aiguilles.
 
 Installation :
     pip install -e modules/

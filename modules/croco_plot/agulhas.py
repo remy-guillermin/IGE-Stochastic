@@ -3,22 +3,24 @@ Module plot pour croco_plot.
 
 Ce module contient des fonctions pour l'affichage des données CROCO spécifiquement dans la région du courant des Aiguilles.
 """
+import os
+from pathlib import Path
+import shutil
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import cmocean
 import cartopy.crs as ccrs
 from .utils import load_grid, load_data, save_figure, plot_zoom
-import os
-from pathlib import Path
-import shutil
 
-def velocity(data_path, 
-             date,
-             figsize=(10, 8), 
-             cmap=cmocean.cm.speed, 
-             grid_path=None,
-             isFilm=False):
+def velocity(
+    data_path, 
+    date,
+    figsize=(10, 8), 
+    cmap=cmocean.cm.speed, 
+    grid_path=None,
+    isFilm=False
+):
     """
     Plot velocity data on a map for a specific date range.
 
@@ -49,9 +51,14 @@ def velocity(data_path,
         lon, lat, _, _, msk, msk_inv, angle, _ = load_grid(grid_path)
     else:
         lon, lat, _, _, msk, msk_inv, angle, _ = load_grid()
-
+        
     # Load simulation data
     u, v = load_data(data_path, ('u', 'v'))
+    
+    if date not in u['time'].dt.strftime('%Y-%m-%d').values:
+        raise ValueError(f"Date {date} not found in the time dimension of u.")
+    if date not in v['time'].dt.strftime('%Y-%m-%d').values:
+        raise ValueError(f"Date {date} not found in the time dimension of v.")
     
     u = u[:,:,:,:].sel(time=date).mean(dim='time')
     v = v[:,:,:,:].sel(time=date).mean(dim='time')
@@ -86,5 +93,5 @@ def velocity(data_path,
     if isFilm:
         save_figure(fig, f"{os.path.splitext(data_path)[0]}/velocity_{date}.png")
     else:
-        save_figure(fig, f"velocity_{date}.png")
+        save_figure(fig, f"agulhas_velocity_{date}.png")
     plt.close(fig)
