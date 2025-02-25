@@ -12,7 +12,12 @@ import cmcrameri
 import cartopy.crs as ccrs
 from .utils import load_grid, load_data, save_figure, plot_map
 
-def velocity(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm.oslo):
+def velocity(data_path, 
+             start_date, 
+             end_date, 
+             figsize=(8, 8), 
+             cmap=cmcrameri.cm.oslo, 
+             grid_path=None):
     """
     Plot velocity data on a map for a specific date range.
 
@@ -30,7 +35,10 @@ def velocity(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm.
         Colormap for velocity, by default cmcrameri.cm.oslo
     """
     # Load grid data
-    lon, lat, _, _, msk, msk_inv, angle, _ = load_grid(is_Velocity=True)
+    if grid_path is not None:
+        lon, lat, _, _, msk, msk_inv, angle, _ = load_grid(grid_path)
+    else:
+        lon, lat, _, _, msk, msk_inv, angle, _ = load_grid()
 
     # Load simulation data
     u, v = load_data(data_path, ('u', 'v'))
@@ -69,7 +77,12 @@ def velocity(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm.
     plt.close(fig)
 
 
-def vorticity(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm.vik):
+def vorticity(data_path, 
+              start_date, 
+              end_date, 
+              figsize=(8, 8), 
+              cmap=cmcrameri.cm.vik, 
+              grid_path=None):
     """
     Plot vorticity data on a map for a specific date range.
 
@@ -87,7 +100,10 @@ def vorticity(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm
         Colormap for vorticity, by default cmcrameri.cm.vik
     """
     # Load grid data
-    lon, lat, pm, pn, msk, msk_inv, angle, _ = load_grid(is_Velocity=True)
+    if grid_path is not None:
+        lon, lat, pm, pn, msk, msk_inv, angle, _ = load_grid(grid_path)
+    else:
+        lon, lat, pm, pn, msk, msk_inv, angle, _ = load_grid()
 
     # Load simulation data
     u, v = load_data(data_path, ('u', 'v'))
@@ -133,7 +149,11 @@ def vorticity(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm
     save_figure(fig, f"vorticity_{start_date}_{end_date}.png")
     plt.close(fig)
     
-def eke(data_path, date, figsize=(8, 8), cmap=cmcrameri.cm.lapaz):
+def eke(data_path, 
+        date, 
+        figsize=(8, 8), 
+        cmap=cmcrameri.cm.lapaz, 
+        grid_path=None):
     """
     Plot EKE data on a map for a specific date.
 
@@ -149,7 +169,10 @@ def eke(data_path, date, figsize=(8, 8), cmap=cmcrameri.cm.lapaz):
         Colormap for EKE, by default cmcrameri.cm.lapaz
     """
     # Load grid data
-    lon, lat, pm, pn, msk, msk_inv, angle, h = load_grid(is_Velocity=True)
+    if grid_path is not None:
+        lon, lat, pm, pn, msk, msk_inv, angle, h = load_grid(grid_path)
+    else:
+        lon, lat, pm, pn, msk, msk_inv, angle, h = load_grid()
 
     # Load simulation data
     u, v, w, s_rho = load_data(data_path, ('u', 'v', 'w', 's_rho'))
@@ -209,7 +232,12 @@ def eke(data_path, date, figsize=(8, 8), cmap=cmcrameri.cm.lapaz):
     save_figure(fig, f"eke_{date}.png")
     plt.close(fig)
 
-def mke(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm.lapaz):
+def mke(data_path, 
+        start_date, 
+        end_date, 
+        figsize=(8, 8), 
+        cmap=cmcrameri.cm.lapaz, 
+        grid_path=None):
     """
     Plot MKE data on a map for a specific date range.
 
@@ -227,7 +255,10 @@ def mke(data_path, start_date, end_date, figsize=(8, 8), cmap=cmcrameri.cm.lapaz
         Colormap for EKE, by default cmcrameri.cm.lapaz
     """
     # Load grid data
-    lon, lat, _, _, msk, msk_inv, angle, _ = load_grid(is_Velocity=True)
+    if grid_path is not None:
+        lon, lat, _, _, msk, msk_inv, angle, _ = load_grid(grid_path)
+    else:
+        lon, lat, _, _, msk, msk_inv, angle, _ = load_grid()
 
     # Load simulation data
     u, v, w = load_data(data_path, ('u', 'v', 'w'))

@@ -21,7 +21,8 @@ def multiple_annual(data_path,
                     figsize=(24, 6), 
                     sss_cmap=cmocean.cm.haline, 
                     ssh_cmap=cmcrameri.cm.roma_r, 
-                    sst_cmap=cmocean.cm.thermal):
+                    sst_cmap=cmocean.cm.thermal, 
+                    grid_path=None):
     """
     Plot multiple surface variables (SSS, SSH, SST) on a map for a specific date range or annual standard deviation.
 
@@ -54,7 +55,10 @@ def multiple_annual(data_path,
         variables = ['sss', 'ssh', 'sst', 'annual_sd']
     
     # Load grid data
-    lon, lat, _, _, msk, msk_inv, _, _ = load_grid()
+    if grid_path is not None:
+        lon, lat, _, _, msk, msk_inv, _, _ = load_grid(grid_path)
+    else:
+        lon, lat, _, _, msk, msk_inv, _, _ = load_grid()
     salt, zeta, temp, time = load_data(data_path, ('salt', 'zeta', 'temp', 'time'))
     
     fill_value = 9.96921e+36
