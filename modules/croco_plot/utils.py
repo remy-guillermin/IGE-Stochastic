@@ -358,7 +358,12 @@ def save_figure(
         raise ValueError(f"Film directory (filmDir) is not specified")
     
     fig.savefig(os.path.join(output_dir, filename), dpi=300)
-    print(f"""
+    if isFilm:
+        print(f"""
+Figure saved as {os.path.join(output_dir, filename)}.
+""")
+    else:
+        print(f"""
 Figure saved as {filename}.
 To open the figure, run: cplot.utils.open_figure('{filename}')
 """)
