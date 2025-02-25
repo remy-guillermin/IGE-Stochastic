@@ -168,7 +168,7 @@ def velocity(
     gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.3}
 
     ax.set_title(f"Velocity SWIO {date}", size=9)
-    levels = np.linspace(0, 2.5, 21)
+    levels = np.linspace(0, 2.5, 26)
     norm = mpl.colors.BoundaryNorm(levels, cmap.N)
     
     zoom = np.min(lon.data) + 1 , 50, np.min(lat.data) + 1, - 10.0

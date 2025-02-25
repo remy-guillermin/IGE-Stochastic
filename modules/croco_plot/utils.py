@@ -313,6 +313,27 @@ def plot_time_series(
     save_figure(fig, filename)
     plt.close(fig)
 
+def prepare_film(func, data_path, dates, grid_path=None, **kwargs):
+    """
+    Prepare a series of plots for a film by varying the date parameter.
+
+    Parameters
+    ----------
+    func : callable
+        The plotting function to use.
+    data_path : str
+        Path to the simulation data file.
+    dates : list of str
+        List of dates for the data slices in 'YYYY-MM-DD' format.
+    grid_path : str, optional
+        Path to the grid data file, by default None.
+    **kwargs : dict
+        Additional keyword arguments to pass to the plotting function.
+    """
+    for date in dates:
+        print(f"Processing date: {date}")
+        func(data_path=data_path, date=date, grid_path=grid_path, isFilm=True, **kwargs)
+
 def save_figure(
     fig: plt.Figure, 
     filename: str
