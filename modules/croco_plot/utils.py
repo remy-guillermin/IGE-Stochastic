@@ -170,8 +170,8 @@ def plot_map(
     """
     try:
         pcm = ax.pcolormesh(lon[:, :], lat[:, :], data, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
-        ax.contour(lon, lat, msk, colors='k', linewidths=0.1)
         ax.contourf(lon, lat, msk_inv, colors='lightgray')
+        ax.contour(lon, lat, msk, colors='k', linewidths=0.5)
 
         gl = ax.gridlines(crs=ccrs.PlateCarree(), **gridline_style)
         gl.top_labels = False
@@ -229,8 +229,8 @@ def plot_zoom(
         x1, x2, y1, y2 = np.min(lon.data) + 1 , 39.5, np.min(lat.data) + 1, - 15.0
 
         pcm = ax.pcolormesh(lon[:, :], lat[:, :], data, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
-        ax.contour(lon, lat, msk, colors='k', linewidths=0.1)
         ax.contourf(lon, lat, msk_inv, colors='lightgray')
+        ax.contour(lon, lat, msk, colors='k', linewidths=0.5)
         
         axins = ax.inset_axes([0.33, 0.03, 0.64, 0.94], projection=ccrs.PlateCarree(), anchor='NE')
         axins.set_extent(ax.get_extent(), crs=ccrs.PlateCarree())
