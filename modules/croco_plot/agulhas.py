@@ -117,9 +117,6 @@ def velocity(
     if isFilm:
         output_dir = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures'
         folder_path = Path(output_dir) / Path(os.path.splitext(data_path)[0])
-
-        if folder_path.exists():
-            shutil.rmtree(folder_path)
         # Create the folder if it doesn't exist
         folder_path.mkdir(parents=True, exist_ok=True)
 
