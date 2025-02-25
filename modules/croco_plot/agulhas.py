@@ -40,7 +40,6 @@ def zoom_velocity(
         folder_path = Path(output_dir) / Path(os.path.splitext(data_path)[0])
         # Create the folder if it doesn't exist
         folder_path.mkdir(parents=True, exist_ok=True)
-
         print(f"Folder '{folder_path}' is ready.")
 
     # Load grid data
@@ -174,7 +173,7 @@ def velocity(
 
     plt.tight_layout()
     if isFilm:
-        save_figure(fig, f"velocity_{date}.png")
+        save_figure(fig, f"agulhas_velocity_{date}.png", isFilm=isFilm, filmDir=os.path.splitext(data_path)[0])
     else:
         save_figure(fig, f"agulhas_velocity_{date}.png")
     plt.close(fig)
