@@ -13,9 +13,8 @@ import cartopy.crs as ccrs
 from .utils import load_grid, load_data, save_figure, plot_map
 
 def velocity(data_path, 
-             start_date, 
-             end_date, 
-             figsize=(8, 8), 
+             date, 
+             figsize=(10, 8), 
              cmap=cmcrameri.cm.oslo, 
              grid_path=None):
     """
@@ -25,10 +24,8 @@ def velocity(data_path,
     ----------
     data_path : str
         Path to the simulation data file.
-    start_date : str
-        Start date for the data slice in 'YYYY-MM-DD' format.
-    end_date : str
-        End date for the data slice in 'YYYY-MM-DD' format.
+    date : str
+        Date for the data slice in 'YYYY-MM-DD' format.
     figsize : tuple, optional
         Size of the figure, by default (8, 8)
     cmap : colormap, optional
@@ -43,8 +40,8 @@ def velocity(data_path,
     # Load simulation data
     u, v = load_data(data_path, ('u', 'v'))
     
-    u = u[:,:,:,:].sel(time=slice(start_date, end_date)).mean(dim='time')
-    v = v[:,:,:,:].sel(time=slice(start_date, end_date)).mean(dim='time')
+    u = u[:,:,:,:].sel(time=date).mean(dim='time')
+    v = v[:,:,:,:].sel(time=date).mean(dim='time')
     print("Data sliced")
     
     fill_value = 9.96921e+36
@@ -67,20 +64,19 @@ def velocity(data_path,
     # Define common gridline styles
     gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.3}
 
-    ax.set_title(f"Velocity SWIO {start_date} to {end_date}", size=9)
+    ax.set_title(f"Velocity SWIO {date}", size=9)
     levels = np.linspace(0, 2.5, 21)
     norm = mpl.colors.BoundaryNorm(levels, cmap.N)
     plot_map(ax, lon[:-1,:-1], lat[:-1,:-1], velocity[-1,:,:], cmap, norm, 'Velocity [$m.s^{-1}$]', msk[:-1,:-1], msk_inv[:-1,:-1], gridline_style, levels=levels)
 
     plt.tight_layout()
-    save_figure(fig, f"velocity_{start_date}_{end_date}.png")
+    save_figure(fig, f"velocity_{date}.png")
     plt.close(fig)
 
 
 def vorticity(data_path, 
-              start_date, 
-              end_date, 
-              figsize=(8, 8), 
+              date,
+              figsize=(10, 8), 
               cmap=cmcrameri.cm.vik, 
               grid_path=None):
     """
@@ -90,10 +86,8 @@ def vorticity(data_path,
     ----------
     data_path : str
         Path to the simulation data file.
-    start_date : str
-        Start date for the data slice in 'YYYY-MM-DD' format.
-    end_date : str
-        End date for the data slice in 'YYYY-MM-DD' format.
+    date : str
+        Date for the data slice in 'YYYY-MM-DD' format.
     figsize : tuple, optional
         Size of the figure, by default (8, 8)
     cmap : colormap, optional
@@ -108,8 +102,8 @@ def vorticity(data_path,
     # Load simulation data
     u, v = load_data(data_path, ('u', 'v'))
     
-    u = u[:,:,:,:].sel(time=slice(start_date, end_date)).mean(dim='time')
-    v = v[:,:,:,:].sel(time=slice(start_date, end_date)).mean(dim='time')
+    u = u[:,:,:,:].sel(time=date)
+    v = v[:,:,:,:].sel(time=date)
     print("Data selected")
     
     fill_value = 9.96921e+36
@@ -140,18 +134,18 @@ def vorticity(data_path,
     # Define common gridline styles
     gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.3}
 
-    ax.set_title(f"Vorticity SWIO {start_date} to {end_date}", size=9)
+    ax.set_title(f"Vorticity SWIO {date}", size=9)
     levels = np.linspace(-0.15, 0.15, 21)
     norm = mpl.colors.BoundaryNorm(levels, cmap.N)
     plot_map(ax, lon[:-1,:-1], lat[:-1,:-1], vorticity[-1,:,:] * 3600, cmap, norm, 'Vorticity [$h^{-1}$]', msk[:-1,:-1], msk_inv[:-1,:-1], gridline_style, levels=levels)
 
     plt.tight_layout()
-    save_figure(fig, f"vorticity_{start_date}_{end_date}.png")
+    save_figure(fig, f"vorticity_{date}.png")
     plt.close(fig)
     
 def eke(data_path, 
         date, 
-        figsize=(8, 8), 
+        figsize=(10, 8), 
         cmap=cmcrameri.cm.lapaz, 
         grid_path=None):
     """
@@ -235,7 +229,7 @@ def eke(data_path,
 def mke(data_path, 
         start_date, 
         end_date, 
-        figsize=(8, 8), 
+        figsize=(10, 8), 
         cmap=cmcrameri.cm.lapaz, 
         grid_path=None):
     """

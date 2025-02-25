@@ -24,3 +24,4 @@ from . import utils
 from . import plot
 from . import surf_plot
 from . import time_series
+from . import agulhas

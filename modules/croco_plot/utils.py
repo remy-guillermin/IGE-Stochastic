@@ -174,6 +174,89 @@ def plot_map(
             cb.ax.set_yticklabels(np.round(ticks, 2), fontsize=8)
     except Exception as e:
         print(f"Error in plot_map: {e}")
+ 
+def plot_zoom(
+    ax: Axes,
+    lon: np.ndarray,
+    lat: np.ndarray,
+    data: np.ndarray,
+    cmap: Colormap,
+    norm: Normalize,
+    label: str,
+    msk: np.ndarray,
+    msk_inv: np.ndarray,
+    gridline_style: Dict,
+    levels: Optional[np.ndarray] = None
+) -> None:
+    """
+    Helper function to plot data on a given axis.
+
+    Parameters
+    ----------
+    ax : Axes
+        The axis to plot on.
+    lon : ndarray
+        Longitudes.
+    lat : ndarray
+        Latitudes.
+    data : ndarray
+        Data to plot.
+    cmap : Colormap
+        Colormap to use.
+    norm : Normalize
+        Normalization for the colormap.
+    label : str
+        Label for the colorbar.
+    msk : ndarray
+        Mask for contour.
+    msk_inv : ndarray
+        Inverse mask for contourf.
+    gridline_style : dict
+        Style for gridlines.
+    """
+    try:
+        x1, x2, y1, y2 = np.min(lon.data) + 1 , 40.0, np.min(lat.data) + 1, - 15.0
+
+        pcm = ax.pcolormesh(lon[:, :], lat[:, :], data, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
+        ax.contour(lon, lat, msk, colors='k', linewidths=0.1)
+        ax.contourf(lon, lat, msk_inv, colors='lightgray')
+        
+        axins = ax.inset_axes([0.33, 0.03, 0.64, 0.94], projection=ccrs.PlateCarree(), anchor='NE')
+        axins.set_extent(ax.get_extent(), crs=ccrs.PlateCarree())
+
+        # Inset map using pcolormesh
+        axins.pcolormesh(lon[:, :], lat[:, :], data, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
+        axins.contour(lon, lat, msk, colors='k', linewidths=0.1)
+        axins.contourf(lon, lat, msk_inv, colors='lightgray')
+        
+        axins.set_xlim(x1, x2)
+        axins.set_ylim(y1, y2)
+        axins.set_xticklabels('')
+        axins.set_yticklabels('')
+        
+        gl = ax.gridlines(crs=ccrs.PlateCarree(), **gridline_style)
+        gl.top_labels = False
+        gl.right_labels = False
+        gl.xlabel_style = gl.ylabel_style = {'size': 8, 'color': 'k'}
+        
+        glins = axins.gridlines(crs=ccrs.PlateCarree(), **gridline_style)
+        glins.top_labels = False
+        glins.right_labels = False
+        glins.bottom_labels = False
+        glins.left_labels = False
+        
+        ax.plot([x1, x2], [y1, y1], "k--")
+        ax.plot([x2, x2], [y1, y2], "k--")
+        ax.plot([x2, x1], [y2, y2], "k--")
+        ax.plot([x1, x1], [y2, y1], "k--")
+        
+        cb = plt.colorbar(pcm, ax=ax, label=label, orientation='vertical')
+        if levels is not None:
+            ticks = levels
+            cb.set_ticks(ticks)
+            cb.ax.set_yticklabels(np.round(ticks, 2), fontsize=8)
+    except Exception as e:
+        print(f"Error in plot_map: {e}") 
         
 def plot_time_series(
     time_results: np.ndarray,
