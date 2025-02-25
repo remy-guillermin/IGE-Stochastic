@@ -336,7 +336,9 @@ def prepare_film(func, data_path, dates, grid_path=None, **kwargs):
 
 def save_figure(
     fig: plt.Figure, 
-    filename: str
+    filename: str,
+    isFilm: bool = False,
+    filmDir: str = None
 ) -> None:
     """
     Save the figure to the specified filename.
@@ -350,6 +352,11 @@ def save_figure(
     """
     output_dir = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures'
     os.makedirs(output_dir, exist_ok=True)
+    if isFilm and filmDir is not None:
+        output_dir = os.path.join(output_dir, filmDir) 
+    elif isFilm and filmDir is None:
+        raise ValueError(f"Film directory (filmDir) is not specified")
+    
     fig.savefig(os.path.join(output_dir, filename), dpi=300)
     print(f"""
 Figure saved as {filename}.

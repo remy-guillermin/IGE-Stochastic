@@ -174,7 +174,7 @@ def velocity(
 
     plt.tight_layout()
     if isFilm:
-        save_figure(fig, f"{os.path.splitext(data_path)[0]}/velocity_{date}.png")
+        save_figure(fig, f"velocity_{date}.png")
     else:
         save_figure(fig, f"agulhas_velocity_{date}.png")
     plt.close(fig)
