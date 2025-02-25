@@ -140,7 +140,8 @@ def plot_map(
     msk: np.ndarray,
     msk_inv: np.ndarray,
     gridline_style: Dict,
-    levels: Optional[np.ndarray] = None
+    levels: Optional[np.ndarray] = None,
+    bounds: Optional[Tuple[float, float, float, float]] = None
 ) -> None:
     """
     Helper function to plot data on a given axis.
@@ -172,6 +173,11 @@ def plot_map(
         pcm = ax.pcolormesh(lon[:, :], lat[:, :], data, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
         ax.contourf(lon, lat, msk_inv, colors='lightgray')
         ax.contour(lon, lat, msk, colors='k', linewidths=0.2)
+        
+        if bounds is not None:
+            x1, x2, y1, y2 = bounds
+            ax.set_xlim(x1, x2)
+            ax.set_ylim(y1, y2)
 
         gl = ax.gridlines(crs=ccrs.PlateCarree(), **gridline_style)
         gl.top_labels = False
@@ -226,7 +232,7 @@ def plot_zoom(
         Style for gridlines.
     """
     try:
-        x1, x2, y1, y2 = np.min(lon.data) + 1 , 39.5, np.min(lat.data) + 1, - 15.0
+        x1, x2, y1, y2 = np.min(lon.data) + 1 , 50, np.min(lat.data) + 1, - 10.0
 
         pcm = ax.pcolormesh(lon[:, :], lat[:, :], data, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
         ax.contourf(lon, lat, msk_inv, colors='lightgray')
