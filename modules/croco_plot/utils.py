@@ -171,7 +171,7 @@ def plot_map(
     try:
         pcm = ax.pcolormesh(lon[:, :], lat[:, :], data, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
         ax.contourf(lon, lat, msk_inv, colors='lightgray')
-        ax.contour(lon, lat, msk, colors='k', linewidths=0.5)
+        ax.contour(lon, lat, msk, colors='k', linewidths=0.2)
 
         gl = ax.gridlines(crs=ccrs.PlateCarree(), **gridline_style)
         gl.top_labels = False
@@ -230,15 +230,15 @@ def plot_zoom(
 
         pcm = ax.pcolormesh(lon[:, :], lat[:, :], data, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
         ax.contourf(lon, lat, msk_inv, colors='lightgray')
-        ax.contour(lon, lat, msk, colors='k', linewidths=0.5)
+        ax.contour(lon, lat, msk, colors='k', linewidths=0.2)
         
         axins = ax.inset_axes([0.33, 0.03, 0.64, 0.94], projection=ccrs.PlateCarree(), anchor='NE')
         axins.set_extent(ax.get_extent(), crs=ccrs.PlateCarree())
 
         # Inset map using pcolormesh
         axins.pcolormesh(lon[:, :], lat[:, :], data, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
-        axins.contour(lon, lat, msk, colors='k', linewidths=0.1)
         axins.contourf(lon, lat, msk_inv, colors='lightgray')
+        axins.contour(lon, lat, msk, colors='k', linewidths=0.2)
         
         axins.set_xlim(x1, x2)
         axins.set_ylim(y1, y2)
