@@ -45,7 +45,7 @@ def velocity(data_path,
     
     u = u[:,:,:,:].sel(time=slice(start_date, end_date)).mean(dim='time')
     v = v[:,:,:,:].sel(time=slice(start_date, end_date)).mean(dim='time')
-    print("Data selected")
+    print("Data sliced")
     
     fill_value = 9.96921e+36
     u = u.where((u != fill_value), np.nan).data
@@ -68,9 +68,9 @@ def velocity(data_path,
     gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.3}
 
     ax.set_title(f"Velocity SWIO {start_date} to {end_date}", size=9)
-    levels = np.linspace(0, 2.5, 11)
+    levels = np.linspace(0, 2.5, 21)
     norm = mpl.colors.BoundaryNorm(levels, cmap.N)
-    plot_map(ax, lon, lat, velocity[-1,:,:], cmap, norm, levels, 'Velocity [$m.s^{-1}$]', msk, msk_inv, gridline_style)
+    plot_map(ax, lon[:-1,:-1], lat[:-1,:-1], velocity[-1,:,:], cmap, norm, 'Velocity [$m.s^{-1}$]', msk[:-1,:-1], msk_inv[:-1,:-1], gridline_style, levels=levels)
 
     plt.tight_layout()
     save_figure(fig, f"velocity_{start_date}_{end_date}.png")
@@ -128,8 +128,8 @@ def vorticity(data_path,
     pn_expand = pn.data.reshape(1, pn.shape[0], pn.shape[1])
     
     # Calculate derivatives
-    dv_dlon = np.gradient(v_geo, axis=2) * pm_expand
-    du_dlat = np.gradient(u_geo, axis=1) * pn_expand
+    dv_dlon = np.gradient(v_geo, axis=2) * pm_expand[:,:-1,:-1]
+    du_dlat = np.gradient(u_geo, axis=1) * pn_expand[:,:-1,:-1]
 
     # Calculate vorticity and helicity
     vorticity = dv_dlon - du_dlat
@@ -141,9 +141,9 @@ def vorticity(data_path,
     gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.3}
 
     ax.set_title(f"Vorticity SWIO {start_date} to {end_date}", size=9)
-    levels = np.linspace(-0.15, 0.15, 11)
+    levels = np.linspace(-0.15, 0.15, 21)
     norm = mpl.colors.BoundaryNorm(levels, cmap.N)
-    plot_map(ax, lon, lat, vorticity[-1,:,:] * 3600, cmap, norm, levels, 'Vorticity [$h^{-1}$]', msk, msk_inv, gridline_style)
+    plot_map(ax, lon[:-1,:-1], lat[:-1,:-1], vorticity[-1,:,:] * 3600, cmap, norm, 'Vorticity [$h^{-1}$]', msk[:-1,:-1], msk_inv[:-1,:-1], gridline_style, levels=levels)
 
     plt.tight_layout()
     save_figure(fig, f"vorticity_{start_date}_{end_date}.png")
@@ -213,7 +213,7 @@ def eke(data_path,
     wt_geo = wt[:,:,:-1,:-1]
     print("Turbulent velocity transformed")
     
-    EKE = 1 / 2 * (ut_geo[0,-1,:,:] ** 2 + vt_geo[0,-1,:,:] ** 2 + wt_geo[0,-1,:,:] ** 2) * cell_volume / surface_volume
+    EKE = 1 / 2 * (ut_geo[0,-1,:,:] ** 2 + vt_geo[0,-1,:,:] ** 2 + wt_geo[0,-1,:,:] ** 2) * cell_volume[:-1,:-1] / surface_volume
     print("EKE calculated")
     
     # Plotting
@@ -223,10 +223,10 @@ def eke(data_path,
     gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.3}
 
     ax.set_title(f"EKE SWIO {date}", size=9)
-    a = -7
-    b = -5
-    norm = mpl.colors.LogNorm(vmin=a, vmax=b)
-    plot_map(ax, lon, lat, EKE, cmap, norm, 'EKE [$m^2.s^{-2}$]', msk, msk_inv, gridline_style)
+    a = int(np.log10(np.nanmax(EKE)))
+    b = a-2
+    norm = mpl.colors.LogNorm(vmin=10**b, vmax=10**a)
+    plot_map(ax, lon[:-1,:-1], lat[:-1,:-1], EKE, cmap, norm, 'EKE [$m^2.s^{-2}$]', msk[:-1,:-1], msk_inv[:-1,:-1], gridline_style)
 
     plt.tight_layout()
     save_figure(fig, f"eke_{date}.png")
@@ -293,10 +293,10 @@ def mke(data_path,
     gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.3}
 
     ax.set_title(f"MKE SWIO {start_date} to {end_date}", size=9)
-    a = -2
-    b = 1
-    norm = mpl.colors.LogNorm(vmin=a, vmax=b)
-    plot_map(ax, lon, lat, MKE[-1,:,:], cmap, norm, 'MKE [$m^2.s^{-2}$]', msk, msk_inv, gridline_style)
+    a = int(np.log10(np.nanmax(MKE)))
+    b = a-2
+    norm = mpl.colors.LogNorm(vmin=10**b, vmax=10**a)
+    plot_map(ax, lon[:-1,:-1], lat[:-1,:-1], MKE[-1,:,:], cmap, norm, 'MKE [$m^2.s^{-2}$]', msk[:-1,:-1], msk_inv[:-1,:-1], gridline_style)
 
     plt.tight_layout()
     save_figure(fig, f"mke_{start_date}_{end_date}.png")

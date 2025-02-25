@@ -9,9 +9,21 @@ import xarray as xr
 import os
 import subprocess
 import matplotlib.pyplot as plt
+from matplotlib.axes import Axes
+from matplotlib.colors import Colormap, Normalize
 import cartopy.crs as ccrs
+from typing import Optional, Tuple, Union, Dict, List
 
-def load_grid(path=None, is_Velocity=False):
+def load_grid(path: Optional[str] = None, is_Velocity: bool = False) -> Tuple[
+    np.ndarray,  # lon
+    np.ndarray,  # lat
+    np.ndarray,  # pm
+    np.ndarray,  # pn
+    np.ndarray,  # msk
+    np.ndarray,  # msk_inv
+    np.ndarray,  # angle
+    np.ndarray   # h
+]:
     """
     Load the grid file into this iPython instance
 
@@ -51,7 +63,7 @@ def load_grid(path=None, is_Velocity=False):
     print("Grid loaded.")
     return lon, lat, pm, pn, msk, msk_inv, angle, h
 
-def load_data(path, fields):
+def load_data(path: str, fields: Tuple[str, ...]) -> Union[Tuple[xr.DataArray, ...], xr.DataArray]:
     """
     Load the specified fields from the simulation data file.
 
@@ -77,7 +89,7 @@ def load_data(path, fields):
     print(f"Data in {path} loaded.")
     return data
 
-def calc_depth(s, Cs, hc, h):
+def calc_depth(s: xr.DataArray, Cs: xr.DataArray, hc: float, h: xr.DataArray) -> xr.DataArray:
     """
     Compute the depth of the mask using the S-coordinate transformation.
 
@@ -106,13 +118,25 @@ def calc_depth(s, Cs, hc, h):
         depth[k, :, :] = z0[k, :, :] * h
     return depth
 
-def plot_map(ax, lon, lat, data, cmap, norm, label, msk, msk_inv, gridline_style, levels = None):
+def plot_map(
+    ax: Axes,
+    lon: np.ndarray,
+    lat: np.ndarray,
+    data: np.ndarray,
+    cmap: Colormap,
+    norm: Normalize,
+    label: str,
+    msk: np.ndarray,
+    msk_inv: np.ndarray,
+    gridline_style: Dict,
+    levels: Optional[np.ndarray] = None
+) -> None:
     """
     Helper function to plot data on a given axis.
 
     Parameters
     ----------
-    ax : GeoAxes
+    ax : Axes
         The axis to plot on.
     lon : ndarray
         Longitudes.
@@ -151,7 +175,16 @@ def plot_map(ax, lon, lat, data, cmap, norm, label, msk, msk_inv, gridline_style
     except Exception as e:
         print(f"Error in plot_map: {e}")
         
-def plot_time_series(time_results, results, ylabel, roll, names, colors, filename, title):
+def plot_time_series(
+    time_results: np.ndarray,
+    results: Dict[str, np.ndarray],
+    ylabel: str,
+    roll: int,
+    names: List[str],
+    colors: List[str],
+    filename: str,
+    title: str
+) -> None:
     """
     Plot time series data with rolling mean for multiple variables.
 
@@ -186,7 +219,7 @@ def plot_time_series(time_results, results, ylabel, roll, names, colors, filenam
     save_figure(fig, filename)
     plt.close(fig)
 
-def save_figure(fig, filename):
+def save_figure(fig: plt.Figure, filename: str) -> None:
     """
     Save the figure to the specified filename.
 
@@ -206,7 +239,7 @@ To open the figure, run: cplot.utils.open_figure('{filename}')
 """)
 
 
-def open_figure(filenames):
+def open_figure(filenames: Union[str, List[str]]) -> None:
     """
     Open the saved figure(s) using a terminal command without blocking the IPython session.
 
