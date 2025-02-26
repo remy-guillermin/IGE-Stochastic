@@ -24,26 +24,19 @@ def create_from_CROCO(
         variables = [variables]
         
     if 'all' in variables:
-        variables = ['sla', 'ssa', 'sta', 'ssh', 'sss', 'sst']
+        variables = ['eke', 'mke', 'sla', 'ssa', 'sta', 'ssh', 'sss', 'sst']
     
     # Load grid data
     if grid_path is not None:
-        lon, lat, pm, pn, msk, _, _, h = load_grid(grid_path)
+        lon, lat, pm, pn, msk, _, _, _ = load_grid(grid_path)
     else:
-        lon, lat, pm, pn, msk, _, _, h = load_grid()
+        lon, lat, pm, pn, msk, _, _, _ = load_grid()
         
     cell_surface = 1 / (pm * pn).data
     cell_surface[(1-msk).astype(int)] = np.nan
     
-    zeta, temp, salt, u, v, w, time, s_rho = load_data(data_path, ('zeta', 'temp', 'salt', 'u', 'v', 'w', 'time', 's_rho'))
-    
-    depth = h * s_rho # Profondeur
-    depth = np.transpose(depth.data, (2, 0, 1)) # Transpose depth to match u, v, w shape
-    ddepth = np.diff(depth, axis=0)
-    ddepth = ddepth.reshape(1,ddepth.shape[0], ddepth.shape[1], ddepth.shape[2])
-    cell_volume = ddepth * cell_surface
-    domain_volume = np.nansum(cell_volume)
-    depth, ddepth, cell_surface, s_rho = None, None, None, None
+    zeta, temp, salt, u, v, w, time, _ = load_data(data_path, ('zeta', 'temp', 'salt', 'u', 'v', 'w', 'time', 's_rho'))
+
         
     fill_value = 9.96921e+36
     
@@ -67,7 +60,7 @@ def create_from_CROCO(
         salt[salt == fill_value] = np.nan
         
     for (lon1, lon2, lat1, lat2), name in zip(boxes, names):
-        results = {var: [] for var in variables if var != 'ke'}
+        results = {var: [] for var in variables}
         
         for var in ['mke', 'eke', 'sla', 'ssa', 'sta', 'ssh', 'sss', 'sst']:
             if var in variables:
@@ -100,9 +93,7 @@ def create_from_CROCO(
                 else:
                     box_data = var_data[:,:,box_mask]
                 if var in ['mke', 'eke']:
-                    volume_box = cell_volume[:,:,:-1,:-1][:,:,box_mask]
-                    weighted_data = box_data[:,1:,:] * volume_box / domain_volume
-                    box_sum = np.nansum(weighted_data[:,-1,:], axis=1)
+                    box_sum = np.nansum(box_data[:,-1,:], axis=1)
                 else:
                     box_sum = np.nanmean(box_data, axis=1)
                     weighted_data = None
@@ -140,7 +131,7 @@ def create_from_GLORYS(
         variables = [variables]
         
     if 'all' in variables:
-        variables = ['sla', 'ssa', 'sta', 'ssh', 'sss', 'sst']
+        variables = ['mke', 'eke','sla', 'ssa', 'sta', 'ssh', 'sss', 'sst']
         
     salt, temp, zeta, u, v, lon, lat, _, _ = load_GLORYS(data_path)
     time = pd.to_datetime(salt['time'].data)
