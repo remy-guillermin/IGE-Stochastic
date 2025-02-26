@@ -338,7 +338,6 @@ def prepare_film(func, data_path, dates, grid_path=None, **kwargs):
 def create_film(
     filmDir: str, 
     filmName: str,
-    frameName: str,
     framerate: int = 25,
 ) -> None:
     """
@@ -349,9 +348,7 @@ def create_film(
     filmDir : str
         Directory containing the film frames.
     filmName : str
-        Name of the film file to create.
-    frame_format : str, optional
-        Format of the frames (default is "png").
+        Name of the film file to create, which is the same as the frame name before the date stamp.
     framerate : int, optional
         Framerate of the output video (default is 25 fps).
     """
@@ -361,7 +358,7 @@ def create_film(
 
     (
         ffmpeg
-        .input(f'{film_path}/{frameName}_%Y-%m-%d.png', r=1)
+        .input(f'{film_path}/{filmName}_%Y-%m-%d.png', r=1)
         .filter('fps', fps=framerate)
         .filter('scale', 'iw-mod(iw,2)', 'ih-mod(ih,2)')
         .output(film_file, pix_fmt='yuv420p')
