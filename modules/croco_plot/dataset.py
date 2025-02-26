@@ -231,12 +231,21 @@ def create_from_GLORYS(
         del ds, results
             
 def concatenate(
-    file_pattern:str,
-    output_file:str
+    file_pattern: str, 
+    output_dir: str
 ):
-    file_list = sorted(glob.glob(file_pattern))
+    os.makedirs(f'/lus/work/CT1/c1601279/rguillermin/{output_dir}', exist_ok=True)
+    
+    file_list = sorted(glob.glob(f'{file_pattern}*.nc'))
+    if not file_list:
+        print(f"No files found matching {file_pattern}*.nc")
+        return
+
     ds = xr.open_mfdataset(file_list, combine='by_coords')
-    print(f'{len(file_list)} Files {file_pattern} concatenated')
-    ds.to_netcdf("/lus/work/CT1/c1601279/rguillermin/{output_file}")
+    output_file = f"/lus/work/CT1/c1601279/rguillermin/{output_dir}/{file_pattern}.nc"
+    
+    print(f'{len(file_list)} files matching {file_pattern} concatenated.')
+    ds.to_netcdf(output_file)
     ds.close()
+    
     print(f"Concatenation complete: {output_file}")

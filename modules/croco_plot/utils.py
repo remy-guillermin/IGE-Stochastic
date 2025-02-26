@@ -345,7 +345,12 @@ def plot_time_series(
     save_figure(fig, filename)
     plt.close(fig)
 
-def prepare_film(func, data_path, dates, grid_path=None, **kwargs):
+def prepare_film(
+    func, 
+    data_path, 
+    dates, 
+    grid_path=None, 
+    **kwargs):
     """
     Prepare a series of plots for a film by varying the date parameter.
 
@@ -428,9 +433,7 @@ def save_figure(
     
     fig.savefig(os.path.join(output_dir, filename), dpi=300)
     if isFilm:
-        print(f"""
-Figure saved as {os.path.join(output_dir, filename)}.
-""")
+        print(f"Figure saved as {os.path.join(output_dir, filename)}.")
     else:
         print(f"""
 Figure saved as {filename}.

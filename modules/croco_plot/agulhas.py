@@ -298,8 +298,6 @@ def velocity(
         # Create the folder if it doesn't exist
         folder_path.mkdir(parents=True, exist_ok=True)
 
-        print(f"Folder '{folder_path}' is ready.")
-
     # Load grid data
     if grid_path is not None:
         lon, lat, _, _, msk, msk_inv, angle, _ = load_grid(grid_path)
@@ -316,19 +314,22 @@ def velocity(
     
     u = u[:,:,:,:].sel(time=date).mean(dim='time')
     v = v[:,:,:,:].sel(time=date).mean(dim='time')
-    print("Data sliced")
+    if not isFilm:
+        print("Data sliced")
     
     fill_value = 9.96921e+36
     u = u.where((u != fill_value), np.nan).data
     v = v.where((v != fill_value), np.nan).data
-    print("NaN values added")
+    if not isFilm:
+        print("NaN values added")
     
     # Transformation des composantes de vent (grille déformée -> grille géographique) pour chaque time index
     angle_expand = angle[:,:].data.reshape(1, angle.shape[0], angle.shape[1])
     
     u_geo = u[:,:-1,:] * np.cos(angle_expand[:,:-1,:-1]) - v[:,:,:-1] * np.sin(angle_expand[:,:-1,:-1])
     v_geo = u[:,:-1,:] * np.sin(angle_expand[:,:-1,:-1]) + v[:,:,:-1] * np.cos(angle_expand[:,:-1,:-1])
-    print("Velocity transformed")
+    if not isFilm:
+        print("Velocity transformed")
     
     velocity = np.sqrt(u_geo**2 + v_geo**2)
 
