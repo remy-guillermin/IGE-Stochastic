@@ -97,6 +97,33 @@ def load_data(
     print(f"Data in {path} loaded.")
     return data
 
+def load_GLORYS(
+    path: str,
+) -> Tuple[xr.DataArray, ...]:
+    """
+    Load the specified fields from the GLORYS data file.
+
+    Parameters
+    ----------
+    path : str
+        Path to the GLORYS data file.
+
+    Returns
+    -------
+    tuple
+        Tuple of loaded fields in the same order as requested.
+    """
+    d = xr.open_dataset(path)
+    salt = d['so']
+    temp = d['thetao']
+    u = d['uo']
+    v = d['vo']
+    lon = d['longitude'][:, :]
+    lat = d['latitude'][:, :]
+    d.close()
+    print(f"GLORYS data in {path} loaded.")
+    return salt, temp, u, v, lon, lat
+
 def calc_depth(
     s: xr.DataArray, 
     Cs: xr.DataArray, 
@@ -360,8 +387,6 @@ def create_film(
     images.sort()
     input_files = '|'.join(images)
     
-    ffmpeg.input(f'concat:{input_files}', r=framerate).output(f'{film_file}.mp4', pix_fmt='yuv420p').run(overwrite_output=True)
-
     print(f"""
 Film created as {film_file}.
 To open the film, run: cplot.utils.open_figure('{filmName}')
