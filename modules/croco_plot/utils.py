@@ -115,6 +115,7 @@ def load_GLORYS(
         - temp: Temperature values.
         - u: Zonal velocity values.
         - v: Meridional velocity values.
+        - zeta: Sea surface height values.
         - Lon: Longitude grid values.
         - Lat: Latitude grid values.
         - msk: Mask array of valid grid points.
@@ -123,16 +124,17 @@ def load_GLORYS(
     d = xr.open_dataset(path)
     salt = d['so']
     temp = d['thetao']
+    zeta = d['zos']
     u = d['uo']
     v = d['vo']
     lon = d['longitude']
     lat = d['latitude']
     d.close()
-    msk = np.isnan(salt[0, 0, :, :]).data
+    msk = ~np.isnan(salt[0, 0, :, :]).data
     msk_inv = np.where(msk == 0, msk, np.nan)
     Lon, Lat = np.meshgrid(lon, lat)
     print(f"GLORYS data in {path} loaded.")
-    return salt, temp, u, v, Lon, Lat, msk, msk_inv
+    return salt, temp, zeta, u, v, Lon, Lat, msk, msk_inv
 
 def calc_depth(
     s: xr.DataArray, 

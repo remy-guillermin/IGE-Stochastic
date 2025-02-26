@@ -144,26 +144,33 @@ def GLORYS_annual(
     variables: list = 'all',
     start_date: str = None, 
     end_date: str = None, 
-    figsize=(18, 6), 
-    sss_cmap=cmocean.cm.haline, 
+    figsize=(24, 6), 
+    sss_cmap=cmocean.cm.haline,
     ssh_cmap=cmcrameri.cm.roma_r, 
+    sst_cmap=cmocean.cm.thermal, 
 ):
     if isinstance(variables, str):
         variables = [variables]
         
     if 'all' in variables:
-        variables = ['sss', 'sst', 'annual_sd']
+        variables = ['sss', 'ssh', 'sst', 'annual_sd']
     
-    salt, temp, u, v, lon, lat, msk, msk_inv = load_GLORYS(data_path)
+    salt, temp, zeta, u, v, lon, lat, msk, msk_inv = load_GLORYS(data_path)
+    salt = salt[:,0,:,:]
+    zeta = zeta
+    temp = temp[:,0,:,:]
     
     if 'annual_sd' in variables:
         salt_yr = salt.mean(dim='time')
+        zeta_yr = zeta.mean(dim='time')
         temp_yr = temp.mean(dim='time')
         
         temp_SD = np.sqrt((temp - temp_yr)**2).mean(dim='time')
+        zeta_SD = np.sqrt((zeta - zeta_yr)**2).mean(dim='time')
         salt_SD = np.sqrt((salt - salt_yr)**2).mean(dim='time')
         
     salt = salt.mean(dim='time')
+    zeta = zeta.mean(dim='time')
     temp = temp.mean(dim='time')
     
     gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.3}
@@ -178,11 +185,49 @@ def GLORYS_annual(
         plot_map(ax, lon, lat, salt_SD, sss_cmap, norm, r'$SD_{SSS}$ [psu]', msk, msk_inv, gridline_style, levels = levels)
         
         ax = axs[1]
-        levels = np.linspace(0, np.round(np.nanmax(temp_SD), 1), 21)
+        levels = np.linspace(0, np.round(np.nanmax(zeta_SD), 1), 21)
         norm = mpl.colors.BoundaryNorm(levels, ssh_cmap.N)
-        plot_map(ax, lon, lat, temp_SD, ssh_cmap, norm, r'$SD_{SSH}$ [m]', msk, msk_inv, gridline_style, levels = levels)
+        plot_map(ax, lon, lat, zeta_SD, ssh_cmap, norm, r'$SD_{SSH}$ [m]', msk, msk_inv, gridline_style, levels = levels)
+        
+        ax = axs[2]
+        levels = np.linspace(0, np.round(np.nanmax(temp_SD), 1), 21)
+        norm = mpl.colors.BoundaryNorm(levels, sst_cmap.N)
+        plot_map(ax, lon, lat, temp_SD, sst_cmap, norm, r'$SD_{SST}$ [m]', msk, msk_inv, gridline_style, levels = levels)
 
         plt.tight_layout()
         save_figure(fig, f"surface_SD_{os.path.splitext(data_path)[0]}.png")
         plt.close(fig)
     
+    if 'sss' in variables and 'ssh' in variables and 'sst' in variables:
+        fig, axs = plt.subplots(1, 3, figsize=figsize, subplot_kw={'projection': ccrs.PlateCarree()})
+
+        ax = axs[0]
+        ax.set_title(f"SWIO {start_date} to {end_date}", size=9)
+        a = int(np.nanmin(salt))
+        b = int(np.nanmax(salt))
+        c = b - a
+        levels = np.linspace(a, b, 2 * c + 1)
+        norm = mpl.colors.BoundaryNorm(levels, sss_cmap.N)
+        plot_map(ax, lon, lat, salt, sss_cmap, norm, r'$\overline{\overline{SSS}}$ [psu]', msk, msk_inv, gridline_style, levels = levels)
+        
+        ax = axs[1]
+        ax.set_title(f"SWIO {start_date} to {end_date}", size=9)
+        a = int(np.nanmin(zeta))
+        b = int(np.nanmax(zeta))
+        c = b - a
+        levels = np.linspace(a, b, 2 * c + 1)
+        norm = mpl.colors.BoundaryNorm(levels, ssh_cmap.N)
+        plot_map(ax, lon, lat, zeta, sst_cmap, norm, r'$\overline{\overline{SSH}}$ [°C]', msk, msk_inv, gridline_style, levels = levels)
+        
+        ax = axs[2]
+        ax.set_title(f"SWIO {start_date} to {end_date}", size=9)
+        a = int(np.nanmin(temp))
+        b = int(np.nanmax(temp))
+        c = b - a
+        levels = np.linspace(a, b, 2 * c + 1)
+        norm = mpl.colors.BoundaryNorm(levels, sst_cmap.N)
+        plot_map(ax, lon, lat, temp, sst_cmap, norm, r'$\overline{\overline{SST}}$ [°C]', msk, msk_inv, gridline_style, levels = levels)
+        
+        plt.tight_layout()
+        save_figure(fig, f"surface_all_{os.path.splitext(data_path)[0]}.png")
+        plt.close(fig)
