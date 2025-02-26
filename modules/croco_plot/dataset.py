@@ -3,12 +3,12 @@ Module plot pour croco_plot.
 
 Ce module contient des fonctions pour la création et l'affichage de fichiers netCDF issues des fichiers CROCO brut.
 """
-
 import os
 from pathlib import Path
 import xarray as xr
 import glob
 import numpy as np
+import pandas as pd
 from .utils import load_grid, load_data, load_GLORYS
 
 def create_from_CROCO(
@@ -35,6 +35,8 @@ def create_from_CROCO(
     cell_surface = 1 / (pm * pn).data
     cell_surface[(1-msk).astype(int)] = np.nan
     
+    zeta, temp, salt, u, v, w, time, s_rho = load_data(data_path, ('zeta', 'temp', 'salt', 'u', 'v', 'w', 'time', 's_rho'))
+    
     depth = h * s_rho # Profondeur
     depth = np.transpose(depth.data, (2, 0, 1)) # Transpose depth to match u, v, w shape
     ddepth = np.diff(depth, axis=0)
@@ -44,8 +46,6 @@ def create_from_CROCO(
     depth, ddepth, cell_surface, s_rho = None, None, None, None
         
     fill_value = 9.96921e+36
-        
-    zeta, temp, salt, u, v, w, time, s_rho = load_data(data_path, ('zeta', 'temp', 'salt', 'u', 'v', 'w', 'time', 's_rho'))
     
     if 'ke' in variables or 'eke' in variables or 'mke' in variables:
         print('Converting velocities')
@@ -59,14 +59,12 @@ def create_from_CROCO(
         zeta[zeta == fill_value] = np.nan
     if 'sta' in variables or 'sst' in variables:
         print('Converting temperature')
-        temp = temp.data
+        temp = temp[:,-1,:,:].data
         temp[temp == fill_value] = np.nan
-        temp = temp[:,-1,:,:]
     if 'ssa' in variables or 'sss' in variables:
         print('Converting salinity')
-        salt = salt.data
+        salt = salt[:,-1,:,:].data
         salt[salt == fill_value] = np.nan
-        salt = salt[:,-1,:,:]
         
     for (lon1, lon2, lat1, lat2), name in zip(boxes, names):
         results = {var: [] for var in variables if var != 'ke'}
@@ -144,7 +142,8 @@ def create_from_GLORYS(
     if 'all' in variables:
         variables = ['sla', 'ssa', 'sta', 'ssh', 'sss', 'sst']
         
-    salt, temp, zeta, u, v, lon, lat, msk, msk_inv = load_GLORYS(data_path)
+    salt, temp, zeta, u, v, lon, lat, _, _ = load_GLORYS(data_path)
+    time = pd.to_datetime(salt['time'].data)
     salt = salt[:,0,:,:]
     zeta = zeta
     temp = temp[:,0,:,:]
@@ -152,23 +151,15 @@ def create_from_GLORYS(
     if 'ke' in variables or 'eke' in variables or 'mke' in variables:
         print('Converting velocities')
         u, v, w = u.data, v.data, w.data
-        u[u == fill_value] = np.nan
-        v[v == fill_value] = np.nan
-        w[w == fill_value] = np.nan
     if 'sla' in variables or 'ssh' in variables:
         print('Converting free surface')
         zeta = zeta.data
-        zeta[zeta == fill_value] = np.nan
     if 'sta' in variables or 'sst' in variables:
         print('Converting temperature')
         temp = temp.data
-        temp[temp == fill_value] = np.nan
-        temp = temp[:,-1,:,:]
     if 'ssa' in variables or 'sss' in variables:
         print('Converting salinity')
         salt = salt.data
-        salt[salt == fill_value] = np.nan
-        salt = salt[:,-1,:,:]
         
     for (lon1, lon2, lat1, lat2), name in zip(boxes, names):
         results = {var: [] for var in variables if var != 'ke'}
@@ -203,15 +194,10 @@ def create_from_GLORYS(
                     box_data = var_data[:,box_mask]
                 else:
                     box_data = var_data[:,:,box_mask]
-                if var in ['mke', 'eke']:
-                    volume_box = cell_volume[:,:,:-1,:-1][:,:,box_mask]
-                    weighted_data = box_data[:,1:,:] * volume_box / domain_volume
-                    box_sum = np.nansum(weighted_data[:,-1,:], axis=1)
-                else:
-                    box_sum = np.nanmean(box_data, axis=1)
-                    weighted_data = None
+                    
+                box_sum = np.nanmean(box_data, axis=1)
                 results[var].append(box_sum)
-                del var_data, box_data, weighted_data
+                del var_data, box_data
         
         results = {var: np.array(results[var]).squeeze() for var in results}
         
