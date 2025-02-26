@@ -8,6 +8,7 @@ import numpy as np
 import xarray as xr
 import os
 import subprocess
+import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.colors import Colormap, Normalize
@@ -371,9 +372,16 @@ def prepare_film(func, data_path, dates, grid_path=None, **kwargs):
     **kwargs : dict
         Additional keyword arguments to pass to the plotting function.
     """
-    for date in dates:
-        print(f"Processing date: {date}")
-        func(data_path=data_path, date=date, grid_path=grid_path, isFilm=True, **kwargs)
+    original_backend = matplotlib.get_backend()  # Store the original backend
+    matplotlib.use('Agg')  # Temporarily switch to non-interactive backend
+
+    try:
+        for date in dates:
+            print(f"Processing date: {date}")
+            func(data_path=data_path, date=date, grid_path=grid_path, isFilm=True, **kwargs)
+    finally:
+        matplotlib.use(original_backend)  # Restore the original backend after processing
+
         
 def create_film(
     filmDir: str, 
