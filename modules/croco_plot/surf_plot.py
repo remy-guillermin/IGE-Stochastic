@@ -203,28 +203,28 @@ def GLORYS_annual(
 
         ax = axs[0]
         ax.set_title(f"SWIO {start_date} to {end_date}", size=9)
-        a = int(np.nanmin(salt))
-        b = int(np.nanmax(salt))
+        a = 33
+        b = 36
         c = b - a
-        levels = np.linspace(a, b, 2 * c + 1)
+        levels = np.linspace(a, b, 4 * c + 1)
         norm = mpl.colors.BoundaryNorm(levels, sss_cmap.N)
         plot_map(ax, lon, lat, salt, sss_cmap, norm, r'$\overline{\overline{SSS}}$ [psu]', msk, msk_inv, gridline_style, levels = levels)
         
         ax = axs[1]
         ax.set_title(f"SWIO {start_date} to {end_date}", size=9)
-        a = int(np.nanmin(zeta))
-        b = int(np.nanmax(zeta))
-        c = b - a
-        levels = np.linspace(a, b, 2 * c + 1)
+        a = np.round(np.nanmin(zeta), 1)
+        b = np.round(np.nanmax(zeta), 1)
+        c = int((b - a) * 10)
+        levels = np.linspace(a, b, c + 1)
         norm = mpl.colors.BoundaryNorm(levels, ssh_cmap.N)
-        plot_map(ax, lon, lat, zeta, sst_cmap, norm, r'$\overline{\overline{SSH}}$ [°C]', msk, msk_inv, gridline_style, levels = levels)
+        plot_map(ax, lon, lat, zeta, ssh_cmap, norm, r'$\overline{\overline{SSH}}$ [°C]', msk, msk_inv, gridline_style, levels = levels)
         
         ax = axs[2]
         ax.set_title(f"SWIO {start_date} to {end_date}", size=9)
         a = int(np.nanmin(temp))
         b = int(np.nanmax(temp))
         c = b - a
-        levels = np.linspace(a, b, 2 * c + 1)
+        levels = np.linspace(a, b, c + 1)
         norm = mpl.colors.BoundaryNorm(levels, sst_cmap.N)
         plot_map(ax, lon, lat, temp, sst_cmap, norm, r'$\overline{\overline{SST}}$ [°C]', msk, msk_inv, gridline_style, levels = levels)
         
