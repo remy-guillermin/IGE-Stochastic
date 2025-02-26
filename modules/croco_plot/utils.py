@@ -18,8 +18,7 @@ import ffmpeg
 import glob
 
 def load_grid(
-    path: Optional[str] = None, 
-    is_Velocity: bool = False
+    path: Optional[str] = None
 ) -> Tuple[
     np.ndarray,  # lon
     np.ndarray,  # lat
@@ -48,22 +47,13 @@ def load_grid(
     if path is None:
         path = '/lus/work/CT1/c1601279/lweiss/CROCO/RUN/SWIOSE/CROCO_FILES/grid/croco_grid_swio2.nc'
     g = xr.open_dataset(path)
-    if is_Velocity:
-        lon = g['lon_rho'][:-1, :-1]
-        lat = g['lat_rho'][:-1, :-1]
-        msk = g['mask_rho'][:-1, :-1]
-        pm = g['pm'][:-1,:-1] 
-        pn = g['pn'][:-1,:-1]
-        msk_inv = np.where(msk == 0, msk, np.nan)
-        h = g['h'][:-1, :-1]
-    else:
-        lon = g['lon_rho'][:, :]
-        lat = g['lat_rho'][:, :]
-        msk = g['mask_rho'][:, :]
-        pm = g['pm'][:,:] 
-        pn = g['pn'][:,:]
-        msk_inv = np.where(msk == 0, msk, np.nan)
-        h = g['h'][:, :]
+    lon = g['lon_rho'][:, :]
+    lat = g['lat_rho'][:, :]
+    msk = g['mask_rho'][:, :]
+    pm = g['pm'][:,:] 
+    pn = g['pn'][:,:]
+    msk_inv = np.where(msk == 0, msk, np.nan)
+    h = g['h'][:, :]
     angle = g['angle'][:, :]
     g.close()
     print("Grid loaded.")
