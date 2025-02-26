@@ -118,8 +118,8 @@ def load_GLORYS(
     temp = d['thetao']
     u = d['uo']
     v = d['vo']
-    lon = d['longitude'][:, :]
-    lat = d['latitude'][:, :]
+    lon = d['longitude']
+    lat = d['latitude']
     d.close()
     print(f"GLORYS data in {path} loaded.")
     return salt, temp, u, v, lon, lat
