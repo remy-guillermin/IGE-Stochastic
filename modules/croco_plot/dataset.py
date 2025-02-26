@@ -96,9 +96,8 @@ def create_from_CROCO(
                     box_sum = np.nansum(box_data[:,-1,:], axis=1)
                 else:
                     box_sum = np.nanmean(box_data, axis=1)
-                    weighted_data = None
                 results[var].append(box_sum)
-                del var_data, box_data, weighted_data
+                del var_data, box_data
         
         results = {var: np.array(results[var]).squeeze() for var in results}
         
