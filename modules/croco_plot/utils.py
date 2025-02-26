@@ -371,7 +371,6 @@ def prepare_film(func, data_path, dates, grid_path=None, **kwargs):
             func(data_path=data_path, date=date, grid_path=grid_path, isFilm=True, **kwargs)
     finally:
         matplotlib.use(original_backend)  # Restore the original backend after processing
-
         
 def create_film(
     filmDir: str, 

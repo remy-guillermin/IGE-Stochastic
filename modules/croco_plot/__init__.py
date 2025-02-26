@@ -11,6 +11,7 @@ Modules :
 - surf_plot.py : Contient des fonctions pour l'affichage des données de surface CROCO.
 - time_series.py : Contient des fonctions pour calculer et afficher les séries temporelles de l'énergie cinétique turbulente (EKE).
 - agulhas.py : Contient des fonctions pour afficher des valeurs zoomées sur la région du courant des Aiguilles.
+- dataset.py : Contient des fonctions pour manipuler les fichiers netCDF.
 
 Installation :
     pip install -e modules/
@@ -19,10 +20,11 @@ Dépendances :
     numpy, xarray, matplotlib, cmocean, cmcrameri, cartopy, metpy
 """
 
-__version__ = '0.1.0'
+__version__ = '0.2.0'
 
 from . import utils
 from . import plot
 from . import surf_plot
 from . import time_series
 from . import agulhas
+from . import dataset
