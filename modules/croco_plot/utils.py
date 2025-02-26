@@ -14,6 +14,7 @@ from matplotlib.colors import Colormap, Normalize
 import cartopy.crs as ccrs
 from typing import Optional, Tuple, Union, Dict, List
 import ffmpeg
+import glob
 
 def load_grid(
     path: Optional[str] = None, 
@@ -355,15 +356,11 @@ def create_film(
     output_dir = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures'
     film_path = os.path.join(output_dir, filmDir)
     film_file = os.path.join(output_dir, filmName)
-
-    (
-        ffmpeg
-        .input(f'{film_path}/{filmName}_%Y-%m-%d.png', r=1)
-        .filter('fps', fps=framerate)
-        .filter('scale', 'iw-mod(iw,2)', 'ih-mod(ih,2)')
-        .output(film_file, pix_fmt='yuv420p')
-        .run(overwrite_output=True)
-    )   
+    images = glob.glob(f'{film_path}/{filmName}_*.png')
+    images.sort()
+    input_files = '|'.join(images)
+    
+    ffmpeg.input(f'concat:{input_files}', r=framerate).output(f'{film_file}.mp4', pix_fmt='yuv420p').run(overwrite_output=True)
 
     print(f"""
 Film created as {film_file}.

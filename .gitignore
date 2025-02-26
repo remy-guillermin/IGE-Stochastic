@@ -22,6 +22,9 @@ Icon?
 !slides/figures/*.png
 *.jpg
 *.jpeg
+*.mp4
+*.mov
+*.avi
 
 # Tree files
 *project.tree 
