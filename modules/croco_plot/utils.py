@@ -401,7 +401,7 @@ def create_film(
     images.sort()
     input_files = '|'.join(images)
     
-    ffmpeg.input(f'concat:{input_files}', r=framerate).output(film_file, pix_fmt='yuv420p').run(overwrite_output=True)
+    ffmpeg.input(f'concat:{input_files}', r=framerate).output(f'{film_file}.mp4', pix_fmt='yuv420p').run(overwrite_output=True)
     
     print(f"""
 Film created as {film_file}.

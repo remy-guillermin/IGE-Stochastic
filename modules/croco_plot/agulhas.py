@@ -196,7 +196,7 @@ def plot(
 
         plt.tight_layout()
         if isFilm:
-            save_figure(fig, f"agulhas_velocity_{date}.png", isFilm=isFilm, filmDir=os.path.splitext(data_path)[0])
+            save_figure(fig, f"agulhas_vorticity_{date}.png", isFilm=isFilm, filmDir=os.path.splitext(data_path)[0])
         else:
             save_figure(fig, f"agulhas_vorticity_{date}.png")
         plt.close(fig)
