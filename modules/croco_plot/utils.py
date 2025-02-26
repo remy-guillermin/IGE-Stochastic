@@ -46,7 +46,7 @@ def load_grid(
         - h: Bathymetric depth values.
     """
     if path is None:
-        path = '/lus/store/CT1/c1601279/lweiss/GRID/croco_grid_swio2.nc'
+        path = '/lus/work/CT1/c1601279/lweiss/CROCO/RUN/SWIOSE/CROCO_FILES/grid/croco_grid_swio2.nc'
     g = xr.open_dataset(path)
     if is_Velocity:
         lon = g['lon_rho'][:-1, :-1]

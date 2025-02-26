@@ -81,9 +81,11 @@ def zoom_velocity(
     gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.3}
 
     ax.set_title(f"Velocity SWIO {date}", size=9)
-    levels = np.linspace(0, 2.5, 21)
+    a = -1.2
+    b = 0
+    norm = mpl.colors.LogNorm(10**a, 10**b)
     norm = mpl.colors.BoundaryNorm(levels, cmap.N)
-    plot_zoom(ax, lon[:-1,:-1], lat[:-1,:-1], velocity[-1,:,:], cmap, norm, 'Velocity [$m.s^{-1}$]', msk[:-1,:-1], msk_inv[:-1,:-1], gridline_style, levels=levels)
+    plot_zoom(ax, lon[:-1,:-1], lat[:-1,:-1], velocity[-1,:,:], cmap, norm, 'Velocity [$m.s^{-1}$]', msk[:-1,:-1], msk_inv[:-1,:-1], gridline_style)
 
     plt.tight_layout()
     if isFilm:
@@ -124,9 +126,9 @@ def velocity(
 
     # Load grid data
     if grid_path is not None:
-        lon, lat, _, _, msk, msk_inv, angle, _ = load_grid(grid_path)
+        lon, lat, pm, pn, msk, msk_inv, angle, _ = load_grid(grid_path)
     else:
-        lon, lat, _, _, msk, msk_inv, angle, _ = load_grid()
+        lon, lat, pm, pn, msk, msk_inv, angle, _ = load_grid()
         
     # Load simulation data
     u, v = load_data(data_path, ('u', 'v'))
@@ -161,12 +163,14 @@ def velocity(
     gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.3}
 
     ax.set_title(f"Velocity SWIO {date}", size=9)
-    levels = np.linspace(0, 2.5, 26)
-    norm = mpl.colors.BoundaryNorm(levels, cmap.N)
+    #levels = np.linspace(0, 2.5, 26)
+    a = -1.2
+    b = 0
+    norm = mpl.colors.LogNorm(10**a, 10**b)
     
     zoom = np.min(lon.data) + 1 , 50, np.min(lat.data) + 1, - 10.0
     
-    plot_map(ax, lon[:-1,:-1], lat[:-1,:-1], velocity[-1,:,:], cmap, norm, 'Velocity [$m.s^{-1}$]', msk[:-1,:-1], msk_inv[:-1,:-1], gridline_style, levels=levels, bounds=zoom)
+    plot_map(ax, lon[:-1,:-1], lat[:-1,:-1], velocity[-1,:,:], cmap, norm, 'Velocity [$m.s^{-1}$]', msk[:-1,:-1], msk_inv[:-1,:-1], gridline_style, bounds=zoom)
 
     plt.tight_layout()
     if isFilm:
