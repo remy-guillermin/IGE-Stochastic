@@ -13,6 +13,7 @@ from matplotlib.axes import Axes
 from matplotlib.colors import Colormap, Normalize
 import cartopy.crs as ccrs
 from typing import Optional, Tuple, Union, Dict, List
+import ffmpeg
 
 def load_grid(
     path: Optional[str] = None, 
@@ -333,6 +334,44 @@ def prepare_film(func, data_path, dates, grid_path=None, **kwargs):
     for date in dates:
         print(f"Processing date: {date}")
         func(data_path=data_path, date=date, grid_path=grid_path, isFilm=True, **kwargs)
+        
+def create_film(
+    filmDir: str, 
+    filmName: str,
+    frameName: str,
+    framerate: int = 25,
+) -> None:
+    """
+    Create a film from the saved figures.
+
+    Parameters
+    ----------
+    filmDir : str
+        Directory containing the film frames.
+    filmName : str
+        Name of the film file to create.
+    frame_format : str, optional
+        Format of the frames (default is "png").
+    framerate : int, optional
+        Framerate of the output video (default is 25 fps).
+    """
+    output_dir = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures'
+    film_path = os.path.join(output_dir, filmDir)
+    film_file = os.path.join(output_dir, filmName)
+
+    (
+        ffmpeg
+        .input(f'{film_path}/{frameName}_%Y-%m-%d.png', r=1)
+        .filter('fps', fps=framerate)
+        .filter('scale', 'iw-mod(iw,2)', 'ih-mod(ih,2)')
+        .output(film_file, pix_fmt='yuv420p')
+        .run(overwrite_output=True)
+    )   
+
+    print(f"""
+Film created as {film_file}.
+To open the film, run: cplot.utils.open_figure('{filmName}')
+""")
 
 def save_figure(
     fig: plt.Figure, 
