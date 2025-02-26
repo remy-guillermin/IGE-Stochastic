@@ -12,7 +12,7 @@ import cmcrameri
 import cartopy.crs as ccrs
 import xarray as xr
 import os
-from .utils import load_grid, load_data, save_figure, plot_map
+from .utils import load_grid, load_data, load_GLORYS, save_figure, plot_map
 
 def multiple_annual(data_path, 
                     variables='all', 
@@ -81,9 +81,9 @@ def multiple_annual(data_path,
         zeta_yr = zeta.mean(dim='time')
         temp_yr = temp.mean(dim='time')
         
-        SLA = np.sqrt((zeta - zeta_yr)**2).mean(dim='time')
-        STA = np.sqrt((temp - temp_yr)**2).mean(dim='time')
-        SSA = np.sqrt((salt - salt_yr)**2).mean(dim='time')
+        zeta_SD = np.sqrt((zeta - zeta_yr)**2).mean(dim='time')
+        temp_SD = np.sqrt((temp - temp_yr)**2).mean(dim='time')
+        salt_SD = np.sqrt((salt - salt_yr)**2).mean(dim='time')
         
     salt = salt.mean(dim='time')
     zeta = zeta.mean(dim='time')
@@ -121,20 +121,68 @@ def multiple_annual(data_path,
         
         ax = axs[0]
         ax.set_title("Annual Standard Deviation", size=9)
-        levels = np.linspace(0, np.round(np.nanmax(SSA), 1), 21)
+        levels = np.linspace(0, np.round(np.nanmax(salt_SD), 1), 21)
         norm = mpl.colors.BoundaryNorm(levels, sss_cmap.N)
-        plot_map(ax, lon, lat, SSA, sss_cmap, norm, r'$SD_{SSS}$ [psu]', msk, msk_inv, gridline_style, levels = levels)
+        plot_map(ax, lon, lat, salt_SD, sss_cmap, norm, r'$SD_{SSS}$ [psu]', msk, msk_inv, gridline_style, levels = levels)
         
         ax = axs[1]
-        levels = np.linspace(0, np.round(np.nanmax(SLA), 1), 21)
+        levels = np.linspace(0, np.round(np.nanmax(zeta_SD), 1), 21)
         norm = mpl.colors.BoundaryNorm(levels, ssh_cmap.N)
-        plot_map(ax, lon, lat, SLA, ssh_cmap, norm, r'$SD_{SSH}$ [m]', msk, msk_inv, gridline_style, levels = levels)
+        plot_map(ax, lon, lat, zeta_SD, ssh_cmap, norm, r'$SD_{SSH}$ [m]', msk, msk_inv, gridline_style, levels = levels)
         
         ax = axs[2]
-        levels = np.linspace(0, np.round(np.nanmax(STA), 1), 21)
+        levels = np.linspace(0, np.round(np.nanmax(temp_SD), 1), 21)
         norm = mpl.colors.BoundaryNorm(levels, sst_cmap.N)
-        plot_map(ax, lon, lat, STA, sst_cmap, norm, r'$SD_{SST}$ [°C]', msk, msk_inv, gridline_style, levels = levels)
+        plot_map(ax, lon, lat, temp_SD, sst_cmap, norm, r'$SD_{SST}$ [°C]', msk, msk_inv, gridline_style, levels = levels)
 
         plt.tight_layout()
         save_figure(fig, f"surface_SD_{os.path.splitext(data_path)[0]}.png")
         plt.close(fig)
+        
+def GLORYS_annual(
+    data_path: str,
+    variables: list = 'all',
+    start_date: str = None, 
+    end_date: str = None, 
+    figsize=(18, 6), 
+    sss_cmap=cmocean.cm.haline, 
+    ssh_cmap=cmcrameri.cm.roma_r, 
+):
+    if isinstance(variables, str):
+        variables = [variables]
+        
+    if 'all' in variables:
+        variables = ['sss', 'sst', 'annual_sd']
+    
+    salt, temp, u, v, lon, lat, msk, msk_inv = load_GLORYS(data_path)
+    
+    if 'annual_sd' in variables:
+        salt_yr = salt.mean(dim='time')
+        temp_yr = temp.mean(dim='time')
+        
+        temp_SD = np.sqrt((temp - temp_yr)**2).mean(dim='time')
+        salt_SD = np.sqrt((salt - salt_yr)**2).mean(dim='time')
+        
+    salt = salt.mean(dim='time')
+    temp = temp.mean(dim='time')
+    
+    gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.3}
+    
+    if 'annual_sd' in variables:
+        fig, axs = plt.subplots(1, 3, figsize=figsize, subplot_kw={'projection': ccrs.PlateCarree()})
+        
+        ax = axs[0]
+        ax.set_title("Annual Standard Deviation", size=9)
+        levels = np.linspace(0, np.round(np.nanmax(salt_SD), 1), 21)
+        norm = mpl.colors.BoundaryNorm(levels, sss_cmap.N)
+        plot_map(ax, lon, lat, salt_SD, sss_cmap, norm, r'$SD_{SSS}$ [psu]', msk, msk_inv, gridline_style, levels = levels)
+        
+        ax = axs[1]
+        levels = np.linspace(0, np.round(np.nanmax(temp_SD), 1), 21)
+        norm = mpl.colors.BoundaryNorm(levels, ssh_cmap.N)
+        plot_map(ax, lon, lat, temp_SD, ssh_cmap, norm, r'$SD_{SSH}$ [m]', msk, msk_inv, gridline_style, levels = levels)
+
+        plt.tight_layout()
+        save_figure(fig, f"surface_SD_{os.path.splitext(data_path)[0]}.png")
+        plt.close(fig)
+    

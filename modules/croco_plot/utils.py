@@ -111,7 +111,14 @@ def load_GLORYS(
     Returns
     -------
     tuple
-        Tuple of loaded fields in the same order as requested.
+        - salt: Salinity values.
+        - temp: Temperature values.
+        - u: Zonal velocity values.
+        - v: Meridional velocity values.
+        - Lon: Longitude grid values.
+        - Lat: Latitude grid values.
+        - msk: Mask array of valid grid points.
+        - msk_inv: Inverse mask array with invalid points set to NaN.
     """
     d = xr.open_dataset(path)
     salt = d['so']
@@ -121,8 +128,11 @@ def load_GLORYS(
     lon = d['longitude']
     lat = d['latitude']
     d.close()
+    msk = np.isnan(salt[0, 0, :, :]).data
+    msk_inv = np.where(msk == 0, msk, np.nan)
+    Lon, Lat = np.meshgrid(lon, lat)
     print(f"GLORYS data in {path} loaded.")
-    return salt, temp, u, v, lon, lat
+    return salt, temp, u, v, Lon, Lat, msk, msk_inv
 
 def calc_depth(
     s: xr.DataArray, 
@@ -386,6 +396,8 @@ def create_film(
     images = glob.glob(f'{film_path}/{filmName}_*.png')
     images.sort()
     input_files = '|'.join(images)
+    
+    ffmpeg.input(f'concat:{input_files}', r=framerate).output(film_file, pix_fmt='yuv420p').run(overwrite_output=True)
     
     print(f"""
 Film created as {film_file}.
