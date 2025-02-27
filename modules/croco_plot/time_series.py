@@ -6,10 +6,9 @@ Ce module contient des fonctions pour l'affichage des données temporelles de CR
 
 import numpy as np
 import xarray as xr
+import pandas as pd
+from pathlib import Path
 import matplotlib.pyplot as plt
-import matplotlib as mpl
-import cmocean
-import cartopy.crs as ccrs
 from .utils import load_grid, load_data, save_figure, plot_time_series
 
 def multiple_time_series(data_files, 
@@ -172,3 +171,135 @@ def multiple_time_series(data_files,
             for name in names:
                 results[var][name] = np.concatenate(results[var][name])
             plot_time_series(time_results, results[var], ylabel, roll, names, colors, filename, title)
+            
+def time_series_from_dataset(
+    datasets,
+    variables='all',
+    figwidth=12,
+    names=['Equator', 'Mayotte-Comores', 'South-Moz', 'Mascarene'],
+    roll = 9
+):      
+    if isinstance(variables, str):
+        variables = [variables]
+        
+    if 'all' in variables:
+        variables = ['Energies', 'Anomalies', 'Fields']
+    
+    time = None
+    
+    for name in names:
+        files = datasets[name]
+        
+        
+        if 'Energies' in variables:
+            fig_energy, axes_energy = plt.subplots(2, 1, figsize=(figwidth, int(figwidth/3)), sharex=True)
+        if 'Anomalies' in variables:
+            fig_anomaly, axes_anomaly = plt.subplots(3, 1, figsize=(figwidth, int(2*figwidth/3)), sharex=True)
+        if 'Fields' in variables:
+            fig_field, axes_field = plt.subplots(3, 1, figsize=(figwidth, int(2*figwidth/3)), sharex=True)
+
+        for file in files:
+            print(file)
+            source = Path(file).parent.name
+            f = xr.open_dataset(file)
+            time = pd.to_datetime(f.time.data)
+            if 'Energies' in variables:
+                ax = axes_energy[0]
+                mke = f.mke.data
+                if 'mercator' in file:
+                    style = 'k.'
+                else:
+                    style = '--'
+                ax.plot(time, mke, style, label=source)
+                ax.set_title('Mean Kinetic Energy')
+                ax.set_ylabel('MKE [$m^2/s^2$]')
+                ax.set_xlabel('Time')
+                
+                ax = axes_energy[1]
+                eke = f.eke.data
+                if 'mercator' in file:
+                    style = 'k.'
+                else:
+                    style = '--'
+                ax.plot(time, eke, style, label=source)
+                ax.set_title('Eddy Kinetic Energy')
+                ax.set_ylabel('EKE [$m^2/s^2$]')
+                ax.set_xlabel('Time')
+            if 'Anomalies' in variables:
+                ax = axes_anomaly[0]
+                sla = f.sla.data
+                if 'mercator' in file:
+                    style = 'k.'
+                else:
+                    style = '--'
+                ax.plot(time, sla, style, label=source)
+                ax.set_title('Sea Level Anomaly')
+                ax.set_ylabel('SLA [$m$]')
+                ax.set_xlabel('Time')
+                
+                ax = axes_anomaly[1]
+                ssa = f.ssa.data
+                if 'mercator' in file:
+                    style = 'k.'
+                else:
+                    style = '--'
+                ax.plot(time, ssa, style, label=source)
+                ax.set_title('Sea Salinity Anomaly')
+                ax.set_ylabel('SSA [$psu$]')
+                ax.set_xlabel('Time')
+                
+                ax = axes_anomaly[2]
+                sta = f.sta.data
+                if 'mercator' in file:
+                    style = 'k.'
+                else:
+                    style = '--'
+                ax.plot(time, sta, style, label=source)
+                ax.set_title('Sea Temperature Anomaly')
+                ax.set_ylabel('STA [$°C$]')
+                ax.set_xlabel('Time')
+            if 'Fields' in variables:
+                ax = axes_field[0]
+                ssh = f.ssh.data
+                if 'mercator' in file:
+                    style = 'k.'
+                else:
+                    style = '--'
+                ax.plot(time, sla, style, label=source)
+                ax.set_title('Sea Surface Height')
+                ax.set_ylabel('SSH [$m$]')
+                ax.set_xlabel('Time')
+                
+                ax = axes_field[1]
+                sss = f.sss.data
+                if 'mercator' in file:
+                    style = 'k.'
+                else:
+                    style = '--'
+                ax.plot(time, ssa, style, label=source)
+                ax.set_title('Sea Surface Salinity')
+                ax.set_ylabel('SSS [$psu$]')
+                ax.set_xlabel('Time')
+                
+                ax = axes_field[2]
+                sst = f.sst.data
+                if 'mercator' in file:
+                    style = 'k.'
+                else:
+                    style = '--'
+                ax.plot(time, sta, style, label=source)
+                ax.set_title('Sea Surface Temperature')
+                ax.set_ylabel('SST [$°C$]')
+                ax.set_xlabel('Time')    
+            f.close()
+        
+        fig_energy.suptitle(f'Energies over time for {name}')
+        fig_anomaly.suptitle(f'Anomalies over time for {name}')
+        fig_field.suptitle(f'Fields over time for {name}')
+        
+        axes_anomaly[0].set_xlim(pd.Timestamp('2017-01-01'), pd.Timestamp('2019-12-31'))
+        
+        fig_energy.tight_layout()
+        fig_anomaly.tight_layout()
+        fig_field.tight_layout()
+        

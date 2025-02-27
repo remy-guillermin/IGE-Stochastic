@@ -4,7 +4,6 @@ Module plot pour croco_plot.
 Ce module contient des fonctions pour la création et l'affichage de fichiers netCDF issues des fichiers CROCO brut.
 """
 import os
-from pathlib import Path
 import xarray as xr
 import glob
 import numpy as np
@@ -39,12 +38,11 @@ def create_from_CROCO(
     
     zeta, temp, salt, u, v, w, time, _ = load_data(data_path, ('zeta', 'temp', 'salt', 'u', 'v', 'w', 'time', 's_rho'))
 
-        
     fill_value = 9.96921e+36
     
     if 'ke' in variables or 'eke' in variables or 'mke' in variables:
         print('Converting velocities')
-        u, v, w = u.data, v.data, w.data
+        u, v, w = u[:,-1,:,:].data, v[:,-1,:,:].data, w[:,-1,:,:].data
         u[u == fill_value] = np.nan
         v[v == fill_value] = np.nan
         w[w == fill_value] = np.nan
@@ -90,14 +88,9 @@ def create_from_CROCO(
                 box_mask = np.array((lon >= lon1) & (lon <= lon2) & (lat >= lat1) & (lat <= lat2))
                 if var in ['mke', 'eke']:
                     box_mask = box_mask[:-1,:-1]
-                if var in ['sla', 'ssh', 'sta', 'ssa', 'sss', 'sst']:
-                    box_data = var_data[:,box_mask]
-                else:
-                    box_data = var_data[:,:,box_mask]
-                if var in ['mke', 'eke']:
-                    box_sum = np.nansum(box_data[:,-1,:], axis=1)
-                else:
-                    box_sum = np.nanmean(box_data, axis=1)
+                
+                box_data = var_data[:,box_mask]
+                box_sum = np.nanmean(box_data, axis=1)
                 results[var].append(box_sum)
                 del var_data, box_data
         
