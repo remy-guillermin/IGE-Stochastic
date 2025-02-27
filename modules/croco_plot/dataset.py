@@ -8,6 +8,7 @@ import xarray as xr
 import glob
 import numpy as np
 import pandas as pd
+from pathlib import Path
 from .utils import load_grid, load_data, load_GLORYS
 
 def create_from_CROCO(
@@ -233,12 +234,12 @@ def create_from_GLORYS(
         print(f'File {file_path} created')
         del ds, results
             
-def concatenate(
+def merge(
     file_pattern: str, 
     output_dir: str
 ):
     """
-    Concatenate multiple netCDF files matching a pattern into a single file.
+    Merge multiple netCDF files matching a pattern into a single file.
 
     Parameters
     ----------
@@ -262,3 +263,27 @@ def concatenate(
     ds.close()
     
     print(f"Concatenation complete: {output_file}")
+    
+def fetch_datasets() -> dict:
+    """
+    Fetch all netCDF files in the current directory and group them by their dataset names.
+
+    Returns
+    -------
+    dict
+        A dictionary where keys are dataset names and values are lists of file paths.
+    """
+    current_directory = Path.cwd()
+    file_groups = {}
+
+    # Iterate over all .nc files
+    for file in current_directory.rglob("*.nc"):
+        # Extract the name part (e.g., 'Equator' from 'box_data_Equator.nc')
+        name = file.stem.replace('box_data_', '')  # Remove 'box_data_' from the filename stem
+
+        if name in file_groups:
+            file_groups[name].append(str(file))
+        else:
+            file_groups[name] = [str(file)]
+            
+    return file_groups

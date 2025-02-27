@@ -8,6 +8,7 @@ import numpy as np
 import xarray as xr
 import pandas as pd
 from pathlib import Path
+import matplotlib
 import matplotlib.pyplot as plt
 from .utils import load_grid, load_data, save_figure, plot_time_series
 
@@ -180,8 +181,13 @@ def time_series_from_dataset(
     variables='all',
     figwidth=12,
     names=['Equator', 'Mayotte-Comores', 'South-Moz', 'Mascarene'],
-    roll = 9
-):      
+    roll = 9,
+    interactive: bool = False
+):   
+    if interactive:
+        original_backend = matplotlib.get_backend()  # Store the original backend
+        matplotlib.use('tkagg')  # Temporarily switch to interactive backend
+           
     if isinstance(variables, str):
         variables = [variables]
         
@@ -199,13 +205,14 @@ def time_series_from_dataset(
 
         for file in files:
             source = Path(file).parent.name
+            print(source)
             f = xr.open_dataset(file)
             time = pd.to_datetime(f.time.data)
             
             if 'mercator' in file:
-                style = 'k.'
+                style = 'r.'
             else:
-                style = '--'
+                style = '-'
             if 'Energies' in variables:
                 ax = axes_energy[0]
                 mke = f.mke.data
@@ -273,9 +280,24 @@ def time_series_from_dataset(
         fig_anomaly.suptitle(f'Anomalies over time for {name}')
         fig_field.suptitle(f'Fields over time for {name}')
         
-        axes_anomaly[0].set_xlim(pd.Timestamp('2017-01-01'), pd.Timestamp('2019-12-31'))
+        axes_energy[-1].set_xlim(pd.Timestamp('2017-01-01'), pd.Timestamp('2019-12-31'))
+        axes_anomaly[-1].set_xlim(pd.Timestamp('2017-01-01'), pd.Timestamp('2019-12-31'))
+        axes_field[-1].set_xlim(pd.Timestamp('2017-01-01'), pd.Timestamp('2019-12-31'))
+        
+        axes_energy[0].legend()
+        axes_anomaly[0].legend()
+        axes_field[0].legend()
         
         fig_energy.tight_layout()
         fig_anomaly.tight_layout()
         fig_field.tight_layout()
         
+        save_figure(fig_energy, f"{name}_energies_time_series.png")
+        save_figure(fig_anomaly, f"{name}_anomalies_time_series.png")
+        save_figure(fig_field, f"{name}_fields_time_series.png")
+        
+        plt.close(fig_energy)
+        plt.close(fig_anomaly)
+        plt.close(fig_field)
+        
+    matplotlib.use(original_backend)  # Restore the original backend after processing
