@@ -12,13 +12,15 @@ import cmcrameri
 import cartopy.crs as ccrs
 from .utils import load_grid, load_data, save_figure, plot_map
 
-def velocity(data_path, 
-             date, 
-             figsize=(10, 8), 
-             cmap=cmcrameri.cm.oslo, 
-             grid_path=None):
+def velocity(
+    data_path: str, 
+    date: str, 
+    figsize: tuple = (10, 8), 
+    cmap = cmcrameri.cm.oslo, 
+    grid_path: str = None
+):
     """
-    Plot velocity data on a map for a specific date range.
+    Plot velocity data on a map for a specific date.
 
     Parameters
     ----------
@@ -27,9 +29,11 @@ def velocity(data_path,
     date : str
         Date for the data slice in 'YYYY-MM-DD' format.
     figsize : tuple, optional
-        Size of the figure, by default (8, 8)
+        Size of the figure, by default (10, 8).
     cmap : colormap, optional
-        Colormap for velocity, by default cmcrameri.cm.oslo
+        Colormap for velocity, by default cmcrameri.cm.oslo.
+    grid_path : str, optional
+        Path to the grid data file, by default None.
     """
     # Load grid data
     if grid_path is not None:
@@ -74,13 +78,15 @@ def velocity(data_path,
     plt.close(fig)
 
 
-def vorticity(data_path, 
-              date,
-              figsize=(10, 8), 
-              cmap=cmcrameri.cm.vik, 
-              grid_path=None):
+def vorticity(
+    data_path: str, 
+    date: str,
+    figsize: tuple = (10, 8), 
+    cmap = cmcrameri.cm.vik, 
+    grid_path: str = None
+):
     """
-    Plot vorticity data on a map for a specific date range.
+    Plot vorticity data on a map for a specific date.
 
     Parameters
     ----------
@@ -89,9 +95,11 @@ def vorticity(data_path,
     date : str
         Date for the data slice in 'YYYY-MM-DD' format.
     figsize : tuple, optional
-        Size of the figure, by default (8, 8)
+        Size of the figure, by default (10, 8).
     cmap : colormap, optional
-        Colormap for vorticity, by default cmcrameri.cm.vik
+        Colormap for vorticity, by default cmcrameri.cm.vik.
+    grid_path : str, optional
+        Path to the grid data file, by default None.
     """
     # Load grid data
     if grid_path is not None:
@@ -143,11 +151,13 @@ def vorticity(data_path,
     save_figure(fig, f"vorticity_{date}.png")
     plt.close(fig)
     
-def eke(data_path, 
-        date, 
-        figsize=(10, 8), 
-        cmap=cmcrameri.cm.lapaz, 
-        grid_path=None):
+def eke(
+    data_path: str, 
+    date: str, 
+    figsize: tuple = (10, 8), 
+    cmap = cmcrameri.cm.lapaz, 
+    grid_path: str = None
+):
     """
     Plot EKE data on a map for a specific date.
 
@@ -158,9 +168,11 @@ def eke(data_path,
     date : str
         Date for the data slice in 'YYYY-MM-DD' format.
     figsize : tuple, optional
-        Size of the figure, by default (8, 8)
+        Size of the figure, by default (10, 8).
     cmap : colormap, optional
-        Colormap for EKE, by default cmcrameri.cm.lapaz
+        Colormap for EKE, by default cmcrameri.cm.lapaz.
+    grid_path : str, optional
+        Path to the grid data file, by default None.
     """
     # Load grid data
     if grid_path is not None:
@@ -226,12 +238,14 @@ def eke(data_path,
     save_figure(fig, f"eke_{date}.png")
     plt.close(fig)
 
-def mke(data_path, 
-        start_date, 
-        end_date, 
-        figsize=(10, 8), 
-        cmap=cmcrameri.cm.lapaz, 
-        grid_path=None):
+def mke(
+    data_path: str, 
+    start_date: str, 
+    end_date: str, 
+    figsize: tuple = (10, 8), 
+    cmap = cmcrameri.cm.lapaz, 
+    grid_path: str = None
+):
     """
     Plot MKE data on a map for a specific date range.
 
@@ -244,9 +258,11 @@ def mke(data_path,
     end_date : str
         End date for the data slice in 'YYYY-MM-DD' format.
     figsize : tuple, optional
-        Size of the figure, by default (8, 8)
+        Size of the figure, by default (10, 8).
     cmap : colormap, optional
-        Colormap for EKE, by default cmcrameri.cm.lapaz
+        Colormap for MKE, by default cmcrameri.cm.lapaz.
+    grid_path : str, optional
+        Path to the grid data file, by default None.
     """
     # Load grid data
     if grid_path is not None:

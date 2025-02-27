@@ -15,26 +15,30 @@ import cartopy.crs as ccrs
 from .utils import load_grid, load_data, save_figure, plot_zoom, plot_map
 
 def zoom_velocity(
-    data_path, 
-    date,
-    figsize=(10, 8), 
-    cmap=cmocean.cm.speed, 
-    grid_path=None,
-    isFilm=False
+    data_path: str, 
+    date: str,
+    figsize: tuple = (10, 8), 
+    cmap: mpl.colors.Colormap = cmocean.cm.speed, 
+    grid_path: str = None,
+    isFilm: bool = False
 ):
     """
-    Plot velocity data on a map for a specific date range.
+    Plot velocity data on a map for a specific date.
 
     Parameters
     ----------
     data_path : str
         Path to the simulation data file.
-    start_date : str
+    date : str
         Date for the data slice in 'YYYY-MM-DD' format.
     figsize : tuple, optional
-        Size of the figure, by default (8, 8)
-    cmap : colormap, optional
-        Colormap for velocity, by default cmcrameri.cm.oslo
+        Size of the figure, by default (10, 8).
+    cmap : Colormap, optional
+        Colormap for velocity, by default cmocean.cm.speed.
+    grid_path : str, optional
+        Path to the grid data file, by default None.
+    isFilm : bool, optional
+        Flag to indicate if the plot is part of a film sequence, by default False.
     """
     if isFilm:
         output_dir = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures'
@@ -96,17 +100,43 @@ def zoom_velocity(
     plt.close(fig)
     
 def plot(
-    data_path,
-    date,
-    variables='all',
-    figsize=(10, 8),
-    tri_figsize=(24,6),
-    vel_cmap=cmocean.cm.speed,
-    vort_cmap=cmcrameri.cm.vik,
-    mke_cmap=cmcrameri.cm.devon,
-    grid_path=None,
-    isFilm=False
+    data_path: str,
+    date: str,
+    variables: str = 'all',
+    figsize: tuple = (10, 8),
+    tri_figsize: tuple = (24, 6),
+    vel_cmap: mpl.colors.Colormap = cmocean.cm.speed,
+    vort_cmap: mpl.colors.Colormap = cmcrameri.cm.vik,
+    mke_cmap: mpl.colors.Colormap = cmcrameri.cm.devon,
+    grid_path: str = None,
+    isFilm: bool = False
 ): 
+    """
+    Plot various data on a map for a specific date.
+
+    Parameters
+    ----------
+    data_path : str
+        Path to the simulation data file.
+    date : str
+        Date for the data slice in 'YYYY-MM-DD' format.
+    variables : str, optional
+        Variables to plot, by default 'all'.
+    figsize : tuple, optional
+        Size of the figure, by default (10, 8).
+    tri_figsize : tuple, optional
+        Size of the triad figure, by default (24, 6).
+    vel_cmap : Colormap, optional
+        Colormap for velocity, by default cmocean.cm.speed.
+    vort_cmap : Colormap, optional
+        Colormap for vorticity, by default cmcrameri.cm.vik.
+    mke_cmap : Colormap, optional
+        Colormap for MKE, by default cmcrameri.cm.devon.
+    grid_path : str, optional
+        Path to the grid data file, by default None.
+    isFilm : bool, optional
+        Flag to indicate if the plot is part of a film sequence, by default False.
+    """
     if isFilm:
         output_dir = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures'
         folder_path = Path(output_dir) / Path(os.path.splitext(data_path)[0])

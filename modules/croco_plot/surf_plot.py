@@ -14,15 +14,15 @@ import xarray as xr
 import os
 from .utils import load_grid, load_data, load_GLORYS, save_figure, plot_map
 
-def multiple_annual(data_path, 
-                    variables='all', 
-                    start_date=None, 
-                    end_date=None, 
-                    figsize=(24, 6), 
-                    sss_cmap=cmocean.cm.haline, 
-                    ssh_cmap=cmcrameri.cm.roma_r, 
-                    sst_cmap=cmocean.cm.thermal, 
-                    grid_path=None):
+def multiple_annual(data_path: str, 
+                    variables: list = 'all', 
+                    start_date: str = None, 
+                    end_date: str = None, 
+                    figsize: tuple = (24, 6), 
+                    sss_cmap = cmocean.cm.haline, 
+                    ssh_cmap = cmcrameri.cm.roma_r, 
+                    sst_cmap = cmocean.cm.thermal, 
+                    grid_path: str = None):
     """
     Plot multiple surface variables (SSS, SSH, SST) on a map for a specific date range or annual standard deviation.
 
@@ -45,8 +45,8 @@ def multiple_annual(data_path,
         Colormap for the SSH plot, by default cmcrameri.cm.roma_r
     sst_cmap : colormap, optional
         Colormap for the SST plot, by default cmocean.cm.thermal
-    
-    cplot.time_series.multiple_time_series(['swio_avg_2017.nc', 'swio_avg_2018.nc', 'swio_avg_2019.nc', 'swio_avg_2020.nc', 'swio_avg_2021.nc', 'swio_avg_2022.nc', 'swio_avg_2023.nc'], variables='all')
+    grid_path : str, optional
+        Path to the grid data file, by default None
     """
     if isinstance(variables, str):
         variables = [variables]
@@ -139,16 +139,37 @@ def multiple_annual(data_path,
         save_figure(fig, f"surface_SD_{os.path.splitext(data_path)[0]}.png")
         plt.close(fig)
         
-def GLORYS_annual(
-    data_path: str,
-    variables: list = 'all',
-    start_date: str = None, 
-    end_date: str = None, 
-    figsize=(24, 6), 
-    sss_cmap=cmocean.cm.haline,
-    ssh_cmap=cmcrameri.cm.roma_r, 
-    sst_cmap=cmocean.cm.thermal, 
-):
+def GLORYS_annual(data_path: str,
+                  variables: list = 'all',
+                  start_date: str = None, 
+                  end_date: str = None, 
+                  figsize: tuple = (24, 6), 
+                  sss_cmap = cmocean.cm.haline,
+                  ssh_cmap = cmcrameri.cm.roma_r, 
+                  sst_cmap = cmocean.cm.thermal):
+    """
+    Plot GLORYS surface variables (SSS, SSH, SST) on a map for a specific date range or annual standard deviation.
+
+    Parameters
+    ----------
+    data_path : str
+        Path to the GLORYS data file.
+    variables : list of str, optional
+        List of variables to plot, by default 'all'
+        options : 'sss', 'ssh', 'sst', 'annual_sd'
+    start_date : str, optional
+        Start date for the data slice in 'YYYY-MM-DD' format.
+    end_date : str, optional
+        End date for the data slice in 'YYYY-MM-DD' format.
+    figsize : tuple, optional
+        Size of the figure, by default (24, 6)
+    sss_cmap : colormap, optional
+        Colormap for the SSS plot, by default cmocean.cm.haline
+    ssh_cmap : colormap, optional
+        Colormap for the SSH plot, by default cmcrameri.cm.roma_r
+    sst_cmap : colormap, optional
+        Colormap for the SST plot, by default cmocean.cm.thermal
+    """
     if isinstance(variables, str):
         variables = [variables]
         

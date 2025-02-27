@@ -30,7 +30,12 @@ def load_grid(
     np.ndarray   # h
 ]:
     """
-    Load the grid file into this iPython instance
+    Load the grid file into this iPython instance.
+
+    Parameters
+    ----------
+    path : str, optional
+        Path to the grid file. If None, a default path is used.
 
     Returns
     -------
@@ -70,7 +75,7 @@ def load_data(
     ----------
     path : str
         Path to the simulation data file.
-    fields : tuple
+    fields : tuple of str
         Tuple of field names to load (e.g., ('u', 'v', 'temp', 'salt')).
 
     Returns
@@ -138,18 +143,18 @@ def calc_depth(
 
     Parameters
     ----------
-    s : array-like
+    s : xr.DataArray
         S-coordinate at RHO-points, typically ranging from -1 (surface) to 0 (bottom).
-    Cs : array-like
+    Cs : xr.DataArray
         S-coordinate stretching curves at W-points, defining the vertical stretching.
     hc : float
         Critical depth parameter (in meters), influencing vertical terrain-following transformation.
-    h : array-like
+    h : xr.DataArray
         Bathymetric depth at RHO-points (in meters), representing the seafloor depth.
 
     Returns
     -------
-    array-like
+    xr.DataArray
         Computed depth at RHO-points.
     """
     N = len(s)
@@ -182,11 +187,11 @@ def plot_map(
     ----------
     ax : Axes
         The axis to plot on.
-    lon : ndarray
+    lon : np.ndarray
         Longitudes.
-    lat : ndarray
+    lat : np.ndarray
         Latitudes.
-    data : ndarray
+    data : np.ndarray
         Data to plot.
     cmap : Colormap
         Colormap to use.
@@ -194,12 +199,16 @@ def plot_map(
         Normalization for the colormap.
     label : str
         Label for the colorbar.
-    msk : ndarray
+    msk : np.ndarray
         Mask for contour.
-    msk_inv : ndarray
+    msk_inv : np.ndarray
         Inverse mask for contourf.
     gridline_style : dict
         Style for gridlines.
+    levels : np.ndarray, optional
+        Contour levels.
+    bounds : tuple of float, optional
+        Bounds for the plot (x1, x2, y1, y2).
     """
     try:
         pcm = ax.pcolormesh(lon[:, :], lat[:, :], data, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
@@ -238,17 +247,17 @@ def plot_zoom(
     levels: Optional[np.ndarray] = None
 ) -> None:
     """
-    Helper function to plot data on a given axis.
+    Helper function to plot data on a given axis with a zoomed inset.
 
     Parameters
     ----------
     ax : Axes
         The axis to plot on.
-    lon : ndarray
+    lon : np.ndarray
         Longitudes.
-    lat : ndarray
+    lat : np.ndarray
         Latitudes.
-    data : ndarray
+    data : np.ndarray
         Data to plot.
     cmap : Colormap
         Colormap to use.
@@ -256,12 +265,14 @@ def plot_zoom(
         Normalization for the colormap.
     label : str
         Label for the colorbar.
-    msk : ndarray
+    msk : np.ndarray
         Mask for contour.
-    msk_inv : ndarray
+    msk_inv : np.ndarray
         Inverse mask for contourf.
     gridline_style : dict
         Style for gridlines.
+    levels : np.ndarray, optional
+        Contour levels.
     """
     try:
         x1, x2, y1, y2 = np.min(lon.data) + 1 , 50, np.min(lat.data) + 1, - 10.0
@@ -316,7 +327,7 @@ def plot_time_series(
 
     Parameters
     ----------
-    time_results : array-like
+    time_results : np.ndarray
         Array of time points corresponding to the results.
     results : dict
         Dictionary containing the results to plot, with keys as variable names and values as arrays of data.
@@ -346,11 +357,12 @@ def plot_time_series(
     plt.close(fig)
 
 def prepare_film(
-    func, 
-    data_path, 
-    dates, 
-    grid_path=None, 
-    **kwargs):
+    func: callable, 
+    data_path: str, 
+    dates: List[str], 
+    grid_path: Optional[str] = None, 
+    **kwargs
+) -> None:
     """
     Prepare a series of plots for a film by varying the date parameter.
 
@@ -411,17 +423,21 @@ def save_figure(
     fig: plt.Figure, 
     filename: str,
     isFilm: bool = False,
-    filmDir: str = None
+    filmDir: Optional[str] = None
 ) -> None:
     """
     Save the figure to the specified filename.
 
     Parameters
     ----------
-    fig : Figure
+    fig : plt.Figure
         The figure to save.
     filename : str
         The path to save the figure.
+    isFilm : bool, optional
+        Whether the figure is part of a film sequence, by default False.
+    filmDir : str, optional
+        Directory for film frames, required if isFilm is True.
     """
     output_dir = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures'
     os.makedirs(output_dir, exist_ok=True)
