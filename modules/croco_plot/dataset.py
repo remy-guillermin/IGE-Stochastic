@@ -25,6 +25,8 @@ def create_from_CROCO(
         
     if 'all' in variables:
         variables = ['eke', 'mke', 'sla', 'ssa', 'sta', 'ssh', 'sss', 'sst']
+        
+    print(f'Computing {", ".join(var for var in variables)}')
     
     # Load grid data
     if grid_path is not None:
@@ -129,7 +131,9 @@ def create_from_GLORYS(
         variables = [variables]
         
     if 'all' in variables:
-        variables = ['mke', 'eke','sla', 'ssa', 'sta', 'ssh', 'sss', 'sst']
+        variables = ['mke', 'eke', 'sla', 'ssa', 'sta', 'ssh', 'sss', 'sst']
+        
+    print(f'Computing {", ".join(var for var in variables)}')
         
     salt, temp, zeta, u, v, lon, lat, _, _ = load_GLORYS(data_path)
     time = pd.to_datetime(salt['time'].data)
@@ -177,7 +181,7 @@ def create_from_GLORYS(
                 
                 box_mask = np.array((lon >= lon1) & (lon <= lon2) & (lat >= lat1) & (lat <= lat2))
                 if var in ['mke', 'eke']:
-                    box_mask = box_mask[:-1,:-1]
+                    box_mask = box_mask[:,:]
                 if var in ['sla', 'ssh', 'sta', 'ssa', 'sss', 'sst']:
                     box_data = var_data[:,box_mask]
                 else:
