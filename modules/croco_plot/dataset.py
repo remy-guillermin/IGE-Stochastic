@@ -236,7 +236,8 @@ def create_from_GLORYS(
             
 def merge(
     file_pattern: str, 
-    output_dir: str
+    output_dir: str,
+    output_name: str = None
 ):
     """
     Merge multiple netCDF files matching a pattern into a single file.
@@ -247,8 +248,12 @@ def merge(
         Pattern to match the files to concatenate.
     output_dir : str
         Directory to save the concatenated file.
+    output_name : str
+        Name of the concatenated file.
     """
     os.makedirs(f'/lus/work/CT1/c1601279/rguillermin/{output_dir}', exist_ok=True)
+    if output_name is None:
+        output_name = file_pattern
     
     file_list = sorted(glob.glob(f'{file_pattern}*.nc'))
     if not file_list:
@@ -256,13 +261,13 @@ def merge(
         return
 
     ds = xr.open_mfdataset(file_list, combine='by_coords')
-    output_file = f"/lus/work/CT1/c1601279/rguillermin/{output_dir}/{file_pattern}.nc"
+    output_file = f"/lus/work/CT1/c1601279/rguillermin/{output_dir}/{output_name}.nc"
     
-    print(f'{len(file_list)} files matching {file_pattern} concatenated.')
+    print(f'{len(file_list)} files matching {output_name} concatenated.')
     ds.to_netcdf(output_file)
     ds.close()
     
-    print(f"Concatenation complete: {output_file}")
+    print(f"Concatenation complete: {output_name}")
     
 def fetch_datasets() -> dict:
     """
