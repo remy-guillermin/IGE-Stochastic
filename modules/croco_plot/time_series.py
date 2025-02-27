@@ -284,9 +284,9 @@ def time_series_from_dataset(
         axes_anomaly[-1].set_xlim(pd.Timestamp('2017-01-01'), pd.Timestamp('2019-12-31'))
         axes_field[-1].set_xlim(pd.Timestamp('2017-01-01'), pd.Timestamp('2019-12-31'))
         
-        axes_energy[0].legend()
-        axes_anomaly[0].legend()
-        axes_field[0].legend()
+        axes_energy[0].legend(loc="upper right")
+        axes_anomaly[0].legend(loc="upper right")
+        axes_field[0].legend(loc="upper right")
         
         fig_energy.tight_layout()
         fig_anomaly.tight_layout()
@@ -300,4 +300,5 @@ def time_series_from_dataset(
         plt.close(fig_anomaly)
         plt.close(fig_field)
         
-    matplotlib.use(original_backend)  # Restore the original backend after processing
+    if interactive:
+        matplotlib.use(original_backend)  # Restore the original backend after processing
