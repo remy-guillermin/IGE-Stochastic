@@ -26,7 +26,7 @@ def create_from_CROCO(
     if 'all' in variables:
         variables = ['eke', 'mke', 'sla', 'ssa', 'sta', 'ssh', 'sss', 'sst']
         
-    print(f'Computing {", ".join(var for var in variables)}')
+    print(f'Computing {", ".join(var for var in variables)}.')
     
     # Load grid data
     if grid_path is not None:
@@ -133,10 +133,12 @@ def create_from_GLORYS(
     if 'all' in variables:
         variables = ['mke', 'eke', 'sla', 'ssa', 'sta', 'ssh', 'sss', 'sst']
         
-    print(f'Computing {", ".join(var for var in variables)}')
+    print(f'Computing {", ".join(var for var in variables)}.')
         
     salt, temp, zeta, u, v, lon, lat, _, _ = load_GLORYS(data_path)
     time = pd.to_datetime(salt['time'].data)
+    u = u[:,0,:,:]
+    v = v[:,0,:,:]
     salt = salt[:,0,:,:]
     zeta = zeta
     temp = temp[:,0,:,:]
@@ -185,7 +187,7 @@ def create_from_GLORYS(
                 if var in ['sla', 'ssh', 'sta', 'ssa', 'sss', 'sst']:
                     box_data = var_data[:,box_mask]
                 else:
-                    box_data = var_data[:,:,box_mask]
+                    box_data = var_data[:,box_mask]
                     
                 box_sum = np.nanmean(box_data, axis=1)
                 results[var].append(box_sum)
