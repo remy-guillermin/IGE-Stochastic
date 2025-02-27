@@ -8,6 +8,7 @@ import numpy as np
 import xarray as xr
 import pandas as pd
 from pathlib import Path
+import matplotlib
 import matplotlib.pyplot as plt
 from .utils import load_grid, load_data, save_figure, plot_time_series
 
@@ -17,7 +18,8 @@ def multiple_time_series(data_files,
                          names=['Equator', 'Mayotte-Comores', 'South-Moz', 'Mascarene'], 
                          colors=['saddlebrown', 'darkorchid', 'navy', 'teal'],
                          roll = 9,
-                         grid_path=None):
+                         grid_path=None,
+                         interactive=False):
     """
     Calculate and plot multiple time series for specified regions.
 

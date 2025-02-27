@@ -178,7 +178,8 @@ def plot_map(
     msk_inv: np.ndarray,
     gridline_style: Dict,
     levels: Optional[np.ndarray] = None,
-    bounds: Optional[Tuple[float, float, float, float]] = None
+    bounds: Optional[Tuple[float, float, float, float]] = None,
+    interactive: bool = False
 ) -> None:
     """
     Helper function to plot data on a given axis.
@@ -210,6 +211,9 @@ def plot_map(
     bounds : tuple of float, optional
         Bounds for the plot (x1, x2, y1, y2).
     """
+    if interactive:
+        original_backend = matplotlib.get_backend()  # Store the original backend
+        matplotlib.use('tkagg')  # Temporarily switch to interactive backend
     try:
         pcm = ax.pcolormesh(lon[:, :], lat[:, :], data, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
         ax.contourf(lon, lat, msk_inv, colors='lightgray')
@@ -232,6 +236,8 @@ def plot_map(
             cb.ax.set_yticklabels(np.round(ticks, 2), fontsize=8)
     except Exception as e:
         print(f"Error in plot_map: {e}")
+    finally:
+        matplotlib.use(original_backend)  # Restore the original backend after processing
  
 def plot_zoom(
     ax: Axes,
@@ -244,7 +250,8 @@ def plot_zoom(
     msk: np.ndarray,
     msk_inv: np.ndarray,
     gridline_style: Dict,
-    levels: Optional[np.ndarray] = None
+    levels: Optional[np.ndarray] = None,
+    interactive: bool = False
 ) -> None:
     """
     Helper function to plot data on a given axis with a zoomed inset.
@@ -274,6 +281,9 @@ def plot_zoom(
     levels : np.ndarray, optional
         Contour levels.
     """
+    if interactive:
+        original_backend = matplotlib.get_backend()  # Store the original backend
+        matplotlib.use('tkagg')  # Temporarily switch to interactive backend
     try:
         x1, x2, y1, y2 = np.min(lon.data) + 1 , 50, np.min(lat.data) + 1, - 10.0
 
@@ -310,7 +320,9 @@ def plot_zoom(
             cb.set_ticks(ticks)
             cb.ax.set_yticklabels(np.round(ticks, 2), fontsize=8)
     except Exception as e:
-        print(f"Error in plot_map: {e}") 
+        print(f"Error in plot_zoom: {e}") 
+    finally:
+        matplotlib.use(original_backend)  # Restore the original backend after processing
         
 def plot_time_series(
     time_results: np.ndarray,
@@ -320,7 +332,8 @@ def plot_time_series(
     names: List[str],
     colors: List[str],
     filename: str,
-    title: str
+    title: str,
+    interactive: bool = False
 ) -> None:
     """
     Plot time series data with rolling mean for multiple variables.
@@ -344,17 +357,25 @@ def plot_time_series(
     title : str
         Title of the plot.
     """
-    fig, axes = plt.subplots(len(names), 1, figsize=(12, 2 * len(names)), sharex=True)
-    for ax, (name, color) in zip(axes, zip(names, colors)):
-        ax.plot(time_results, results[name], color=color, linestyle='--', linewidth=1)
-        rolling_mean = np.convolve(results[name], np.ones(roll)/roll, mode='same')
-        ax.plot(time_results[int((roll-1)/2):-int((roll-1)/2)], rolling_mean[int((roll-1)/2):-int((roll-1)/2)], color=color, linestyle='-', linewidth=1.5, alpha=0.8)
-        ax.set_ylabel(ylabel)
-        ax.set_title(name)
-    axes[-1].set_xlabel('Time')
-    fig.suptitle(title)
-    save_figure(fig, filename)
-    plt.close(fig)
+    if interactive:
+        original_backend = matplotlib.get_backend()  # Store the original backend
+        matplotlib.use('tkagg')  # Temporarily switch to interactive backend
+    try:
+        fig, axes = plt.subplots(len(names), 1, figsize=(12, 2 * len(names)), sharex=True)
+        for ax, (name, color) in zip(axes, zip(names, colors)):
+            ax.plot(time_results, results[name], color=color, linestyle='--', linewidth=1)
+            rolling_mean = np.convolve(results[name], np.ones(roll)/roll, mode='same')
+            ax.plot(time_results[int((roll-1)/2):-int((roll-1)/2)], rolling_mean[int((roll-1)/2):-int((roll-1)/2)], color=color, linestyle='-', linewidth=1.5, alpha=0.8)
+            ax.set_ylabel(ylabel)
+            ax.set_title(name)
+        axes[-1].set_xlabel('Time')
+        fig.suptitle(title)
+        save_figure(fig, filename)
+        plt.close(fig)
+    except Exception as e:
+        print(f"Error in plot_time_series: {e}") 
+    finally:
+        matplotlib.use(original_backend)  # Restore the original backend after processing
 
 def prepare_film(
     func: callable, 

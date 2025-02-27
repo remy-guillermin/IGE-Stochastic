@@ -65,12 +65,12 @@ def create_from_CROCO(
         for var in ['mke', 'eke', 'sla', 'ssa', 'sta', 'ssh', 'sss', 'sst']:
             if var in variables:
                 if var == 'mke':
-                    var_data = 1 / 2 * (u[:,:,:-1,:] ** 2 + v[:,:,:,:-1] ** 2 + w[:,:,:-1,:-1] ** 2)
+                    var_data = 1 / 2 * (u[:,:-1,:] ** 2 + v[:,:,:-1] ** 2 + w[:,:-1,:-1] ** 2)
                 elif var == 'eke':
                     ut = (u - np.nanmean(u, axis=0))
                     vt = (v - np.nanmean(v, axis=0))
                     wt = (w - np.nanmean(w, axis=0))
-                    var_data = 1 / 2 * (ut[:,:,:-1,:] ** 2 + vt[:,:,:,:-1] ** 2 + wt[:,:,:-1,:-1] ** 2)
+                    var_data = 1 / 2 * (ut[:,:-1,:] ** 2 + vt[:,:,:-1] ** 2 + wt[:,:-1,:-1] ** 2)
                     del ut, vt, wt
                 elif var == 'sla':
                     var_data = (zeta - np.nanmean(zeta, axis=0))
