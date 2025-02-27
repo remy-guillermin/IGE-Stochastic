@@ -404,8 +404,7 @@ def create_film(
     ffmpeg.input(f'concat:{input_files}', r=framerate).output(f'{film_file}.mp4', pix_fmt='yuv420p').run(overwrite_output=True)
     
     print(f"""
-Film created as {film_file}.
-To open the film, run: cplot.utils.open_figure('{filmName}')
+Film created as {film_file}.mp4.
 """)
 
 def save_figure(

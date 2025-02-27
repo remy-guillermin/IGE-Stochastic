@@ -121,8 +121,7 @@ def create_from_GLORYS(
     data_path:str,
     variables:str = 'all',
     boxes:tuple=[(48, 60, -4, 3), (41, 47, -15, -8), (36.5, 42.5, -28, -19), (52, 60, -24, -16)], 
-    names:tuple=['Equator', 'Mayotte-Comores', 'South-Moz', 'Mascarene'], 
-    grid_path:str=None
+    names:tuple=['Equator', 'Mayotte-Comores', 'South-Moz', 'Mascarene']
 ):      
     output_dir = f'/lus/work/CT1/c1601279/rguillermin/datasets/{os.path.splitext(data_path)[0]}'
     os.makedirs(output_dir, exist_ok=True)
@@ -138,9 +137,9 @@ def create_from_GLORYS(
     zeta = zeta
     temp = temp[:,0,:,:]
     
-    if 'ke' in variables or 'eke' in variables or 'mke' in variables:
+    if 'eke' in variables or 'mke' in variables:
         print('Converting velocities')
-        u, v, w = u.data, v.data, w.data
+        u, v = u.data, v.data
     if 'sla' in variables or 'ssh' in variables:
         print('Converting free surface')
         zeta = zeta.data
@@ -157,13 +156,12 @@ def create_from_GLORYS(
         for var in ['mke', 'eke', 'sla', 'ssa', 'sta', 'ssh', 'sss', 'sst']:
             if var in variables:
                 if var == 'mke':
-                    var_data = 1 / 2 * (u[:,:,:-1,:] ** 2 + v[:,:,:,:-1] ** 2 + w[:,:,:-1,:-1] ** 2)
+                    var_data = 1 / 2 * (u[:,:,:-1,:] ** 2 + v[:,:,:,:-1] ** 2)
                 elif var == 'eke':
                     ut = (u - np.nanmean(u, axis=0))
                     vt = (v - np.nanmean(v, axis=0))
-                    wt = (w - np.nanmean(w, axis=0))
-                    var_data = 1 / 2 * (ut[:,:,:-1,:] ** 2 + vt[:,:,:,:-1] ** 2 + wt[:,:,:-1,:-1] ** 2)
-                    del ut, vt, wt
+                    var_data = 1 / 2 * (ut[:,:,:-1,:] ** 2 + vt[:,:,:,:-1] ** 2 )
+                    del ut, vt
                 elif var == 'sla':
                     var_data = (zeta - np.nanmean(zeta, axis=0))
                 elif var == 'ssa':
