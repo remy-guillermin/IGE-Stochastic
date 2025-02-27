@@ -185,25 +185,26 @@ def create_from_GLORYS(
         
         for var in ['mke', 'eke', 'sla', 'ssa', 'sta', 'ssh', 'sss', 'sst']:
             if var in variables:
-                if var == 'mke':
-                    var_data = 1 / 2 * (u ** 2 + v ** 2)
-                elif var == 'eke':
-                    ut = (u - np.nanmean(u, axis=0))
-                    vt = (v - np.nanmean(v, axis=0))
-                    var_data = 1 / 2 * (ut ** 2 + vt ** 2 )
-                    del ut, vt
-                elif var == 'sla':
-                    var_data = (zeta - np.nanmean(zeta, axis=0))
-                elif var == 'ssa':
-                    var_data = (salt - np.nanmean(salt, axis=0))
-                elif var == 'sta':
-                    var_data = (temp - np.nanmean(temp, axis=0))
-                elif var == 'ssh':
-                    var_data = zeta
-                elif var == 'sss':
-                    var_data = salt
-                elif var == 'sst':
-                    var_data = temp
+                with np.errstate(all='ignore'):
+                    if var == 'mke':
+                        var_data = 1 / 2 * (u ** 2 + v ** 2)
+                    elif var == 'eke':
+                        ut = (u - np.nanmean(u, axis=0))
+                        vt = (v - np.nanmean(v, axis=0))
+                        var_data = 1 / 2 * (ut ** 2 + vt ** 2 )
+                        del ut, vt
+                    elif var == 'sla':
+                        var_data = (zeta - np.nanmean(zeta, axis=0))
+                    elif var == 'ssa':
+                        var_data = (salt - np.nanmean(salt, axis=0))
+                    elif var == 'sta':
+                        var_data = (temp - np.nanmean(temp, axis=0))
+                    elif var == 'ssh':
+                        var_data = zeta
+                    elif var == 'sss':
+                        var_data = salt
+                    elif var == 'sst':
+                        var_data = temp
                 
                 box_mask = np.array((lon >= lon1) & (lon <= lon2) & (lat >= lat1) & (lat <= lat2))
                 if var in ['mke', 'eke']:

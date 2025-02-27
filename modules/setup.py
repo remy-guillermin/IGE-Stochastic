@@ -2,9 +2,9 @@ from setuptools import setup, find_packages
 
 setup(
     name='croco_plot',
-    version='0.3.4',
+    version='0.3.5',
     author='Remy Guillermin',
-    description='A package for plotting CROCO simulation data in 2D and 3D.',
+    description='A package for plotting CROCO simulation data in 1D, 2D and 3D.',
     packages=find_packages(where='.'),
     package_dir={'': '.'},
     install_requires=[
