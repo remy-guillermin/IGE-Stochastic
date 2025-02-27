@@ -8,7 +8,6 @@ import numpy as np
 import xarray as xr
 import pandas as pd
 from pathlib import Path
-import matplotlib
 import matplotlib.pyplot as plt
 from .utils import load_grid, load_data, save_figure, plot_time_series
 
@@ -38,6 +37,8 @@ def multiple_time_series(data_files,
         Colors for the plot lines.
     grid_path : str, optional
         Path to the grid file, by default None
+    interactive : bool, optional
+        Whether to use an interactive backend for plotting.
     """
     if isinstance(data_files, str):
         data_files = [data_files]
@@ -172,7 +173,7 @@ def multiple_time_series(data_files,
         if var in variables:
             for name in names:
                 results[var][name] = np.concatenate(results[var][name])
-            plot_time_series(time_results, results[var], ylabel, roll, names, colors, filename, title)
+            plot_time_series(time_results, results[var], ylabel, roll, names, colors, filename, title, interactive=interactive)
             
 def time_series_from_dataset(
     datasets,
@@ -187,12 +188,8 @@ def time_series_from_dataset(
     if 'all' in variables:
         variables = ['Energies', 'Anomalies', 'Fields']
     
-    time = None
-    
     for name in names:
         files = datasets[name]
-        
-        
         if 'Energies' in variables:
             fig_energy, axes_energy = plt.subplots(2, 1, figsize=(figwidth, int(figwidth/3)), sharex=True)
         if 'Anomalies' in variables:
@@ -201,17 +198,18 @@ def time_series_from_dataset(
             fig_field, axes_field = plt.subplots(3, 1, figsize=(figwidth, int(2*figwidth/3)), sharex=True)
 
         for file in files:
-            print(file)
             source = Path(file).parent.name
             f = xr.open_dataset(file)
             time = pd.to_datetime(f.time.data)
+            
+            if 'mercator' in file:
+                style = 'k.'
+            else:
+                style = '--'
             if 'Energies' in variables:
                 ax = axes_energy[0]
                 mke = f.mke.data
-                if 'mercator' in file:
-                    style = 'k.'
-                else:
-                    style = '--'
+                
                 ax.plot(time, mke, style, label=source)
                 ax.set_title('Mean Kinetic Energy')
                 ax.set_ylabel('MKE [$m^2/s^2$]')
@@ -219,10 +217,7 @@ def time_series_from_dataset(
                 
                 ax = axes_energy[1]
                 eke = f.eke.data
-                if 'mercator' in file:
-                    style = 'k.'
-                else:
-                    style = '--'
+                
                 ax.plot(time, eke, style, label=source)
                 ax.set_title('Eddy Kinetic Energy')
                 ax.set_ylabel('EKE [$m^2/s^2$]')
@@ -230,10 +225,6 @@ def time_series_from_dataset(
             if 'Anomalies' in variables:
                 ax = axes_anomaly[0]
                 sla = f.sla.data
-                if 'mercator' in file:
-                    style = 'k.'
-                else:
-                    style = '--'
                 ax.plot(time, sla, style, label=source)
                 ax.set_title('Sea Level Anomaly')
                 ax.set_ylabel('SLA [$m$]')
@@ -241,10 +232,6 @@ def time_series_from_dataset(
                 
                 ax = axes_anomaly[1]
                 ssa = f.ssa.data
-                if 'mercator' in file:
-                    style = 'k.'
-                else:
-                    style = '--'
                 ax.plot(time, ssa, style, label=source)
                 ax.set_title('Sea Salinity Anomaly')
                 ax.set_ylabel('SSA [$psu$]')
@@ -252,10 +239,6 @@ def time_series_from_dataset(
                 
                 ax = axes_anomaly[2]
                 sta = f.sta.data
-                if 'mercator' in file:
-                    style = 'k.'
-                else:
-                    style = '--'
                 ax.plot(time, sta, style, label=source)
                 ax.set_title('Sea Temperature Anomaly')
                 ax.set_ylabel('STA [$°C$]')
@@ -263,33 +246,24 @@ def time_series_from_dataset(
             if 'Fields' in variables:
                 ax = axes_field[0]
                 ssh = f.ssh.data
-                if 'mercator' in file:
-                    style = 'k.'
-                else:
-                    style = '--'
-                ax.plot(time, sla, style, label=source)
+                
+                ax.plot(time, ssh, style, label=source)
                 ax.set_title('Sea Surface Height')
                 ax.set_ylabel('SSH [$m$]')
                 ax.set_xlabel('Time')
                 
                 ax = axes_field[1]
                 sss = f.sss.data
-                if 'mercator' in file:
-                    style = 'k.'
-                else:
-                    style = '--'
-                ax.plot(time, ssa, style, label=source)
+                
+                ax.plot(time, sss, style, label=source)
                 ax.set_title('Sea Surface Salinity')
                 ax.set_ylabel('SSS [$psu$]')
                 ax.set_xlabel('Time')
                 
                 ax = axes_field[2]
                 sst = f.sst.data
-                if 'mercator' in file:
-                    style = 'k.'
-                else:
-                    style = '--'
-                ax.plot(time, sta, style, label=source)
+                
+                ax.plot(time, sst, style, label=source)
                 ax.set_title('Sea Surface Temperature')
                 ax.set_ylabel('SST [$°C$]')
                 ax.set_xlabel('Time')    

@@ -210,6 +210,8 @@ def plot_map(
         Contour levels.
     bounds : tuple of float, optional
         Bounds for the plot (x1, x2, y1, y2).
+    interactive : bool, optional
+        Whether to use an interactive backend for plotting.
     """
     if interactive:
         original_backend = matplotlib.get_backend()  # Store the original backend
@@ -280,6 +282,8 @@ def plot_zoom(
         Style for gridlines.
     levels : np.ndarray, optional
         Contour levels.
+    interactive : bool, optional
+        Whether to use an interactive backend for plotting.
     """
     if interactive:
         original_backend = matplotlib.get_backend()  # Store the original backend
@@ -356,6 +360,8 @@ def plot_time_series(
         Filename to save the plot.
     title : str
         Title of the plot.
+    interactive : bool, optional
+        Whether to use an interactive backend for plotting.
     """
     if interactive:
         original_backend = matplotlib.get_backend()  # Store the original backend

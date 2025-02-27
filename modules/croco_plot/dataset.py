@@ -17,6 +17,22 @@ def create_from_CROCO(
     names:tuple=['Equator', 'Mayotte-Comores', 'South-Moz', 'Mascarene'], 
     grid_path:str=None
 ):      
+    """
+    Create netCDF files from CROCO data for specified variables and geographical boxes.
+
+    Parameters
+    ----------
+    data_path : str
+        Path to the CROCO data file.
+    variables : str, optional
+        Variables to process, by default 'all'.
+    boxes : tuple, optional
+        Geographical boxes defined by (lon1, lon2, lat1, lat2), by default specific regions.
+    names : tuple, optional
+        Names corresponding to the geographical boxes, by default specific names.
+    grid_path : str, optional
+        Path to the grid data file, by default None.
+    """
     output_dir = f'/lus/work/CT1/c1601279/rguillermin/datasets/{os.path.splitext(data_path)[0]}'
     os.makedirs(output_dir, exist_ok=True)
     if isinstance(variables, str):
@@ -118,6 +134,20 @@ def create_from_GLORYS(
     boxes:tuple=[(48, 60, -4, 3), (41, 47, -15, -8), (36.5, 42.5, -28, -19), (52, 60, -24, -16)], 
     names:tuple=['Equator', 'Mayotte-Comores', 'South-Moz', 'Mascarene']
 ):      
+    """
+    Create netCDF files from GLORYS data for specified variables and geographical boxes.
+
+    Parameters
+    ----------
+    data_path : str
+        Path to the GLORYS data file.
+    variables : str, optional
+        Variables to process, by default 'all'.
+    boxes : tuple, optional
+        Geographical boxes defined by (lon1, lon2, lat1, lat2), by default specific regions.
+    names : tuple, optional
+        Names corresponding to the geographical boxes, by default specific names.
+    """
     output_dir = f'/lus/work/CT1/c1601279/rguillermin/datasets/{os.path.splitext(data_path)[0]}'
     os.makedirs(output_dir, exist_ok=True)
     if isinstance(variables, str):
@@ -207,6 +237,16 @@ def concatenate(
     file_pattern: str, 
     output_dir: str
 ):
+    """
+    Concatenate multiple netCDF files matching a pattern into a single file.
+
+    Parameters
+    ----------
+    file_pattern : str
+        Pattern to match the files to concatenate.
+    output_dir : str
+        Directory to save the concatenated file.
+    """
     os.makedirs(f'/lus/work/CT1/c1601279/rguillermin/{output_dir}', exist_ok=True)
     
     file_list = sorted(glob.glob(f'{file_pattern}*.nc'))
