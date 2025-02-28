@@ -197,11 +197,11 @@ def time_series_from_dataset(
     for name in names:
         files = datasets[name]
         if 'Energies' in variables:
-            fig_energy, axes_energy = plt.subplots(2, 1, figsize=(figwidth, int(figwidth/3)), sharex=True)
+            fig_energy, axes_energy = plt.subplots(2, 1, figsize=(figwidth, int(2*figwidth/3)), sharex=True)
         if 'Anomalies' in variables:
-            fig_anomaly, axes_anomaly = plt.subplots(3, 1, figsize=(figwidth, int(2*figwidth/3)), sharex=True)
+            fig_anomaly, axes_anomaly = plt.subplots(3, 1, figsize=(figwidth, figwidth), sharex=True)
         if 'Fields' in variables:
-            fig_field, axes_field = plt.subplots(3, 1, figsize=(figwidth, int(2*figwidth/3)), sharex=True)
+            fig_field, axes_field = plt.subplots(3, 1, figsize=(figwidth, figwidth), sharex=True)
 
         for file in files:
             source = Path(file).parent.name
@@ -217,7 +217,7 @@ def time_series_from_dataset(
                 ax = axes_energy[0]
                 mke = f.mke.data
                 
-                ax.plot(time, mke, style, label=source)
+                ax.semilogy(time, mke, style, label=source)
                 ax.set_title('Mean Kinetic Energy')
                 ax.set_ylabel('MKE [$m^2/s^2$]')
                 ax.set_xlabel('Time')
@@ -225,7 +225,7 @@ def time_series_from_dataset(
                 ax = axes_energy[1]
                 eke = f.eke.data
                 
-                ax.plot(time, eke, style, label=source)
+                ax.semilogy(time, eke, style, label=source)
                 ax.set_title('Eddy Kinetic Energy')
                 ax.set_ylabel('EKE [$m^2/s^2$]')
                 ax.set_xlabel('Time')
