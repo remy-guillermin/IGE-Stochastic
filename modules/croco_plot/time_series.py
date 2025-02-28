@@ -36,6 +36,8 @@ def multiple_time_series(data_files,
        Names of the regions.
     colors : list, optional
         Colors for the plot lines.
+    roll : int, optional
+        Rolling window size for smoothing the time series, by default 9.
     grid_path : str, optional
         Path to the grid file, by default None
     interactive : bool, optional
@@ -182,8 +184,30 @@ def time_series_from_dataset(
     figwidth=12,
     names=['Equator', 'Mayotte-Comores', 'South-Moz', 'Mascarene'],
     roll = 9,
-    interactive: bool = False
-):   
+    interactive: bool = False,
+    xlim=None
+):
+    """
+    Plot time series from datasets for specified regions.
+
+    Parameters
+    ----------
+    datasets : dict
+        Dictionary where keys are region names and values are lists of dataset file paths.
+    variables : list of str, optional
+        List of variables to plot, by default 'all'
+        options : 'Energies', 'Anomalies', 'Fields'
+    figwidth : int, optional
+        Width of the figure, by default 12.
+    names : list, optional
+        Names of the regions.
+    roll : int, optional
+        Rolling window size for smoothing the time series, by default 9.
+    interactive : bool, optional
+        Whether to use an interactive backend for plotting.
+    xlim : tuple of pd.Timestamp, optional
+        Limits for the x-axis in the form (pd.Timestamp('2017-01-01'), pd.Timestamp('2021-12-31')).
+    """
     if interactive:
         original_backend = matplotlib.get_backend()  # Store the original backend
         matplotlib.use('tkagg')  # Temporarily switch to interactive backend
@@ -279,6 +303,11 @@ def time_series_from_dataset(
         fig_energy.suptitle(f'Energies over time for {name}')
         fig_anomaly.suptitle(f'Anomalies over time for {name}')
         fig_field.suptitle(f'Fields over time for {name}')
+        
+        if xlim is not None:
+            axes_energy[-1].set_xlim(xlim)
+            axes_anomaly[-1].set_xlim(xlim)
+            axes_field[-1].set_xlim(xlim)
         
         axes_energy[0].legend(loc="upper right")
         axes_anomaly[0].legend(loc="upper right")
