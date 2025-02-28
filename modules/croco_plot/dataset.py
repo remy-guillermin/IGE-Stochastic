@@ -46,13 +46,10 @@ def create_from_CROCO(
     
     # Load grid data
     if grid_path is not None:
-        lon, lat, pm, pn, msk, _, _, _ = load_grid(grid_path)
+        lon, lat, _, _, _, _, _, _ = load_grid(grid_path)
     else:
-        lon, lat, pm, pn, msk, _, _, _ = load_grid()
+        lon, lat, _, _, _, _, _, _ = load_grid()
         
-    cell_surface = 1 / (pm * pn).data
-    cell_surface[(1-msk).astype(int)] = np.nan
-    
     zeta, temp, salt, u, v, w, time, _ = load_data(data_path, ('zeta', 'temp', 'salt', 'u', 'v', 'w', 'time', 's_rho'))
 
     fill_value = 9.96921e+36
@@ -76,42 +73,46 @@ def create_from_CROCO(
         salt = salt[:,-1,:,:].data
         salt[salt == fill_value] = np.nan
         
+    time = pd.to_datetime(time.data)
+    
     for (lon1, lon2, lat1, lat2), name in zip(boxes, names):
         results = {var: [] for var in variables}
         
         for var in ['mke', 'eke', 'sla', 'ssa', 'sta', 'ssh', 'sss', 'sst']:
             if var in variables:
-                if var == 'mke':
-                    var_data = 1 / 2 * (u[:,:-1,:] ** 2 + v[:,:,:-1] ** 2 + w[:,:-1,:-1] ** 2)
-                elif var == 'eke':
-                    ut = (u - np.nanmean(u, axis=0))
-                    vt = (v - np.nanmean(v, axis=0))
-                    wt = (w - np.nanmean(w, axis=0))
-                    var_data = 1 / 2 * (ut[:,:-1,:] ** 2 + vt[:,:,:-1] ** 2 + wt[:,:-1,:-1] ** 2)
-                    del ut, vt, wt
-                elif var == 'sla':
-                    var_data = (zeta - np.nanmean(zeta, axis=0))
-                elif var == 'ssa':
-                    var_data = (salt - np.nanmean(salt, axis=0))
-                elif var == 'sta':
-                    var_data = (temp - np.nanmean(temp, axis=0))
-                elif var == 'ssh':
-                    var_data = zeta
-                elif var == 'sss':
-                    var_data = salt
-                elif var == 'sst':
-                    var_data = temp
-                
-                box_mask = np.array((lon >= lon1) & (lon <= lon2) & (lat >= lat1) & (lat <= lat2))
-                if var in ['mke', 'eke']:
-                    box_mask = box_mask[:-1,:-1]
-                
-                box_data = var_data[:,box_mask]
-                box_sum = np.nanmean(box_data, axis=1)
-                results[var].append(box_sum)
-                del var_data, box_data
+                for year in np.unique(time.year):
+                    year_mask = time.year == year
+                    if var == 'mke':
+                        var_data = 1 / 2 * (u[year_mask,:-1,:] ** 2 + v[year_mask,:,:-1] ** 2 + w[year_mask,:-1,:-1] ** 2)
+                    elif var == 'eke':
+                        ut = (u[year_mask] - np.nanmean(u[year_mask], axis=0))
+                        vt = (v[year_mask] - np.nanmean(v[year_mask], axis=0))
+                        wt = (w[year_mask] - np.nanmean(w[year_mask], axis=0))
+                        var_data = 1 / 2 * (ut[:,:-1,:] ** 2 + vt[:,:,:-1] ** 2 + wt[:,:-1,:-1] ** 2)
+                        del ut, vt, wt
+                    elif var == 'sla':
+                        var_data = (zeta[year_mask] - np.nanmean(zeta[year_mask], axis=0))
+                    elif var == 'ssa':
+                        var_data = (salt[year_mask] - np.nanmean(salt[year_mask], axis=0))
+                    elif var == 'sta':
+                        var_data = (temp[year_mask] - np.nanmean(temp[year_mask], axis=0))
+                    elif var == 'ssh':
+                        var_data = zeta[year_mask]
+                    elif var == 'sss':
+                        var_data = salt[year_mask]
+                    elif var == 'sst':
+                        var_data = temp[year_mask]
+                    
+                    box_mask = np.array((lon >= lon1) & (lon <= lon2) & (lat >= lat1) & (lat <= lat2))
+                    if var in ['mke', 'eke']:
+                        box_mask = box_mask[:-1,:-1]
+                    
+                    box_data = var_data[:,box_mask]
+                    box_sum = np.nanmean(box_data, axis=1)
+                    results[var].append(box_sum)
+                    del var_data, box_data
         
-        results = {var: np.array(results[var]).squeeze() for var in results}
+        results = {var: np.concatenate(results[var]) for var in results}
         
         ds = xr.Dataset({
             var: (["time"], results[var]) for var in results},
