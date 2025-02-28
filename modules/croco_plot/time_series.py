@@ -280,10 +280,6 @@ def time_series_from_dataset(
         fig_anomaly.suptitle(f'Anomalies over time for {name}')
         fig_field.suptitle(f'Fields over time for {name}')
         
-        axes_energy[-1].set_xlim(pd.Timestamp('2017-01-01'), pd.Timestamp('2019-12-31'))
-        axes_anomaly[-1].set_xlim(pd.Timestamp('2017-01-01'), pd.Timestamp('2019-12-31'))
-        axes_field[-1].set_xlim(pd.Timestamp('2017-01-01'), pd.Timestamp('2019-12-31'))
-        
         axes_energy[0].legend(loc="upper right")
         axes_anomaly[0].legend(loc="upper right")
         axes_field[0].legend(loc="upper right")
