@@ -15,15 +15,17 @@ def start_ipython_hello():
     
     from IPython import start_ipython
     
-    argv = ["--matplotlib", "-i", "-c"]
+    argv = ["--matplotlib=agg", "-i", "-c"]
     
     code = dedent(
         """
         import os
-        import croco_plot as cplot
+        from pathlib import Path
+        import xarray as xr
         import numpy as np
         import matplotlib.pyplot as plt
         import glob 
+        import croco_plot as cplot
         print("Listing files in", os.getcwd())
         print(os.listdir())
     """

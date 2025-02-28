@@ -12,7 +12,7 @@ slides.pdf:
 
 install:
 	pip install -e modules/
-	cp scripts/croco-ipy-load.py $$VIRTUAL_ENV/bin/croco-ipy-load
+	cp modules/croco-ipy-load.py $$VIRTUAL_ENV/bin/croco-ipy-load
 	chmod +x $$VIRTUAL_ENV/bin/croco-ipy-load
 
 cleanpdf:
