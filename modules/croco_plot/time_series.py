@@ -241,7 +241,7 @@ def time_series_from_dataset(
                 ax = axes_energy[0]
                 mke = f.mke.data
                 
-                ax.semilogy(time, mke, color=color, label=source)
+                ax.semilogy(time, mke, color=color, label=source, linestyle='--')
                 rolling_mean = np.convolve(mke, np.ones(roll)/roll, mode='same')
                 ax.plot(time[int((roll-1)/2):-int((roll-1)/2)], rolling_mean[int((roll-1)/2):-int((roll-1)/2)], color=color, linestyle='-', linewidth=1.5, alpha=0.8, label=f'{source} (smoothed)')
                 ax.set_title('Mean Kinetic Energy')
@@ -251,7 +251,7 @@ def time_series_from_dataset(
                 ax = axes_energy[1]
                 eke = f.eke.data
                 
-                ax.semilogy(time, eke, color=color, label=source)
+                ax.semilogy(time, eke, color=color, label=source, linestyle='--')
                 rolling_mean = np.convolve(eke, np.ones(roll)/roll, mode='same')
                 ax.plot(time[int((roll-1)/2):-int((roll-1)/2)], rolling_mean[int((roll-1)/2):-int((roll-1)/2)], color=color, linestyle='-', linewidth=1.5, alpha=0.8, label=f'{source} (smoothed)')
                 ax.set_title('Eddy Kinetic Energy')
@@ -260,7 +260,7 @@ def time_series_from_dataset(
             if 'Anomalies' in variables:
                 ax = axes_anomaly[0]
                 sla = f.sla.data
-                ax.plot(time, sla, color=color, label=source)
+                ax.plot(time, sla, color=color, label=source, linestyle='--')
                 rolling_mean = np.convolve(sla, np.ones(roll)/roll, mode='same')
                 ax.plot(time[int((roll-1)/2):-int((roll-1)/2)], rolling_mean[int((roll-1)/2):-int((roll-1)/2)], color=color, linestyle='-', linewidth=1.5, alpha=0.8, label=f'{source} (smoothed)')
                 ax.set_title('Sea Level Anomaly')
@@ -269,7 +269,7 @@ def time_series_from_dataset(
                 
                 ax = axes_anomaly[1]
                 ssa = f.ssa.data
-                ax.plot(time, ssa, color=color, label=source)
+                ax.plot(time, ssa, color=color, label=source, linestyle='--')
                 rolling_mean = np.convolve(ssa, np.ones(roll)/roll, mode='same')
                 ax.plot(time[int((roll-1)/2):-int((roll-1)/2)], rolling_mean[int((roll-1)/2):-int((roll-1)/2)], color=color, linestyle='-', linewidth=1.5, alpha=0.8, label=f'{source} (smoothed)')
                 ax.set_title('Sea Salinity Anomaly')
@@ -278,7 +278,7 @@ def time_series_from_dataset(
                 
                 ax = axes_anomaly[2]
                 sta = f.sta.data
-                ax.plot(time, sta, color=color, label=source)
+                ax.plot(time, sta, color=color, label=source, linestyle='--')
                 rolling_mean = np.convolve(sta, np.ones(roll)/roll, mode='same')
                 ax.plot(time[int((roll-1)/2):-int((roll-1)/2)], rolling_mean[int((roll-1)/2):-int((roll-1)/2)], color=color, linestyle='-', linewidth=1.5, alpha=0.8, label=f'{source} (smoothed)')
                 ax.set_title('Sea Temperature Anomaly')
@@ -288,8 +288,7 @@ def time_series_from_dataset(
                 ax = axes_field[0]
                 ssh = f.ssh.data
                 
-                ax.plot(time, ssh, color=color, label=source)
-                
+                ax.plot(time, ssh, color=color, label=source, linestyle='--')
                 rolling_mean = np.convolve(ssh, np.ones(roll)/roll, mode='same')
                 ax.plot(time[int((roll-1)/2):-int((roll-1)/2)], rolling_mean[int((roll-1)/2):-int((roll-1)/2)], color=color, linestyle='-', linewidth=1.5, alpha=0.8, label=f'{source} (smoothed)')
                 ax.set_title('Sea Surface Height')
@@ -299,7 +298,7 @@ def time_series_from_dataset(
                 ax = axes_field[1]
                 sss = f.sss.data
                 
-                ax.plot(time, sss, color=color, label=source)
+                ax.plot(time, sss, color=color, label=source, linestyle='--')
                 
                 rolling_mean = np.convolve(sss, np.ones(roll)/roll, mode='same')
                 ax.plot(time[int((roll-1)/2):-int((roll-1)/2)], rolling_mean[int((roll-1)/2):-int((roll-1)/2)], color=color, linestyle='-', linewidth=1.5, alpha=0.8, label=f'{source} (smoothed)')
@@ -310,7 +309,7 @@ def time_series_from_dataset(
                 ax = axes_field[2]
                 sst = f.sst.data
                 
-                ax.plot(time, sst, color=color, label=source)
+                ax.plot(time, sst, color=color, label=source, linestyle='--')
                 rolling_mean = np.convolve(sst, np.ones(roll)/roll, mode='same')
                 ax.plot(time[int((roll-1)/2):-int((roll-1)/2)], rolling_mean[int((roll-1)/2):-int((roll-1)/2)], color=color, linestyle='-', linewidth=1.5, alpha=0.8, label=f'{source} (smoothed)')
                 ax.set_title('Sea Surface Temperature')
