@@ -22,6 +22,7 @@ def start_ipython_hello():
         import os
         from pathlib import Path
         import xarray as xr
+        import pandas as pd
         import numpy as np
         import matplotlib.pyplot as plt
         import glob 

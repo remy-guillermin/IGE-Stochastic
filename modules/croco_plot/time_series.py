@@ -233,10 +233,10 @@ def time_series_from_dataset(
             f = xr.open_dataset(file)
             time = pd.to_datetime(f.time.data)
             
-            if 'mercator' in file:
-                style = 'r.'
+            if 'GLORYS' in file:
+                style = 'r--'
             else:
-                style = '-'
+                style = 'b--'
             if 'Energies' in variables:
                 ax = axes_energy[0]
                 mke = f.mke.data

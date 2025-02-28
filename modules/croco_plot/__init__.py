@@ -20,7 +20,7 @@ Dépendances :
     numpy, xarray, matplotlib, cmocean, cmcrameri, cartopy, metpy
 """
 
-__version__ = '0.4.3'
+__version__ = '0.4.4'
 
 from . import utils
 from . import plot
