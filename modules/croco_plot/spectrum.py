@@ -41,8 +41,8 @@ def Ekdk(
 
     # Define reference slopes for k^-5/3 and k^-3
     k_ref = k_bins[1:-1]  # Avoid zero since log-log plots can't handle k=0
-    E_k_5_3 = (k_ref / k_ref[0]) ** (-5/3)  # Normalize at first wavenumber
-    E_k_3 = (k_ref / k_ref[0]) ** (-3)  # Normalize at first wavenumber
+    E_k_5_3 = Ekdk[1] * (k_ref / k_ref[0]) ** (-5/3)  # Normalize at first wavenumber
+    E_k_3 = Ekdk[1] * (k_ref / k_ref[0]) ** (-3)  # Normalize at first wavenumber
     
     secax = ax.secondary_xaxis('top', functions=(one_over, inverse))
     secax.set_xlabel(r'$\ell$ [km]')

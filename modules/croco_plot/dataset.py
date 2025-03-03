@@ -389,7 +389,7 @@ def create_spectrum_from_CROCO(
     for name in names:
         results[name] = np.array(results[name]) / num_times
         ds = xr.Dataset({
-            "mean_spectrum": (["k"], results[name] / results[name][0])},
+            "mean_spectrum": (["k"], results[name])},
             coords={
                 "k": K_bins_box[name]
             },
@@ -402,7 +402,7 @@ def create_spectrum_from_CROCO(
         print(f'File {file_path} saved')
         
     ds = xr.Dataset({
-            "mean_spectrum": (["k"], mean_spectrum / mean_spectrum[0])},
+            "mean_spectrum": (["k"], mean_spectrum)},
             coords={
                 "k": k_bins
             },
@@ -555,7 +555,7 @@ def create_spectrum_from_GLORYS(
     for name in names:
         results[name] = np.array(results[name]) / num_times
         ds = xr.Dataset({
-            "mean_spectrum": (["k"], results[name] / results[name][0])},
+            "mean_spectrum": (["k"], results[name])},
             coords={
                 "k": K_bins_box[name]
             },
@@ -568,7 +568,7 @@ def create_spectrum_from_GLORYS(
         print(f'File {file_path} saved')
         
     ds = xr.Dataset({
-            "mean_spectrum": (["k"], mean_spectrum / mean_spectrum[0])},
+            "mean_spectrum": (["k"], mean_spectrum)},
             coords={
                 "k": k_bins
             },
