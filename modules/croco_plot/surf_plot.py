@@ -182,7 +182,7 @@ def GLORYS_annual(data_path: str,
     if 'all' in variables:
         variables = ['sss', 'ssh', 'sst', 'annual_sd']
     
-    salt, temp, zeta, u, v, lon, lat, msk, msk_inv = load_GLORYS(data_path)
+    salt, temp, zeta, _, _, lon, lat, msk, msk_inv = load_GLORYS(data_path)
     salt = salt[:,0,:,:]
     zeta = zeta
     temp = temp[:,0,:,:]

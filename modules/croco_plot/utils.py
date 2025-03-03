@@ -17,6 +17,8 @@ from typing import Optional, Tuple, Union, Dict, List
 import ffmpeg
 import glob
 
+R = 6371.0  
+
 def load_grid(
     path: Optional[str] = None
 ) -> Tuple[
@@ -165,6 +167,41 @@ def calc_depth(
         z0[k, :, :] = (hc * s[k] + h * Cs[k]) / (hc + h)
         depth[k, :, :] = z0[k, :, :] * h
     return depth
+
+def haversine(
+    lat1, 
+    lon1, 
+    lat2, 
+    lon2
+):
+    """
+    Compute the Haversine distance between two points on the Earth.
+    Inputs are assumed to be in degrees.
+    """
+    lat1, lon1, lat2, lon2 = map(np.radians, [lat1, lon1, lat2, lon2])
+    
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+    
+    a = np.sin(dlat / 2)**2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon / 2)**2
+    c = 2 * np.arctan2(np.sqrt(a), np.sqrt(1 - a))
+    
+    return R * c  # Distance in kilometers
+
+def compute_dx_dy(
+    lat, 
+    lon
+):
+    """
+    Compute dx_eff and dy_eff for a given 2D grid of latitudes and longitudes.
+    """
+    # Compute dy_eff (meridional spacing) - Difference between adjacent latitudes
+    dy_eff = haversine(lat[:-1, :], lon[:-1, :], lat[1:, :], lon[1:, :])
+
+    # Compute dx_eff (zonal spacing) - Difference between adjacent longitudes
+    dx_eff = haversine(lat[:, :-1], lon[:, :-1], lat[:, 1:], lon[:, 1:])
+
+    return dx_eff * 1000, dy_eff * 1000 # Convert to m
 
 def plot_map(
     ax: Axes,
