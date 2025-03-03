@@ -331,9 +331,9 @@ def create_spectrum_from_CROCO(
             
             for (lon1, lon2, lat1, lat2), name in zip(boxes, names):
                 box_mask = np.array((lon >= lon1) & (lon <= lon2) & (lat >= lat1) & (lat <= lat2))
+                box_mask =  box_mask[:-1,:-1]
                 true_indices = np.nonzero(box_mask)
                 num_true_points = np.sum(box_mask)
-                box_mask =  box_mask[:-1,:-1]
 
                 # Get the bounding box of the True region
                 if num_true_points > 0:
@@ -341,7 +341,7 @@ def create_spectrum_from_CROCO(
                     min_col, max_col = np.min(true_indices[1]), np.max(true_indices[1])
                     mask_shape = (int(max_row - min_row + 1), int(max_col - min_col + 1))
                 
-                U_k = np.fft.fft2(velocity_windowed[min_row:max_row,min_col:max_col].reshape(mask_shape))
+                U_k = np.fft.fft2(velocity_windowed[box_mask].reshape(mask_shape))
                 U_k_shifted = np.fft.fftshift(U_k)
                 power_spectrum = np.abs(U_k_shifted) ** 2 / 1000
                 # Bin the spectrum in k-space
