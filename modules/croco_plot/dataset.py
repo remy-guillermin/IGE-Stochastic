@@ -287,7 +287,7 @@ def create_spectrum_from_CROCO(
             if num_true_points > 0:
                 min_row, max_row = np.min(true_indices[0]), np.max(true_indices[0])
                 min_col, max_col = np.min(true_indices[1]), np.max(true_indices[1])
-                mask_shape = (int(max_row - min_row + 1), int(max_col - min_col + 1))
+                mask_shape = (int(max_row - min_row), int(max_col - min_col))
             # Define wavenumber grid (adjusted for physical spacing)
             ny, nx = mask_shape
             kx = np.fft.fftshift(np.fft.fftfreq(nx, d=dx_eff))  # Convert 1/meters
@@ -301,7 +301,7 @@ def create_spectrum_from_CROCO(
             K_bins_box[name] = k_bins
    
         # Define wavenumber grid (adjusted for physical spacing)
-        ny, nx = u[0,:-1,].shape
+        ny, nx = u[0,:-1,:].shape
         kx = np.fft.fftshift(np.fft.fftfreq(nx, d=dx_eff))  # Convert 1/meters
         ky = np.fft.fftshift(np.fft.fftfreq(ny, d=dy_eff))
 
