@@ -279,7 +279,7 @@ def create_spectrum_from_CROCO(
         
         for (lon1, lon2, lat1, lat2), name in zip(boxes, names):
             box_mask = np.array((lon >= lon1) & (lon <= lon2) & (lat >= lat1) & (lat <= lat2))
-            box_mask[:-1,:-1]
+            box_mask = box_mask[:-1,:-1]
             true_indices = np.nonzero(box_mask)
             num_true_points = np.sum(box_mask)
 
