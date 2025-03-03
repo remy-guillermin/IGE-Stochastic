@@ -339,9 +339,9 @@ def create_spectrum_from_CROCO(
                 if num_true_points > 0:
                     min_row, max_row = np.min(true_indices[0]), np.max(true_indices[0])
                     min_col, max_col = np.min(true_indices[1]), np.max(true_indices[1])
-                    mask_shape = (int(max_row - min_row + 1), int(max_col - min_col + 1))
+                    mask_shape = (int(max_row - min_row), int(max_col - min_col))
                 
-                U_k = np.fft.fft2(velocity_windowed[box_mask].reshape(mask_shape))
+                U_k = np.fft.fft2(velocity_windowed[min_row:max_row, min_col:max_col])
                 U_k_shifted = np.fft.fftshift(U_k)
                 power_spectrum = np.abs(U_k_shifted) ** 2 / 1000
                 # Bin the spectrum in k-space
