@@ -325,10 +325,6 @@ def create_spectrum_from_CROCO(
 
             # Compute velocity magnitude squared
             velocity = np.sqrt(u_filled[:-1, :]**2 + v_filled[:, :-1]**2)
-
-            # Apply Hann window to reduce spectral leakage
-            window = np.outer(np.hanning(velocity.shape[0]), np.hanning(velocity.shape[1]))
-            velocity_windowed = velocity * window
             
             for (lon1, lon2, lat1, lat2), name in zip(boxes, names):
                 box_mask = np.array((lon >= lon1) & (lon <= lon2) & (lat >= lat1) & (lat <= lat2))
@@ -341,8 +337,11 @@ def create_spectrum_from_CROCO(
                     min_row, max_row = np.min(true_indices[0]), np.max(true_indices[0])
                     min_col, max_col = np.min(true_indices[1]), np.max(true_indices[1])
                     mask_shape = (int(max_row - min_row + 1), int(max_col - min_col + 1))
+                    
+                window = np.outer(np.hanning(mask_shape[0]), np.hanning(mask_shape[1]))
+                velocity_windowed = velocity[min_row:max_row, min_col:max_col] * window
                 
-                U_k = np.fft.fft2(velocity_windowed[min_row:max_row, min_col:max_col])
+                U_k = np.fft.fft2(velocity_windowed)
                 U_k_shifted = np.fft.fftshift(U_k)
 
                 power_spectrum = np.abs(U_k_shifted) ** 2 / 1000
@@ -356,6 +355,10 @@ def create_spectrum_from_CROCO(
                     results[name] = spectrum
                 else:
                     results[name] += spectrum
+                    
+            # Apply Hann window to reduce spectral leakage
+            window = np.outer(np.hanning(velocity.shape[0]), np.hanning(velocity.shape[1]))
+            velocity_windowed = velocity * window
 
             # Compute 2D FFT and shift zero-frequency to the center
             U_k = np.fft.fft2(velocity_windowed)
@@ -489,10 +492,6 @@ def create_spectrum_from_GLORYS(
 
             # Compute velocity magnitude squared
             velocity = np.sqrt(u_filled[:, :]**2 + v_filled[:, :]**2)
-
-            # Apply Hann window to reduce spectral leakage
-            window = np.outer(np.hanning(velocity.shape[0]), np.hanning(velocity.shape[1]))
-            velocity_windowed = velocity * window
             
             for (lon1, lon2, lat1, lat2), name in zip(boxes, names):
                 box_mask = np.array((lon >= lon1) & (lon <= lon2) & (lat >= lat1) & (lat <= lat2))
@@ -504,7 +503,12 @@ def create_spectrum_from_GLORYS(
                     min_row, max_row = np.min(true_indices[0]), np.max(true_indices[0])
                     min_col, max_col = np.min(true_indices[1]), np.max(true_indices[1])
                     mask_shape = (int(max_row - min_row + 1), int(max_col - min_col + 1))
-                U_k = np.fft.fft2(velocity_windowed[box_mask].reshape(mask_shape))
+                    
+                # Apply Hann window to reduce spectral leakage
+                window = np.outer(np.hanning(mask_shape[0]), np.hanning(mask_shape[1]))
+                velocity_windowed = velocity[box_mask].reshape(mask_shape) * window
+                
+                U_k = np.fft.fft2(velocity_windowed)
                 U_k_shifted = np.fft.fftshift(U_k)
                 power_spectrum = np.abs(U_k_shifted) ** 2 / 1000
                 # Bin the spectrum in k-space
@@ -517,6 +521,10 @@ def create_spectrum_from_GLORYS(
                     results[name] = spectrum
                 else:
                     results[name] += spectrum
+                    
+            # Apply Hann window to reduce spectral leakage
+            window = np.outer(np.hanning(velocity.shape[0]), np.hanning(velocity.shape[1]))
+            velocity_windowed = velocity * window
 
             # Compute 2D FFT and shift zero-frequency to the center
             U_k = np.fft.fft2(velocity_windowed)
