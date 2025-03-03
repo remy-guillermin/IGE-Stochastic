@@ -543,3 +543,24 @@ def open_figure(
 
     for file_path in file_paths:
         subprocess.Popen(['eog', file_path])  # Use eog for Linux
+        
+def get_color_from_filename(
+    filename, 
+    names=['Equator', 'Mascarene', 'Mayotte-Comores', 'South-Moz'], 
+    colors=['saddlebrown', 'teal', 'darkorchid', 'navy']
+):
+    return_color = 'black'
+    for name, color in zip(names, colors):
+        if name in filename:
+            return_color = color
+    return return_color
+
+def get_name_from_filename(
+    filename, 
+    names=['Equator', 'Mascarene', 'Mayotte-Comores', 'South-Moz']
+):
+    return_name = 'global'
+    for name in names:
+        if name in filename:
+            return_name = name
+    return return_name
