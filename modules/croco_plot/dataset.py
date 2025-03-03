@@ -338,7 +338,7 @@ def create_spectrum_from_CROCO(
                     min_col, max_col = np.min(true_indices[1]), np.max(true_indices[1])
                     mask_shape = (int(max_row - min_row + 1), int(max_col - min_col + 1))
                     
-                window = np.outer(np.hanning(mask_shape[0]), np.hanning(mask_shape[1]))
+                window = np.outer(np.hanning(mask_shape[0]-1), np.hanning(mask_shape[1]-1))
                 velocity_windowed = velocity[min_row:max_row, min_col:max_col] * window
                 
                 U_k = np.fft.fft2(velocity_windowed)
@@ -505,7 +505,7 @@ def create_spectrum_from_GLORYS(
                     mask_shape = (int(max_row - min_row + 1), int(max_col - min_col + 1))
                     
                 # Apply Hann window to reduce spectral leakage
-                window = np.outer(np.hanning(mask_shape[0]), np.hanning(mask_shape[1]))
+                window = np.outer(np.hanning(mask_shape[0]-1), np.hanning(mask_shape[1]-1))
                 velocity_windowed = velocity[box_mask].reshape(mask_shape) * window
                 
                 U_k = np.fft.fft2(velocity_windowed)
