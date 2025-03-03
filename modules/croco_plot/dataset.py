@@ -296,7 +296,6 @@ def create_spectrum_from_CROCO(
             KX, KY = np.meshgrid(kx, ky)
             K = np.sqrt(KX**2 + KY**2)
             K_box[name] = K
-            print(K.shape)
             k_bins = np.linspace(0, np.max(K), num=int(num/2))
             K_bins_box[name] = k_bins
    
@@ -345,8 +344,7 @@ def create_spectrum_from_CROCO(
                 
                 U_k = np.fft.fft2(velocity_windowed[min_row:max_row, min_col:max_col])
                 U_k_shifted = np.fft.fftshift(U_k)
-                
-                print(U_k_shifted.shape)
+
                 power_spectrum = np.abs(U_k_shifted) ** 2 / 1000
                 # Bin the spectrum in k-space
                 spectrum = np.zeros_like(K_bins_box[name])
