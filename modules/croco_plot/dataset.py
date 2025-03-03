@@ -296,7 +296,7 @@ def create_spectrum_from_CROCO(
             KX, KY = np.meshgrid(kx, ky)
             K = np.sqrt(KX**2 + KY**2)
             K_box[name] = K
-            k_bins = np.linspace(0, np.max(K), num=int(num/2))
+            k_bins = np.linspace(0, np.max(K), num)
             K_bins_box[name] = k_bins
    
         # Define wavenumber grid (adjusted for physical spacing)
@@ -399,7 +399,7 @@ def create_spectrum_from_CROCO(
         print(f'File {file_path} saved')
         
     ds = xr.Dataset({
-            "mean_spectrum": (["k"], mean_spectrum / mean_spectrum)},
+            "mean_spectrum": (["k"], mean_spectrum / mean_spectrum[0])},
             coords={
                 "k": k_bins
             },
@@ -460,7 +460,7 @@ def create_spectrum_from_GLORYS(
             KX, KY = np.meshgrid(kx, ky)
             K = np.sqrt(KX**2 + KY**2)
             K_box[name] = K
-            k_bins = np.linspace(0, np.max(K), num=int(num/2))
+            k_bins = np.linspace(0, np.max(K), num)
             K_bins_box[name] = k_bins
 
         # Define wavenumber grid (adjusted for physical spacing)
@@ -560,7 +560,7 @@ def create_spectrum_from_GLORYS(
         print(f'File {file_path} saved')
         
     ds = xr.Dataset({
-            "mean_spectrum": (["k"], mean_spectrum / mean_spectrum)},
+            "mean_spectrum": (["k"], mean_spectrum / mean_spectrum[0])},
             coords={
                 "k": k_bins
             },

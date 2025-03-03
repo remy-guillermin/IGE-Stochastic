@@ -12,6 +12,7 @@ Modules :
 - time_series.py : Contient des fonctions pour calculer et afficher les séries temporelles de l'énergie cinétique turbulente (EKE).
 - agulhas.py : Contient des fonctions pour afficher des valeurs zoomées sur la région du courant des Aiguilles.
 - dataset.py : Contient des fonctions pour manipuler les fichiers netCDF.
+- spectrum.py : Contient des fonctions pour afficher les spectres.
 
 Installation :
     pip install -e modules/
@@ -28,3 +29,4 @@ from . import surf_plot
 from . import time_series
 from . import agulhas
 from . import dataset
+from . import spectrum
