@@ -296,7 +296,7 @@ def create_spectrum_from_CROCO(
             KX, KY = np.meshgrid(kx, ky)
             K = np.sqrt(KX**2 + KY**2)
             K_box[name] = K
-            print(K_box.shape)
+            print(K.shape)
             k_bins = np.linspace(0, np.max(K), num=int(num/2))
             K_bins_box[name] = k_bins
    
