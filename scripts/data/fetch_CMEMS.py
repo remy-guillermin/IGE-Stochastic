@@ -5,8 +5,8 @@ from pprint import pprint
 #output_directory = '/Users/remyguillermin/Programmation/Stage/IGE-Stochastic/data/RAW/'
 output_directory = '/home/guilremy/IGE-Stochastic/data/RAW/'
 
-dataset = 'METOFFICE-GLO-SST-L4-REP-OBS-SST' # SST
-dataset = 'SEALEVEL_GLO_PHY_L4_MY_008_047' # SSH
+#dataset = 'METOFFICE-GLO-SST-L4-REP-OBS-SST' # SST
+dataset = 'cmems_obs-sl_glo_phy-ssh_my_allsat-l4-duacs-0.125deg_P1D' # SSH
 
 get_result = copernicusmarine.get(
     dataset_id=dataset, # ID du dataset sur https://data.marine.copernicus.eu/products

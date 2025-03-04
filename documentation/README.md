@@ -152,3 +152,10 @@ Pour utiliser le script `croco-ipy-load` :
 
 #### Arguments
 - `--clear` : exécute `clear` avant de lancer l'instance `iPython`
+
+## Données satellites
+### Copernicus
+On peut télécharger les datasets sur copernicus en suivant leur API python : [fetch_CMEMS.py](../scripts/data/fetch_CMEMS.py)
+
+### CCI
+Il faut suivre la [documentation](https://catalogue.ceda.ac.uk/uuid/471698c7db45451cbf3b7d834ecab9fd/)
