@@ -6,6 +6,9 @@ Icon?
 *.tar.gz
 *.synctex.gz
 
+# Data files
+*.nc
+
 # Documents
 *.pdf
 !bibliography/*.pdf
