@@ -8,3 +8,9 @@ On a trouvé l'origine des problèmes pour la simulation. J'ai commencé à étu
 
 ## Mercredi
 Premier film de vitesse fait, j'ai réécrit les scripts pour que ça soit plus rapide et pour afficher aussi la vorticité et l'énergie.
+
+## Jeudi
+
+
+## Vendredi
+Aujourd'hui j'ai commencé les analyses spectrales avec des spectres de vitesses de surface.
