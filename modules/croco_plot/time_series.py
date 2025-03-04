@@ -265,6 +265,7 @@ def time_series_from_dataset(
             if 'Anomalies' in variables:
                 ax = axes_anomaly[0]
                 sla = f.sla.data
+                
                 if 'DATA' in file:
                     sla = sla[::10]
                 
@@ -275,24 +276,31 @@ def time_series_from_dataset(
                 ax.set_ylabel('SLA [$m$]')
                 ax.set_xlabel('Time')
                 
-                if 'DATA' not in file:
-                    ax = axes_anomaly[1]
-                    ssa = f.ssa.data
-                    ax.plot(time, ssa, color=color, label=source, linestyle='--', alpha=0.3)
-                    rolling_mean = np.convolve(ssa, np.ones(roll)/roll, mode='same')
-                    ax.plot(time[int((roll-1)/2):-int((roll-1)/2)], rolling_mean[int((roll-1)/2):-int((roll-1)/2)], color=color, linestyle='-', linewidth=1.5, label=f'{source} ({roll}-smoothed)')
-                    ax.set_title('Sea Salinity Anomaly')
-                    ax.set_ylabel('SSA [$psu$]')
-                    ax.set_xlabel('Time')
+                ax = axes_anomaly[1]
+                ssa = f.ssa.data
                     
-                    ax = axes_anomaly[2]
-                    sta = f.sta.data
-                    ax.plot(time, sta, color=color, label=source, linestyle='--', alpha=0.3)
-                    rolling_mean = np.convolve(sta, np.ones(roll)/roll, mode='same')
-                    ax.plot(time[int((roll-1)/2):-int((roll-1)/2)], rolling_mean[int((roll-1)/2):-int((roll-1)/2)], color=color, linestyle='-', linewidth=1.5, label=f'{source} ({roll}-smoothed)')
-                    ax.set_title('Sea Temperature Anomaly')
-                    ax.set_ylabel('STA [$°C$]')
-                    ax.set_xlabel('Time')
+                if 'DATA' in file:
+                    ssa = ssa[::10]
+                    
+                ax.plot(time, ssa, color=color, label=source, linestyle='--', alpha=0.3)
+                rolling_mean = np.convolve(ssa, np.ones(roll)/roll, mode='same')
+                ax.plot(time[int((roll-1)/2):-int((roll-1)/2)], rolling_mean[int((roll-1)/2):-int((roll-1)/2)], color=color, linestyle='-', linewidth=1.5, label=f'{source} ({roll}-smoothed)')
+                ax.set_title('Sea Salinity Anomaly')
+                ax.set_ylabel('SSA [$psu$]')
+                ax.set_xlabel('Time')
+                
+                ax = axes_anomaly[2]
+                sta = f.sta.data
+                
+                if 'DATA' in file:
+                    sta = sta[::10]
+                    
+                ax.plot(time, sta, color=color, label=source, linestyle='--', alpha=0.3)
+                rolling_mean = np.convolve(sta, np.ones(roll)/roll, mode='same')
+                ax.plot(time[int((roll-1)/2):-int((roll-1)/2)], rolling_mean[int((roll-1)/2):-int((roll-1)/2)], color=color, linestyle='-', linewidth=1.5, label=f'{source} ({roll}-smoothed)')
+                ax.set_title('Sea Temperature Anomaly')
+                ax.set_ylabel('STA [$°C$]')
+                ax.set_xlabel('Time')
             if 'Fields' in variables:
                 if 'DATA' not in file:
                     ax = axes_field[0]
