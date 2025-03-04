@@ -9,6 +9,9 @@ Icon?
 # Data files
 *.nc
 
+# Data folder
+data/*
+
 # Documents
 *.pdf
 !bibliography/*.pdf
