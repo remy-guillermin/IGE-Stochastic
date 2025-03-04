@@ -265,6 +265,8 @@ def time_series_from_dataset(
                 ax = axes_anomaly[0]
                 sla = f.sla.data
 
+                if 'DATA' in file:
+                    source = f.sla.source
                 
                 ax.plot(time, sla, color=color, label=source, linestyle='--', alpha=0.3)
                 rolling_mean = np.convolve(sla, np.ones(roll)/roll, mode='same')
@@ -275,6 +277,9 @@ def time_series_from_dataset(
                 
                 ax = axes_anomaly[1]
                 ssa = f.ssa.data
+                
+                if 'DATA' in file:
+                    source = f.ssa.source
                     
                 ax.plot(time, ssa, color=color, label=source, linestyle='--', alpha=0.3)
                 rolling_mean = np.convolve(ssa, np.ones(roll)/roll, mode='same')
@@ -285,6 +290,9 @@ def time_series_from_dataset(
                 
                 ax = axes_anomaly[2]
                 sta = f.sta.data
+                
+                if 'DATA' in file:
+                    source = f.sta.source
                     
                 ax.plot(time, sta, color=color, label=source, linestyle='--', alpha=0.3)
                 rolling_mean = np.convolve(sta, np.ones(roll)/roll, mode='same')
@@ -307,6 +315,9 @@ def time_series_from_dataset(
                 ax = axes_field[1]
                 sss = f.sss.data
                 
+                if 'DATA' in file:
+                    source = f.sss.source
+                
                 ax.plot(time, sss, color=color, label=source, linestyle='--', alpha=0.3)
                 
                 rolling_mean = np.convolve(sss, np.ones(roll)/roll, mode='same')
@@ -317,6 +328,9 @@ def time_series_from_dataset(
                 
                 ax = axes_field[2]
                 sst = f.sst.data
+                
+                if 'DATA' in file:
+                    source = f.sst.source
                 
                 ax.plot(time, sst, color=color, label=source, linestyle='--', alpha=0.3)
                 rolling_mean = np.convolve(sst, np.ones(roll)/roll, mode='same')
@@ -335,9 +349,12 @@ def time_series_from_dataset(
             axes_anomaly[-1].set_xlim(xlim)
             axes_field[-1].set_xlim(xlim)
         
-        axes_energy[-1].legend(loc="upper right")
-        axes_anomaly[-1].legend(loc="upper right")
-        axes_field[-1].legend(loc="upper right")
+        for ax in axes_energy:
+            ax.legend(loc="upper right")
+        for ax in axes_anomaly:
+            ax.legend(loc="upper right")
+        for ax in axes_field:
+            ax.legend(loc="upper right")
         
         fig_energy.tight_layout()
         fig_anomaly.tight_layout()
