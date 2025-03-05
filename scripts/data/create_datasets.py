@@ -20,9 +20,9 @@ date = '*'
 
 sss_files = glob.glob(sss_path + f'/*{date}*.nc')
 sss_files.sort()
-sst_files = glob.glob(sss_path + f'/*{date}*.nc')
+sst_files = glob.glob(sst_path + f'/*{date}*')
 sst_files.sort()
-sla_files = glob.glob(sss_path + f'/*{date}*.nc')
+sla_files = glob.glob(sla_path + f'/*{date}*.nc')
 sla_files.sort()
 
 sss_values = {name: [] for name in names}
@@ -55,7 +55,7 @@ for i, file in enumerate(sss_files):
         sss_errors[name].append(np.nanmean(sss_err_box.values))
         
 for i, file in enumerate(sst_files):
-    print(f'Opening {i+1}/{len(sss_files)}')
+    print(f'Opening {i+1}/{len(sst_files)}')
     f = xr.open_dataset(file)
     lon = f.lon
     lat = f.lat
