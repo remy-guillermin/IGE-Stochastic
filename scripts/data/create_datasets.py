@@ -33,7 +33,7 @@ sla_values = {name: [] for name in names}
 sla_errors = {name: [] for name in names}
 time = np.arange(np.datetime64('2017-01-01'), np.datetime64('2022-01-01'), dtype='datetime64[D]')
 
-for file, i in zip(sss_files, len(sss_files)):
+for i, file in enumerate(sss_files):
     print(f'Opening {i+1}/{len(sss_files)}')
     f = xr.open_dataset(file)
     lon = f.lon
@@ -48,7 +48,7 @@ for file, i in zip(sss_files, len(sss_files)):
         sss_values[name].append(np.nanmean(sss_box.values))
         sss_errors[name].append(np.nanmean(sss_err_box.values))
         
-for file, i in zip(sst_files, len(sst_files)):
+for i, file in enumerate(sst_files):
     print(f'Opening {i+1}/{len(sss_files)}')
     f = xr.open_dataset(file)
     lon = f.lon
@@ -63,7 +63,7 @@ for file, i in zip(sst_files, len(sst_files)):
         sst_values[name].append(np.nanmean(sst_box.values))
         sst_errors[name].append(np.nanmean(sst_err_box.values))
         
-for file, i in zip(sla_files, len(sla_files)):
+for i, file in enumerate(sla_files):
     print(f'Opening {i+1}/{len(sss_files)}')
     f = xr.open_dataset(file)
     lon = f.longitude
