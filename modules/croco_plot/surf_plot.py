@@ -106,13 +106,13 @@ def multiple_annual(data_path: str,
         ax = axs[1]
         ax.set_title(f"SWIO {start_date} to {end_date}", size=9)
         levels = np.linspace(0, 1, 21)
-        norm = mpl.colors.BoundaryNorm(levels, sss_cmap.N)
+        norm = mpl.colors.BoundaryNorm(levels, ssh_cmap.N)
         plot_map(ax, lon, lat, zeta, ssh_cmap, norm, r'$\overline{\overline{SSH}}$ [m]', msk, msk_inv, gridline_style, levels = levels, interactive=interactive)
         
         ax = axs[2]
         ax.set_title(f"SWIO {start_date} to {end_date}", size=9)
         levels = np.linspace(20, 30, 21)
-        norm = mpl.colors.BoundaryNorm(levels, sss_cmap.N)
+        norm = mpl.colors.BoundaryNorm(levels, sst_cmap.N)
         plot_map(ax, lon, lat, temp, sst_cmap, norm, r'$\overline{\overline{SST}}$ [°C]', msk, msk_inv, gridline_style, levels = levels, interactive=interactive)
         
         plt.tight_layout()
