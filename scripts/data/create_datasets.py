@@ -80,6 +80,7 @@ for file, i in zip(sla_files, len(sla_files)):
         
 sta_values = {name: np.array(sst_values[name]) - np.mean(sst_values[name]) for name in names}
 ssa_values = {name: np.array(sss_values[name]) - np.mean(sss_values[name]) for name in names}
+sla_values = {name: np.array(sla_values[name]) - np.mean(sla_values[name]) for name in names}
 
 
 for name in names:
