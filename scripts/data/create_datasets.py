@@ -9,8 +9,8 @@ path = '/home/guilremy/IGE-Stochastic/data/RAW'
 #output_dir = '/Users/remyguillermin/Programmation/Stage/IGE-Stochastic/data'
 output_dir = '/home/guilremy/IGE-Stochastic/data/PROCESSED'
 sss_path = os.path.join(path, 'SSS_CCI') # On lisa's HDD
-sst_path = os.path.join(path, 'OSTIA_SST')
-sla_path = os.path.join(path, 'CMEMS_SLA') # os.path.join(path, 'SLA_CMEMS')
+sst_path = os.path.join(path, 'SST_OSTIA')
+sla_path = os.path.join(path, 'SLA_CMEMS') # os.path.join(path, 'SLA_CMEMS')
 
 
 boxes = [(48, 60, -4, 3), (41, 47, -15, -8), (36.5, 42.5, -28, -19), (52, 60, -24, -16)]
@@ -43,8 +43,14 @@ for i, file in enumerate(sss_files):
     f.close
     
     for name, box in zip(names, boxes):
-        sss_box = sss.sel(lon=slice(box[0], box[1]), lat=slice(box[2], box[3]))
-        sss_err_box = sss_err.sel(lon=slice(box[0], box[1]), lat=slice(box[2], box[3]))
+        sss_box = sss.where(
+            (lon >= box[2]) & (lon <= box[3]) & (lat >= box[0]) & (lat <= box[1]),
+            drop=True
+        )
+        sss_err_box = sss_err.where(
+            (lon >= box[2]) & (lon <= box[3]) & (lat >= box[0]) & (lat <= box[1]),
+            drop=True
+        )
         sss_values[name].append(np.nanmean(sss_box.values))
         sss_errors[name].append(np.nanmean(sss_err_box.values))
         
