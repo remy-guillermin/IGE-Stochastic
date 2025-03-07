@@ -8,7 +8,7 @@ import pandas as pd
 path = '/home/guilremy/IGE-Stochastic/data/RAW'
 #output_dir = '/Users/remyguillermin/Programmation/Stage/IGE-Stochastic/data'
 output_dir = '/home/guilremy/IGE-Stochastic/data/PROCESSED'
-sss_path = os.path.join(path, 'SSS_CCI') # On lisa's HDD
+sss_path = os.path.join(path, 'SSS_CMEMS')
 sst_path = os.path.join(path, 'SST_OSTIA')
 sla_path = os.path.join(path, 'SLA_CMEMS') # os.path.join(path, 'SLA_CMEMS')
 
@@ -38,19 +38,13 @@ for i, file in enumerate(sss_files):
     f = xr.open_dataset(file)
     lon = f.lon
     lat = f.lat
-    sss = f.sss
-    sss_err = f.sss_random_error
+    sss = f.sos
+    sss_err = f.sos_error
     f.close
     
     for name, box in zip(names, boxes):
-        sss_box = sss.where(
-            (lon >= box[2]) & (lon <= box[3]) & (lat >= box[0]) & (lat <= box[1]),
-            drop=True
-        )
-        sss_err_box = sss_err.where(
-            (lon >= box[2]) & (lon <= box[3]) & (lat >= box[0]) & (lat <= box[1]),
-            drop=True
-        )
+        sss_box = sss.sel(lon=slice(box[0], box[1]), lat=slice(box[2], box[3]))
+        sss_err_box = sss_err.sel(lon=slice(box[0], box[1]), lat=slice(box[2], box[3]))
         sss_values[name].append(np.nanmean(sss_box.values))
         sss_errors[name].append(np.nanmean(sss_err_box.values))
         
@@ -96,20 +90,20 @@ for name in names:
                 "long_name": "Sea Surface Salinity",
                 "standard_name": "sea_surface_salinity",
                 "description": "Box averaged Sea Surface Salinity",
-                "source": "CCI",
+                "source": "CMEMS",
             }),
             "sss_err": (["time"], sss_errors[name], {
                 "units": "PSU",
                 "long_name": "Sea Surface Salinity Error",
                 "description": "Uncertainty in SSS estimation",
-                "source": "CCI",
+                "source": "CMEMS",
             }),
             "ssa": (["time"], ssa_values[name], {
                 "units": "PSU",
                 "long_name": "Sea Salinity Anomaly",
                 "standard_name": "sea_salinity_anomaly",
                 "description": "Box averaged Sea Salinity Anomaly",
-                "source": "CCI",
+                "source": "CMEMS",
             }),
             "sst": (["time"], np.array(sst_values[name]) - 273.15, {  # Convert Kelvin to Celsius
                 "units": "°C",
