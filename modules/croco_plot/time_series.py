@@ -273,7 +273,7 @@ def time_series_from_dataset(
 
                 if 'DATA' in file:
                     source = f.sla.source
-                    lw = 3.0
+                    lw = 2.0
 
                 ax.plot(time, sla, color=color, linestyle='--', alpha=0.3)
                 rolling_mean = np.convolve(sla, np.ones(roll)/roll, mode='same')
@@ -289,7 +289,7 @@ def time_series_from_dataset(
 
                 if 'DATA' in file:
                     source = f.ssa.source
-                    lw = 3.0
+                    lw = 2.0
 
                 ax.plot(time, ssa, color=color, linestyle='--', alpha=0.3)
                 rolling_mean = np.convolve(ssa, np.ones(roll)/roll, mode='same')
@@ -305,7 +305,7 @@ def time_series_from_dataset(
 
                 if 'DATA' in file:
                     source = f.sta.source
-                    lw = 3.0
+                    lw = 2.0
 
                 ax.plot(time, sta, color=color, linestyle='--', alpha=0.3)
                 rolling_mean = np.convolve(sta, np.ones(roll)/roll, mode='same')
@@ -334,9 +334,11 @@ def time_series_from_dataset(
 
                 if 'DATA' in file:
                     source = f.sss.source
-                    lw = 3.0
+                    lw = 2.0
                     err = f.sss_err
-                    ax.fill_between(time, sss-err, sss+err, alpha=0.2, color='black')
+                    rolling_mean_low = np.convolve(sss-err, np.ones(roll)/roll, mode='same')
+                    rolling_mean_up = np.convolve(sss+err, np.ones(roll)/roll, mode='same')
+                    ax.fill_between(time[int((roll-1)/2):-int((roll-1)/2)], rolling_mean_low[int((roll-1)/2):-int((roll-1)/2)], rolling_mean_up[int((roll-1)/2):-int((roll-1)/2)], alpha=0.2, color='black')
 
                 ax.plot(time, sss, color=color, linestyle='--', alpha=0.3)
 
@@ -353,7 +355,7 @@ def time_series_from_dataset(
 
                 if 'DATA' in file:
                     source = f.sst.source
-                    lw = 3.0
+                    lw = 2.0
 
                 ax.plot(time, sst, color=color, linestyle='--', alpha=0.3)
                 rolling_mean = np.convolve(sst, np.ones(roll)/roll, mode='same')

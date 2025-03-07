@@ -77,7 +77,6 @@ def velocity(
     save_figure(fig, f"velocity_{date}.png")
     plt.close(fig)
 
-
 def vorticity(
     data_path: str, 
     date: str,
