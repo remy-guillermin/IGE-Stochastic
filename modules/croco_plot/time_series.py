@@ -235,10 +235,12 @@ def time_series_from_dataset(
             
             if 'GLORYS' in file:
                 color = 'red'
-            elif 'SWIO' in file:
+            elif 'CROCO' in file:
                 color = 'blue'
             elif 'DATA' in file:
                 color = 'black'
+            else:
+                color = 'white'
 
             if 'Energies' in variables:
                 if 'DATA' not in file:
