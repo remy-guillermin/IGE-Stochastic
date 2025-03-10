@@ -16,7 +16,7 @@ def velocity(
     data_path: str, 
     date: str, 
     figsize: tuple = (10, 8), 
-    cmap = cmcrameri.cm.oslo, 
+    cmap = cmocean.cm.speed, 
     grid_path: str = None
 ):
     """
@@ -44,8 +44,8 @@ def velocity(
     # Load simulation data
     u, v = load_data(data_path, ('u', 'v'))
     
-    u = u[:,:,:,:].sel(time=date).mean(dim='time')
-    v = v[:,:,:,:].sel(time=date).mean(dim='time')
+    u = u[:,-1,:,:].sel(time=date).mean(dim='time')
+    v = v[:,-1,:,:].sel(time=date).mean(dim='time')
     print("Data sliced")
     
     fill_value = 9.96921e+36
@@ -53,11 +53,8 @@ def velocity(
     v = v.where((v != fill_value), np.nan).data
     print("NaN values added")
     
-    # Transformation des composantes de vent (grille déformée -> grille géographique) pour chaque time index
-    angle_expand = angle[:,:].data.reshape(1, angle.shape[0], angle.shape[1])
-    
-    u_geo = u[:,:-1,:] * np.cos(angle_expand[:,:-1,:-1]) - v[:,:,:-1] * np.sin(angle_expand[:,:-1,:-1])
-    v_geo = u[:,:-1,:] * np.sin(angle_expand[:,:-1,:-1]) + v[:,:,:-1] * np.cos(angle_expand[:,:-1,:-1])
+    u_geo = u[:-1,:] * np.cos(angle[:-1,:-1]) - v[:,:-1] * np.sin(angle[:-1,:-1])
+    v_geo = u[:-1,:] * np.sin(angle[:-1,:-1]) + v[:,:-1] * np.cos(angle[:-1,:-1])
     print("Velocity transformed")
     
     velocity = np.sqrt(u_geo**2 + v_geo**2)
@@ -68,11 +65,13 @@ def velocity(
     # Define common gridline styles
     gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.3}
 
-    ax.set_title(f"Velocity SWIO {date}", size=9)
-    levels = np.linspace(0, 2.5, 21)
-    norm = mpl.colors.BoundaryNorm(levels, cmap.N)
-    plot_map(ax, lon[:-1,:-1], lat[:-1,:-1], velocity[-1,:,:], cmap, norm, 'Velocity [$m.s^{-1}$]', msk[:-1,:-1], msk_inv[:-1,:-1], gridline_style, levels=levels)
+    ax.set_title(f"Velocity SWIO {date}")
+    a = -1.5
+    b = 0.2
+    norm = mpl.colors.LogNorm(10**a, 10**b)
 
+    plot_map(ax, lon[:-1,:-1], lat[:-1,:-1], velocity[:,:], vel_cmap, norm, 'Velocity [$m.s^{-1}$]', msk[:-1,:-1], msk_inv[:-1,:-1], gridline_style)
+    
     plt.tight_layout()
     save_figure(fig, f"velocity_{date}.png")
     plt.close(fig)
@@ -110,30 +109,24 @@ def vorticity(
     # Load simulation data
     u, v = load_data(data_path, ('u', 'v'))
     
-    u = u[:,:,:,:].sel(time=date)
-    v = v[:,:,:,:].sel(time=date)
-    print("Data selected")
+    u = u[:,-1,:,:].sel(time=date).mean(dim='time')
+    v = v[:,-1,:,:].sel(time=date).mean(dim='time')
+    print("Data sliced")
     
     fill_value = 9.96921e+36
     u = u.where((u != fill_value), np.nan).data
     v = v.where((v != fill_value), np.nan).data
     print("NaN values added")
     
-    # Transformation des composantes de vent (grille déformée -> grille géographique) pour chaque time index
-    angle_expand = angle[:,:].data.reshape(1, angle.shape[0], angle.shape[1])
-    
-    u_geo = u[:,:-1,:] * np.cos(angle_expand[:,:-1,:-1]) - v[:,:,:-1] * np.sin(angle_expand[:,:-1,:-1])
-    v_geo = u[:,:-1,:] * np.sin(angle_expand[:,:-1,:-1]) + v[:,:,:-1] * np.cos(angle_expand[:,:-1,:-1])
+    u_geo = u[:-1,:] * np.cos(angle[:-1,:-1]) - v[:,:-1] * np.sin(angle[:-1,:-1])
+    v_geo = u[:-1,:] * np.sin(angle[:-1,:-1]) + v[:,:-1] * np.cos(angle[:-1,:-1])
     print("Velocity transformed")
-
-    pm_expand = pm.data.reshape(1, pm.shape[0], pm.shape[1])
-    pn_expand = pn.data.reshape(1, pn.shape[0], pn.shape[1])
     
     # Calculate derivatives
-    dv_dlon = np.gradient(v_geo, axis=2) * pm_expand[:,:-1,:-1]
-    du_dlat = np.gradient(u_geo, axis=1) * pn_expand[:,:-1,:-1]
+    dv_dlon = np.gradient(v_geo, axis=1) * pm[:-1,:-1]
+    du_dlat = np.gradient(u_geo, axis=0) * pn[:-1,:-1]
 
-    # Calculate vorticity and helicity
+    # Calculate vorticity
     vorticity = dv_dlon - du_dlat
 
     # Plotting
@@ -142,10 +135,10 @@ def vorticity(
     # Define common gridline styles
     gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.3}
 
-    ax.set_title(f"Vorticity SWIO {date}", size=9)
+    ax.set_title(f"Vorticity SWIO {date}")
     levels = np.linspace(-0.15, 0.15, 21)
     norm = mpl.colors.BoundaryNorm(levels, cmap.N)
-    plot_map(ax, lon[:-1,:-1], lat[:-1,:-1], vorticity[-1,:,:] * 3600, cmap, norm, 'Vorticity [$h^{-1}$]', msk[:-1,:-1], msk_inv[:-1,:-1], gridline_style, levels=levels)
+    plot_map(ax, lon[:-1,:-1], lat[:-1,:-1], vorticity[:,:] * 3600, cmap, norm, 'Vorticity [$h^{-1}$]', msk[:-1,:-1], msk_inv[:-1,:-1], gridline_style, levels=levels)
 
     plt.tight_layout()
     save_figure(fig, f"vorticity_{date}.png")
@@ -155,7 +148,7 @@ def eke(
     data_path: str, 
     date: str, 
     figsize: tuple = (10, 8), 
-    cmap = cmcrameri.cm.lapaz, 
+    cmap = cmcrameri.cm.devon, 
     grid_path: str = None
 ):
     """
@@ -181,13 +174,17 @@ def eke(
         lon, lat, pm, pn, msk, msk_inv, angle, h = load_grid()
 
     # Load simulation data
-    u, v, w, s_rho = load_data(data_path, ('u', 'v', 'w', 's_rho'))
+    u, v, w = load_data(data_path, ('u', 'v', 'w'))
+        
+    u = u[:,-1,:,:]
+    v = v[:,-1,:,:]
+    w = w[:,-1,:,:]
     
-    depth = h * s_rho # Profondeur
-    cell_volume = -(depth[:,:,-1] * 1 / pn * 1 / pm).data # Volumes des cellules de surface
-    surface_volume = - np.sum(depth[:,:,-1].data[h.data != 50] * 1 / pn.data[h.data != 50] * 1 / pm.data[h.data != 50])
-    domain_volume = np.sum(h.data[h.data != 50] * 1/ pn.data[h.data != 50] * 1 / pm.data[h.data != 50]) # Volume du domaine
-    depth, h ,s_rho, pm, pn = None, None, None, None, None 
+    # Moyenne annuelle
+    u_yr = u.mean(dim='time')
+    v_yr = v.mean(dim='time')
+    w_yr = w.mean(dim='time')
+    print("Yearly mean calculated")
     
     fill_value = 9.96921e+36
     u = u.where((u != fill_value), np.nan)
@@ -195,31 +192,18 @@ def eke(
     w = w.where((w != fill_value), np.nan)
     print("NaN values added")
     
-    # Moyenne annuelle
-    u_yr = np.nanmean(u, axis = 0)
-    v_yr = np.nanmean(v, axis = 0)
-    w_yr = np.nanmean(w, axis = 0)
-    print("Yearly mean calculated")
-    
-    u = u[:,:,:,:].sel(time=date)
-    v = v[:,:,:,:].sel(time=date)
-    w = w[:,:,:,:].sel(time=date)
-    print("Date selected")
-    
     # Vitesse turbulente
-    ut = (u_yr - u).data
-    vt = (v_yr - v).data
-    wt = (w_yr - w).data
+    ut = - (u_yr - u.sel(time=date)).data[:,:,0]
+    vt = - (v_yr - v.sel(time=date)).data[:,:,0]
+    wt = - (w_yr - w.sel(time=date)).data[:,:,0]
     print("Turbulent velocity calculated")
     
-    angle_expand = angle[:,:].data.reshape(1, 1, angle.shape[0], angle.shape[1])
-    
-    ut_geo = ut[:,:,:-1,:] * np.cos(angle_expand[:,:,:-1,:-1]) - vt[:,:,:,:-1] * np.sin(angle_expand[:,:,:-1,:-1])
-    vt_geo = ut[:,:,:-1,:] * np.sin(angle_expand[:,:,:-1,:-1]) + vt[:,:,:,:-1] * np.cos(angle_expand[:,:,:-1,:-1])
-    wt_geo = wt[:,:,:-1,:-1]
+    ut_geo = ut[:-1,:] * np.cos(angle[:-1,:-1]) - vt[:,:-1] * np.sin(angle[:-1,:-1])
+    vt_geo = ut[:-1,:] * np.sin(angle[:-1,:-1]) + vt[:,:-1] * np.cos(angle[:-1,:-1])
+    wt_geo = wt[:-1,:-1]
     print("Turbulent velocity transformed")
     
-    EKE = 1 / 2 * (ut_geo[0,-1,:,:] ** 2 + vt_geo[0,-1,:,:] ** 2 + wt_geo[0,-1,:,:] ** 2) * cell_volume[:-1,:-1] / surface_volume
+    EKE = 1 / 2 * (ut_geo ** 2 + vt_geo ** 2 + wt_geo ** 2)
     print("EKE calculated")
     
     # Plotting
@@ -228,9 +212,9 @@ def eke(
     # Define common gridline styles
     gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.3}
 
-    ax.set_title(f"EKE SWIO {date}", size=9)
+    ax.set_title(f"EKE SWIO {date}")
     a = int(np.log10(np.nanmax(EKE)))
-    b = a-2
+    b = a-2.2
     norm = mpl.colors.LogNorm(vmin=10**b, vmax=10**a)
     plot_map(ax, lon[:-1,:-1], lat[:-1,:-1], EKE, cmap, norm, 'EKE [$m^2.s^{-2}$]', msk[:-1,:-1], msk_inv[:-1,:-1], gridline_style)
 
@@ -239,8 +223,6 @@ def eke(
     plt.close(fig)
 
 def mke(
-    data_path: str, 
-    start_date: str, 
     end_date: str, 
     figsize: tuple = (10, 8), 
     cmap = cmcrameri.cm.lapaz, 
@@ -273,23 +255,19 @@ def mke(
     # Load simulation data
     u, v, w = load_data(data_path, ('u', 'v', 'w'))
     
-    u = u[:,:,:,:].sel(time=slice(start_date, end_date)).mean(dim='time')
-    v = v[:,:,:,:].sel(time=slice(start_date, end_date)).mean(dim='time')
-    w = w[:,:,:,:].sel(time=slice(start_date, end_date)).mean(dim='time')
-    print("Data selected")
+    u = u[:,-1,:,:]
+    v = v[:,-1,:,:]
+    w = w[:,-1,:,:]
     
     fill_value = 9.96921e+36
-    u = u.where((u != fill_value), np.nan).data
-    v = v.where((v != fill_value), np.nan).data
-    w = w.where((w != fill_value), np.nan).data
+    u = u.where((u != fill_value), np.nan).mean(dim='time').data
+    v = v.where((v != fill_value), np.nan).mean(dim='time').data
+    w = w.where((w != fill_value), np.nan).mean(dim='time').data
     print("NaN values added")
     
-    # Transformation des composantes de vent (grille déformée -> grille géographique) pour chaque time index
-    angle_expand = angle[:,:].data.reshape(1, angle.shape[0], angle.shape[1])
-    
-    u_geo = u[:,:-1,:] * np.cos(angle_expand[:,:-1,:-1]) - v[:,:,:-1] * np.sin(angle_expand[:,:-1,:-1])
-    v_geo = u[:,:-1,:] * np.sin(angle_expand[:,:-1,:-1]) + v[:,:,:-1] * np.cos(angle_expand[:,:-1,:-1])
-    w_geo = w[:,:-1,:-1]
+    u_geo = u[:-1,:] * np.cos(angle[:-1,:-1]) - v[:,:-1] * np.sin(angle[:-1,:-1])
+    v_geo = u[:-1,:] * np.sin(angle[:-1,:-1]) + v[:,:-1] * np.cos(angle[:-1,:-1])
+    w_geo = w[:-1,:-1]
     print("Velocity transformed")
     
     # Calculate EKE
@@ -302,12 +280,209 @@ def mke(
     # Define common gridline styles
     gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.3}
 
-    ax.set_title(f"MKE SWIO {start_date} to {end_date}", size=9)
+    ax.set_title(f"MKE SWIO")
     a = int(np.log10(np.nanmax(MKE)))
-    b = a-2
+    b = a-2.5
     norm = mpl.colors.LogNorm(vmin=10**b, vmax=10**a)
-    plot_map(ax, lon[:-1,:-1], lat[:-1,:-1], MKE[-1,:,:], cmap, norm, 'MKE [$m^2.s^{-2}$]', msk[:-1,:-1], msk_inv[:-1,:-1], gridline_style)
+    plot_map(ax, lon[:-1,:-1], lat[:-1,:-1], MKE, cmap, norm, 'MKE [$m^2.s^{-2}$]', msk[:-1,:-1], msk_inv[:-1,:-1], gridline_style)
 
     plt.tight_layout()
-    save_figure(fig, f"mke_{start_date}_{end_date}.png")
+    save_figure(fig, f"mke.png")
+    plt.close(fig)
+    
+def all(
+    data_path: str, 
+    date: str, 
+    figsize: tuple = (30, 8), 
+    vel_cmap = cmocean.cm.speed, 
+    vort_cmap = cmcrameri.cm.vik,
+    ke_cmap = cmcrameri.cm.devon, 
+    grid_path: str = None
+):
+
+    # Load grid data
+    if grid_path is not None:
+        lon, lat, pm, pn, msk, msk_inv, angle, _ = load_grid(grid_path)
+    else:
+        lon, lat, pm, pn, msk, msk_inv, angle, _ = load_grid()
+        
+    # Load simulation data
+    u, v, w = load_data(data_path, ('u', 'v', 'w'))
+        
+    u = u[:,-1,:,:]
+    v = v[:,-1,:,:]
+    w = w[:,-1,:,:]  
+    
+    fill_value = 9.96921e+36
+    u = u.where((u != fill_value), np.nan)
+    v = v.where((v != fill_value), np.nan)
+    w = w.where((w != fill_value), np.nan)
+    print("NaN values added")    
+      
+    # Moyenne annuelle
+    u_yr = u.mean(dim='time')
+    v_yr = v.mean(dim='time')
+    w_yr = w.mean(dim='time')
+    print("Time mean calculated")
+    
+    u = u[:,:,:].sel(time=date).mean(dim='time')
+    v = v[:,:,:].sel(time=date).mean(dim='time')
+    w = w[:,:,:].sel(time=date).mean(dim='time')
+    print("Data sliced")
+    
+    # Vitesse turbulente
+    ut = (u - u_yr).data[:,:]
+    vt = (v - v_yr).data[:,:]
+    wt = (w - w_yr).data[:,:]
+    print("Turbulent velocity calculated")
+    
+    u = u.data
+    v = v.data
+    w = w.data
+        
+    u_yr = u_yr.data
+    v_yr = v_yr.data
+    w_yr = w_yr.data
+    
+    angle = angle.data
+    
+    u_geo = u[:-1,:] * np.cos(angle[:-1,:-1]) - v[:,:-1] * np.sin(angle[:-1,:-1])
+    v_geo = u[:-1,:] * np.sin(angle[:-1,:-1]) + v[:,:-1] * np.cos(angle[:-1,:-1])
+    w_geo = w[:-1,:-1]
+    
+    ut_geo = ut[:-1,:] * np.cos(angle[:-1,:-1]) - vt[:,:-1] * np.sin(angle[:-1,:-1])
+    vt_geo = ut[:-1,:] * np.sin(angle[:-1,:-1]) + vt[:,:-1] * np.cos(angle[:-1,:-1])
+    wt_geo = wt[:-1,:-1]
+    
+    u_yr_geo = u_yr[:-1,:] * np.cos(angle[:-1,:-1]) - v_yr[:,:-1] * np.sin(angle[:-1,:-1])
+    v_yr_geo = u_yr[:-1,:] * np.sin(angle[:-1,:-1]) + v_yr[:,:-1] * np.cos(angle[:-1,:-1])
+    w_yr_geo = w_yr[:-1,:-1]
+    print("Velocity transformed")
+    
+    velocity = np.sqrt(u_geo ** 2 + v_geo ** 2)
+    velocity_t = np.sqrt(ut_geo ** 2 + vt_geo ** 2)
+    velocity_yr = np.sqrt(u_yr_geo ** 2 + v_yr_geo ** 2)
+    print('Velocity calculated')
+    
+    # Calculate derivatives
+    dv_dlon = np.gradient(v_geo, axis=1) * pm[:-1,:-1]
+    du_dlat = np.gradient(u_geo, axis=0) * pn[:-1,:-1]
+
+    # Calculate vorticity
+    vorticity = dv_dlon - du_dlat
+
+    dvt_dlon = np.gradient(vt_geo, axis=1) * pm[:-1,:-1]
+    dut_dlat = np.gradient(ut_geo, axis=0) * pn[:-1,:-1]
+
+    vorticity_t = dvt_dlon - dut_dlat
+
+    dv_yr_dlon = np.gradient(v_yr_geo, axis=1) * pm[:-1,:-1]
+    du_yr_dlat = np.gradient(u_yr_geo, axis=0) * pn[:-1,:-1]
+
+    vorticity_yr = dv_yr_dlon - du_yr_dlat
+    print('Vorticity calculated')
+    
+    KE = 1 / 2 * ( u_geo ** 2 + v_geo ** 2 + w_geo ** 2)
+    MKE = 1 / 2 * ( u_yr_geo ** 2 + v_yr_geo ** 2 + w_yr_geo ** 2)    
+    EKE = 1 / 2 * ( ut_geo ** 2 + vt_geo ** 2 + wt_geo ** 2)
+    print('Energy calculated')
+    
+    # Define common gridline styles
+    gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.3}
+
+    # Plotting
+    fig, axes = plt.subplots(1,3,figsize=figsize, subplot_kw={'projection': ccrs.PlateCarree()})
+    
+    fig.suptitle(f"SWIO {date}")
+    
+    ax = axes[0]
+    ax.set_title(f"Velocity")
+    
+    a = -1.5
+    b = 0.2
+    norm = mpl.colors.LogNorm(10**a, 10**b)
+    
+    plot_map(ax, lon[:-1,:-1], lat[:-1,:-1], velocity[:,:], vel_cmap, norm, 'Velocity [$m.s^{-1}$]', msk[:-1,:-1], msk_inv[:-1,:-1], gridline_style)
+    
+    ax = axes[1]
+    ax.set_title(f"Vorticity")
+    
+    levels = np.linspace(-0.15, 0.15, 21)
+    norm = mpl.colors.BoundaryNorm(levels, vort_cmap.N)
+    plot_map(ax, lon[:-1,:-1], lat[:-1,:-1], vorticity[:,:] * 3600, vort_cmap, norm, 'Vorticity [$h^{-1}$]', msk[:-1,:-1], msk_inv[:-1,:-1], gridline_style, levels=levels)
+    
+    ax = axes[2]
+    ax.set_title(f"Energy")
+    
+    a = int(np.log10(np.nanmax(KE)))
+    b = a-2.5
+    norm = mpl.colors.LogNorm(vmin=10**b, vmax=10**a)
+    plot_map(ax, lon[:-1,:-1], lat[:-1,:-1], KE, ke_cmap, norm, 'KE [$m^2.s^{-2}$]', msk[:-1,:-1], msk_inv[:-1,:-1], gridline_style)
+
+    plt.tight_layout()
+    save_figure(fig, f"all_{date}.png")
+    plt.close(fig)
+    
+    fig, axes = plt.subplots(1,3,figsize=figsize, subplot_kw={'projection': ccrs.PlateCarree()})
+    
+    fig.suptitle(f"SWIO")
+    
+    ax = axes[0]
+    ax.set_title(f"Velocity")
+    
+    a = -1.5
+    b = 0.2
+    norm = mpl.colors.LogNorm(10**a, 10**b)
+    
+    plot_map(ax, lon[:-1,:-1], lat[:-1,:-1], velocity_yr[:,:], vel_cmap, norm, 'Velocity [$m.s^{-1}$]', msk[:-1,:-1], msk_inv[:-1,:-1], gridline_style)
+    
+    ax = axes[1]
+    ax.set_title(f"Vorticity")
+    
+    levels = np.linspace(-0.15, 0.15, 21)
+    norm = mpl.colors.BoundaryNorm(levels, vort_cmap.N)
+    plot_map(ax, lon[:-1,:-1], lat[:-1,:-1], vorticity_yr[:,:] * 3600, vort_cmap, norm, 'Vorticity [$h^{-1}$]', msk[:-1,:-1], msk_inv[:-1,:-1], gridline_style, levels=levels)
+    
+    ax = axes[2]
+    ax.set_title(f"Energy")
+    
+    a = int(np.log10(np.nanmax(MKE)))
+    b = a-2.5
+    norm = mpl.colors.LogNorm(vmin=10**b, vmax=10**a)
+    plot_map(ax, lon[:-1,:-1], lat[:-1,:-1], MKE, ke_cmap, norm, 'MKE [$m^2.s^{-2}$]', msk[:-1,:-1], msk_inv[:-1,:-1], gridline_style)
+
+    plt.tight_layout()
+    save_figure(fig, f"all_mean.png")
+    plt.close(fig)
+    
+    fig, axes = plt.subplots(1,3,figsize=figsize, subplot_kw={'projection': ccrs.PlateCarree()})
+    
+    fig.suptitle(f"SWIO turbulent {date}")
+    
+    ax = axes[0]
+    ax.set_title(f"Velocity")
+    
+    a = -1.5
+    b = 0.2
+    norm = mpl.colors.LogNorm(10**a, 10**b)
+    
+    plot_map(ax, lon[:-1,:-1], lat[:-1,:-1], velocity_t[:,:], vel_cmap, norm, 'Velocity [$m.s^{-1}$]', msk[:-1,:-1], msk_inv[:-1,:-1], gridline_style)
+    
+    ax = axes[1]
+    ax.set_title(f"Vorticity")
+    
+    levels = np.linspace(-0.15, 0.15, 21)
+    norm = mpl.colors.BoundaryNorm(levels, vort_cmap.N)
+    plot_map(ax, lon[:-1,:-1], lat[:-1,:-1], vorticity_t[:,:] * 3600, vort_cmap, norm, 'Vorticity [$h^{-1}$]', msk[:-1,:-1], msk_inv[:-1,:-1], gridline_style, levels=levels)
+    
+    ax = axes[2]
+    ax.set_title(f"Energy")
+    
+    a = int(np.log10(np.nanmax(EKE)))
+    b = a-2.5
+    norm = mpl.colors.LogNorm(vmin=10**b, vmax=10**a)
+    plot_map(ax, lon[:-1,:-1], lat[:-1,:-1], EKE, ke_cmap, norm, 'EKE [$m^2.s^{-2}$]', msk[:-1,:-1], msk_inv[:-1,:-1], gridline_style)
+
+    plt.tight_layout()
+    save_figure(fig, f"all_turbulent_{date}.png")
     plt.close(fig)
