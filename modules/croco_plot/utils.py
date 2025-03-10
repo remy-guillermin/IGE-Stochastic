@@ -276,7 +276,8 @@ def plot_map(
     except Exception as e:
         print(f"Error in plot_map: {e}")
     finally:
-        matplotlib.use(original_backend)  # Restore the original backend after processing
+        if interactive:
+            matplotlib.use(original_backend)  # Restore the original backend after processing
  
 def plot_zoom(
     ax: Axes,
