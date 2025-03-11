@@ -507,7 +507,7 @@ def save_figure(
     output_dir = (
         "/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures"
         if os.path.exists("/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic")
-        else "figures"
+        else "/home/guilremy/Images"
     )
     os.makedirs(output_dir, exist_ok=True)
     if isFilm and filmDir is not None:
