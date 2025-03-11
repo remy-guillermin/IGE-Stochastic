@@ -504,11 +504,8 @@ def save_figure(
     filmDir : str, optional
         Directory for film frames, required if isFilm is True.
     """
-    output_dir = (
-        "/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures"
-        if os.path.exists("/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic")
-        else "/home/guilremy/Images"
-    )
+    home_dir = os.path.expanduser("~") # Get the home directory
+    output_dir = os.path.join(home_dir, "Images")
     os.makedirs(output_dir, exist_ok=True)
     if isFilm and filmDir is not None:
         output_dir = os.path.join(output_dir, filmDir) 
@@ -535,7 +532,8 @@ def open_figure(
     filenames : str or list of str
         The name of the file or list of files to open.
     """
-    output_dir = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures'
+    home_dir = os.path.expanduser("~") # Get the home directory
+    output_dir = os.path.join(home_dir, "Images")
     
     if isinstance(filenames, str):
         filenames = [filenames]
