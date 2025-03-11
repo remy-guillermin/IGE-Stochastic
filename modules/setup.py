@@ -14,6 +14,7 @@ setup(
         'cmocean',
         'cmcrameri',
         'cartopy',
-        'metpy'
+        'metpy',
+        'ffmpeg-python',
     ],
 )

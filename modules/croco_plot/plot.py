@@ -70,7 +70,7 @@ def velocity(
     b = 0.2
     norm = mpl.colors.LogNorm(10**a, 10**b)
 
-    plot_map(ax, lon[:-1,:-1], lat[:-1,:-1], velocity[:,:], vel_cmap, norm, 'Velocity [$m.s^{-1}$]', msk[:-1,:-1], msk_inv[:-1,:-1], gridline_style)
+    plot_map(ax, lon[:-1,:-1], lat[:-1,:-1], velocity[:,:], cmap, norm, 'Velocity [$m.s^{-1}$]', msk[:-1,:-1], msk_inv[:-1,:-1], gridline_style)
     
     plt.tight_layout()
     save_figure(fig, f"velocity_{date}.png")
@@ -222,9 +222,9 @@ def eke(
     plt.close(fig)
 
 def mke(
-    end_date: str, 
+    data_path: str, 
     figsize: tuple = (10, 8), 
-    cmap = cmcrameri.cm.lapaz, 
+    cmap = cmcrameri.cm.devon, 
     grid_path: str = None
 ):
     """
@@ -234,10 +234,6 @@ def mke(
     ----------
     data_path : str
         Path to the simulation data file.
-    start_date : str
-        Start date for the data slice in 'YYYY-MM-DD' format.
-    end_date : str
-        End date for the data slice in 'YYYY-MM-DD' format.
     figsize : tuple, optional
         Size of the figure, by default (10, 8).
     cmap : colormap, optional

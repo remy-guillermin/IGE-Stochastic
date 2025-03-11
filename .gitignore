@@ -5,6 +5,7 @@ Icon?
 # Archives & Compressed files
 *.tar.gz
 *.synctex.gz
+*.tar
 
 # Data files
 *.nc
