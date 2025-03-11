@@ -488,8 +488,7 @@ def save_figure(
     fig: plt.Figure, 
     filename: str,
     isFilm: bool = False,
-    filmDir: Optional[str] = None,
-    adastra: Bool = True
+    filmDir: Optional[str] = None
 ) -> None:
     """
     Save the figure to the specified filename.
@@ -505,10 +504,11 @@ def save_figure(
     filmDir : str, optional
         Directory for film frames, required if isFilm is True.
     """
-    if adastra:
-    	output_dir = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures'
-    else:
-    	outputdir = 'figures'
+    output_dir = (
+        "/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures"
+        if os.path.exists("/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic")
+        else "figures"
+    )
     os.makedirs(output_dir, exist_ok=True)
     if isFilm and filmDir is not None:
         output_dir = os.path.join(output_dir, filmDir) 
