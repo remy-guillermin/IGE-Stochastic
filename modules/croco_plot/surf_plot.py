@@ -80,13 +80,9 @@ def multiple_annual(data_path: str,
         end_date = time.data[-1]
     
     if 'annual_sd' in variables:
-        salt_yr = salt.mean(dim='time')
-        zeta_yr = zeta.mean(dim='time')
-        temp_yr = temp.mean(dim='time')
-        
-        zeta_SD = np.sqrt((zeta - zeta_yr)**2).mean(dim='time')
-        temp_SD = np.sqrt((temp - temp_yr)**2).mean(dim='time')
-        salt_SD = np.sqrt((salt - salt_yr)**2).mean(dim='time')
+        salt_SD = salt.std(dim='time')
+        temp_SD = temp.std(dim='time')
+        zeta_SD = zeta.std(dim='time')
         
     salt = salt.mean(dim='time')
     zeta = zeta.mean(dim='time')
