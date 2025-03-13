@@ -12,6 +12,7 @@ Icon?
 
 # Data folder
 data/*
+Data
 
 # Documents
 *.pdf

@@ -221,7 +221,7 @@ def time_series_from_dataset(
     for name in names:
         files = datasets[name]
         if 'Energies' in variables:
-            fig_energy, axes_energy = plt.subplots(2, 1, figsize=(figwidth, int(2*figwidth/3)), sharex=True)
+            fig_energy, axes_energy = plt.subplots(2, 1, figsize=(figwidth, int(figwidth/2)), sharex=True)
         if 'Anomalies' in variables:
             fig_anomaly, axes_anomaly = plt.subplots(3, 1, figsize=(figwidth, figwidth), sharex=True)
         if 'Fields' in variables:
