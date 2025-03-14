@@ -506,11 +506,11 @@ def save_figure(
     """
     home_dir = os.path.expanduser("~") # Get the home directory
     output_dir = os.path.join(home_dir, "Images")
-    os.makedirs(output_dir, exist_ok=True)
     if isFilm and filmDir is not None:
         output_dir = os.path.join(output_dir, filmDir) 
     elif isFilm and filmDir is None:
         raise ValueError(f"Film directory (filmDir) is not specified")
+    os.makedirs(output_dir, exist_ok=True)
     
     fig.savefig(os.path.join(output_dir, filename), dpi=300)
     if isFilm:
