@@ -9,6 +9,7 @@ Icon?
 
 # Data files
 *.nc
+*.csv
 
 # Data folder
 data/*
