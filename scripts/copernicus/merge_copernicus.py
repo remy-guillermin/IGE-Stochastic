@@ -13,7 +13,7 @@ def haversine(lon1, lon2, lat1, lat2):
     a = np.sin(dlat/2)**2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon/2)**2
     c = 2 * np.atan2(np.sqrt(a), np.sqrt(1-a))
     
-    r = 6371
+    r = 6371000
     return c * r
 
 files = glob.glob('/lus/work/CT1/c1601279/rguillermin/GLORYS/raw_cli_mercator_Y*.nc')
@@ -33,9 +33,7 @@ for file in files[1:]:
     print('v concatenated')
     ds.close()
     print(f'Opened {file}')
-    
-    
-    
+       
 Lon = u.longitude
 Lat = u.latitude
 

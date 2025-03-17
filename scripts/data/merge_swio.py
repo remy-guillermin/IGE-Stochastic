@@ -32,7 +32,7 @@ temp3 = ds.temp[:,-1:,:,:]
 zeta3 = ds.zeta
 ds.close()
 
-print('swio_avg_pt2.nc opened')
+print('swio_avg_pt3.nc opened')
 
 grid_path = '/lus/work/CT1/c1601279/lweiss/CROCO/RUN/SWIOSE/CROCO_FILES/grid/croco_grid_swio2.nc'
 g = xr.open_dataset(grid_path)
