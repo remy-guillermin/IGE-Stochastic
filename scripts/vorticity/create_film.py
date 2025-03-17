@@ -40,13 +40,13 @@ vorticity_g =  vorticity_g[:,0,:,:]
 lon_g, lat_g = np.meshgrid(vorticity_g.longitude, vorticity_g.latitude)
 
 figsize = (24,12)
+dates = np.datetime_as_string(vorticity.time.data, 'D')
 
-for index in range(vorticity.shape[0]):
-    date = np.datetime_as_string(vorticity.time.data[index], 'D')
+for date in dates:
     print(f'Plotting {date}...')
 
     fig, axes = plt.subplots(2, 3, figsize=figsize, subplot_kw={'projection': ccrs.PlateCarree()})
-    
+
     axes = axes.flatten()
 
     for ax in axes:
@@ -68,13 +68,13 @@ for index in range(vorticity.shape[0]):
     # =============================================================================
     # VORTICITY
     # =============================================================================
-     
+        
     levels = np.linspace(-0.00005, 0.00005, 51)
     norm = mpl.colors.BoundaryNorm(levels, vort_cmap.N)
 
     ax = axes[0]
     ax.set_title(f"Vorticity CROCO")
-    pcm = ax.pcolormesh(lon[:, :], lat[:, :],  vorticity[index], cmap=vort_cmap, norm=norm, transform=ccrs.PlateCarree())
+    pcm = ax.pcolormesh(lon[:, :], lat[:, :],  vorticity.sel(time=date)[0], cmap=vort_cmap, norm=norm, transform=ccrs.PlateCarree())
 
     cb = plt.colorbar(pcm, ax=ax, label=r'Vorticity [m²/s]', orientation='vertical')
     cb.set_ticks(cb.get_ticks())
@@ -91,9 +91,9 @@ for index in range(vorticity.shape[0]):
     mask_norm = mcolors.BoundaryNorm([-1.5, -0.5, 0.5, 1.5], mask_cmap.N)
 
     # Ternary mask: 0 = no mask, 1 = positive mask, -1 = negative mask
-    mask_values = np.zeros_like(vorticity[index].data, dtype=int)
-    mask_values[vorticity[index].data > min_vort] = 1   # Positive vorticity
-    mask_values[vorticity[index].data < -min_vort] = -1 # Negative vorticity
+    mask_values = np.zeros_like(vorticity.sel(time=date)[0].data, dtype=int)
+    mask_values[vorticity.sel(time=date)[0].data > min_vort] = 1   # Positive vorticity
+    mask_values[vorticity.sel(time=date)[0].data < -min_vort] = -1 # Negative vorticity
 
     labeled_mask, num_features = label(mask_values)
 
@@ -167,13 +167,13 @@ for index in range(vorticity.shape[0]):
     # =============================================================================
     # VORTICITY
     # =============================================================================
-     
-    levels = np.linspace(-0.00005, 0.00005, 51)
+        
+    levels = np.linspace(-0.0005, 0.0005, 51)
     norm = mpl.colors.BoundaryNorm(levels, vort_cmap.N)
 
     ax = axes[3]
     ax.set_title(f"Vorticity GLORYS")
-    pcm = ax.pcolormesh(lon_g[:, :], lat_g[:, :],  vorticity_g[index], cmap=vort_cmap, norm=norm, transform=ccrs.PlateCarree())
+    pcm = ax.pcolormesh(lon_g[:, :], lat_g[:, :],  vorticity_g.sel(time=date), cmap=vort_cmap, norm=norm, transform=ccrs.PlateCarree())
 
     cb = plt.colorbar(pcm, ax=ax, label=r'Vorticity [m²/s]', orientation='vertical')
     cb.set_ticks(cb.get_ticks())
@@ -190,9 +190,9 @@ for index in range(vorticity.shape[0]):
     mask_norm = mcolors.BoundaryNorm([-1.5, -0.5, 0.5, 1.5], mask_cmap.N)
 
     # Ternary mask: 0 = no mask, 1 = positive mask, -1 = negative mask
-    mask_values = np.zeros_like(vorticity_g[index].data, dtype=int)
-    mask_values[vorticity_g[index].data > min_vort] = 1   # Positive vorticity
-    mask_values[vorticity_g[index].data < -min_vort] = -1 # Negative vorticity
+    mask_values = np.zeros_like(vorticity_g.sel(time=date).data, dtype=int)
+    mask_values[vorticity_g.sel(time=date).data > min_vort*10] = 1   # Positive vorticity
+    mask_values[vorticity_g.sel(time=date).data < -min_vort*10] = -1 # Negative vorticity
 
     labeled_mask, num_features = label(mask_values)
 
@@ -208,7 +208,7 @@ for index in range(vorticity.shape[0]):
     for cb_label in cb.ax.get_yticklabels():
         cb_label.set_rotation(90)
         cb_label.set_verticalalignment('center')
-    cb.set_label(rf'$|$Vorticity$| > {min_vort}$')
+    cb.set_label(rf'$|$Vorticity$| > {min_vort*10}$')
 
 
     # =============================================================================
@@ -256,10 +256,10 @@ for index in range(vorticity.shape[0]):
     for cb_label in cb.ax.get_yticklabels():
         cb_label.set_rotation(90)
         cb_label.set_verticalalignment('center')
-    cb.set_label(rf'$|$Vorticity$| > {min_vort}$ & $A > {min_area}$')
+    cb.set_label(rf'$|$Vorticity$| > {min_vort*10}$ & $A > {min_area}$')
 
     fig.suptitle(f'SWIO {date}')
     plt.tight_layout()
-    
+
     cplot.utils.save_figure(fig, f"frame_{date}", isFilm=True, filmDir='vorticity_filtered')
     plt.close()
