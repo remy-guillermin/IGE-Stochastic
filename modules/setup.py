@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='croco_plot',
-    version='0.5.6',
+    version='0.6.0',
     author='Remy Guillermin',
     description='A package for plotting CROCO simulation data in 1D, 2D and 3D.',
     packages=find_packages(where='.'),

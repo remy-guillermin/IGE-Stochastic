@@ -1,55 +1,57 @@
 """
-Module plot pour croco_plot.
+Module for surface data visualization in CROCO.
 
-Ce module contient des fonctions pour l'affichage des données de surface CROCO.
+This module provides functions to plot surface variables (e.g., SSS, SSH, SST) 
+from CROCO simulation data or GLORYS datasets.
 """
 
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
+import matplotlib.colors as mcolors
 import cmocean
 import cmcrameri
 import cartopy.crs as ccrs
-import xarray as xr
 import os
+from typing import Optional
 from .utils import load_grid, load_data, load_GLORYS, save_figure, plot_map
 
 def multiple_annual(data_path: str, 
-                    variables: list = 'all', 
-                    start_date: str = None, 
-                    end_date: str = None, 
-                    figsize: tuple = (24, 6), 
-                    sss_cmap = cmocean.cm.haline, 
-                    ssh_cmap = cmcrameri.cm.roma_r, 
-                    sst_cmap = cmocean.cm.thermal, 
-                    grid_path: str = None,
-                    interactive: bool = False):
+                    variables: Optional[str] = 'all', 
+                    start_date: Optional[str] = None, 
+                    end_date: Optional[str] = None, 
+                    figsize: Optional[tuple] = (24, 6), 
+                    sss_cmap: Optional[mcolors.LinearSegmentedColormap] = cmocean.cm.haline, 
+                    ssh_cmap: Optional[mcolors.ListedColormap] = cmcrameri.cm.roma_r, 
+                    sst_cmap: Optional[mcolors.LinearSegmentedColormap] = cmocean.cm.thermal, 
+                    grid_path: Optional[str] = None,
+                    interactive: Optional[bool] = False):
     """
-    Plot multiple surface variables (SSS, SSH, SST) on a map for a specific date range or annual standard deviation.
+    Plot multiple surface variables (SSS, SSH, SST) on a map for a given date range 
+    or compute their annual standard deviation.
 
     Parameters
     ----------
     data_path : str
         Path to the simulation data file.
     variables : list of str, optional
-        List of variables to plot, by default 'all'
-        options : 'sss', 'ssh', 'sst', 'annual_sd'
+        Variables to plot. Options: 'sss', 'ssh', 'sst', 'annual_sd'. Default is 'all'.
     start_date : str, optional
-        Start date for the data slice in 'YYYY-MM-DD' format.
+        Start date for the data slice in 'YYYY-MM-DD' format. Default is None.
     end_date : str, optional
-        End date for the data slice in 'YYYY-MM-DD' format.
+        End date for the data slice in 'YYYY-MM-DD' format. Default is None.
     figsize : tuple, optional
-        Size of the figure, by default (24, 6)
+        Size of the figure in inches. Default is (24, 6).
     sss_cmap : colormap, optional
-        Colormap for the SSS plot, by default cmocean.cm.haline
+        Colormap for the SSS plot. Default is cmocean.cm.haline.
     ssh_cmap : colormap, optional
-        Colormap for the SSH plot, by default cmcrameri.cm.roma_r
+        Colormap for the SSH plot. Default is cmcrameri.cm.roma_r.
     sst_cmap : colormap, optional
-        Colormap for the SST plot, by default cmocean.cm.thermal
+        Colormap for the SST plot. Default is cmocean.cm.thermal.
     grid_path : str, optional
-        Path to the grid data file, by default None
+        Path to the grid data file. If None, the default grid is used. Default is None.
     interactive : bool, optional
-        Whether to use an interactive backend for plotting.
+        Whether to use an interactive backend for plotting. Default is False.
     """
     if isinstance(variables, str):
         variables = [variables]
@@ -76,8 +78,8 @@ def multiple_annual(data_path: str,
         zeta = zeta.sel(time=slice(start_date, end_date))
         temp = temp.sel(time=slice(start_date, end_date))
     else:
-        start_date = time.data[0]
-        end_date = time.data[-1]
+        start_date = str(np.datetime_as_string(time.data[0], 'D'))
+        end_date = str(np.datetime_as_string(time.data[-1], 'D'))
     
     if 'annual_sd' in variables:
         salt_SD = salt.std(dim='time')
@@ -94,22 +96,22 @@ def multiple_annual(data_path: str,
         fig, axs = plt.subplots(1, 3, figsize=figsize, subplot_kw={'projection': ccrs.PlateCarree()})
 
         ax = axs[0]
-        ax.set_title(f"SWIO {start_date} to {end_date}", size=9)
+        ax.set_title(f"SWIO {start_date} to {end_date}")
         levels = np.linspace(34, 36, 21)
         norm = mpl.colors.BoundaryNorm(levels, sss_cmap.N)
-        plot_map(ax, lon, lat, salt, sss_cmap, norm, r'$\overline{\overline{SSS}}$ [psu]', msk, msk_inv, gridline_style, levels = levels, interactive=interactive)
+        plot_map(ax, lon, lat, salt, sss_cmap, norm, r'$\overline{\overline{SSS}}$ [psu]', msk, msk_inv, gridline_style, interactive=interactive)
         
         ax = axs[1]
-        ax.set_title(f"SWIO {start_date} to {end_date}", size=9)
+        ax.set_title(f"SWIO {start_date} to {end_date}")
         levels = np.linspace(0, 1, 21)
         norm = mpl.colors.BoundaryNorm(levels, ssh_cmap.N)
-        plot_map(ax, lon, lat, zeta, ssh_cmap, norm, r'$\overline{\overline{SSH}}$ [m]', msk, msk_inv, gridline_style, levels = levels, interactive=interactive)
+        plot_map(ax, lon, lat, zeta, ssh_cmap, norm, r'$\overline{\overline{SSH}}$ [m]', msk, msk_inv, gridline_style, interactive=interactive)
         
         ax = axs[2]
-        ax.set_title(f"SWIO {start_date} to {end_date}", size=9)
+        ax.set_title(f"SWIO {start_date} to {end_date}")
         levels = np.linspace(20, 30, 21)
         norm = mpl.colors.BoundaryNorm(levels, sst_cmap.N)
-        plot_map(ax, lon, lat, temp, sst_cmap, norm, r'$\overline{\overline{SST}}$ [°C]', msk, msk_inv, gridline_style, levels = levels, interactive=interactive)
+        plot_map(ax, lon, lat, temp, sst_cmap, norm, r'$\overline{\overline{SST}}$ [°C]', msk, msk_inv, gridline_style, interactive=interactive)
         
         plt.tight_layout()
         save_figure(fig, f"surface_all_{os.path.splitext(data_path)[0]}.png")
@@ -122,55 +124,55 @@ def multiple_annual(data_path: str,
         ax.set_title("Annual Standard Deviation", size=9)
         levels = np.linspace(0, np.round(np.nanmax(salt_SD), 1), 21)
         norm = mpl.colors.BoundaryNorm(levels, sss_cmap.N)
-        plot_map(ax, lon, lat, salt_SD, sss_cmap, norm, r'$SD_{SSS}$ [psu]', msk, msk_inv, gridline_style, levels = levels, interactive=interactive)
+        plot_map(ax, lon, lat, salt_SD, sss_cmap, norm, r'$SD_{SSS}$ [psu]', msk, msk_inv, gridline_style, interactive=interactive)
         
         ax = axs[1]
         levels = np.linspace(0, np.round(np.nanmax(zeta_SD), 1), 21)
         norm = mpl.colors.BoundaryNorm(levels, ssh_cmap.N)
-        plot_map(ax, lon, lat, zeta_SD, ssh_cmap, norm, r'$SD_{SSH}$ [m]', msk, msk_inv, gridline_style, levels = levels, interactive=interactive)
+        plot_map(ax, lon, lat, zeta_SD, ssh_cmap, norm, r'$SD_{SSH}$ [m]', msk, msk_inv, gridline_style, interactive=interactive)
         
         ax = axs[2]
         levels = np.linspace(0, np.round(np.nanmax(temp_SD), 1), 21)
         norm = mpl.colors.BoundaryNorm(levels, sst_cmap.N)
-        plot_map(ax, lon, lat, temp_SD, sst_cmap, norm, r'$SD_{SST}$ [°C]', msk, msk_inv, gridline_style, levels = levels, interactive=interactive)
+        plot_map(ax, lon, lat, temp_SD, sst_cmap, norm, r'$SD_{SST}$ [°C]', msk, msk_inv, gridline_style, interactive=interactive)
 
         plt.tight_layout()
         save_figure(fig, f"surface_SD_{os.path.splitext(data_path)[0]}.png")
         plt.close(fig)
         
 def GLORYS_annual(data_path: str,
-                  variables: list = 'all',
-                  start_date: str = None, 
-                  end_date: str = None, 
-                  figsize: tuple = (24, 6), 
-                  sss_cmap = cmocean.cm.haline,
-                  ssh_cmap = cmcrameri.cm.roma_r, 
-                  sst_cmap = cmocean.cm.thermal,
-                  interactive: bool = False):
+                  variables: Optional[str] = 'all',
+                  start_date: Optional[str] = None, 
+                  end_date: Optional[str] = None, 
+                  figsize: Optional[tuple] = (24, 6), 
+                  sss_cmap: Optional[mcolors.LinearSegmentedColormap] = cmocean.cm.haline, 
+                  ssh_cmap: Optional[mcolors.ListedColormap] = cmcrameri.cm.roma_r, 
+                  sst_cmap: Optional[mcolors.LinearSegmentedColormap] = cmocean.cm.thermal,
+                  interactive: Optional[bool] = False):
     """
-    Plot GLORYS surface variables (SSS, SSH, SST) on a map for a specific date range or annual standard deviation.
+    Plot GLORYS surface variables (SSS, SSH, SST) on a map for a given date range 
+    or compute their annual standard deviation.
 
     Parameters
     ----------
     data_path : str
         Path to the GLORYS data file.
     variables : list of str, optional
-        List of variables to plot, by default 'all'
-        options : 'sss', 'ssh', 'sst', 'annual_sd'
+        Variables to plot. Options: 'sss', 'ssh', 'sst', 'annual_sd'. Default is 'all'.
     start_date : str, optional
-        Start date for the data slice in 'YYYY-MM-DD' format.
+        Start date for the data slice in 'YYYY-MM-DD' format. Default is None.
     end_date : str, optional
-        End date for the data slice in 'YYYY-MM-DD' format.
+        End date for the data slice in 'YYYY-MM-DD' format. Default is None.
     figsize : tuple, optional
-        Size of the figure, by default (24, 6)
+        Size of the figure in inches. Default is (24, 6).
     sss_cmap : colormap, optional
-        Colormap for the SSS plot, by default cmocean.cm.haline
+        Colormap for the SSS plot. Default is cmocean.cm.haline.
     ssh_cmap : colormap, optional
-        Colormap for the SSH plot, by default cmcrameri.cm.roma_r
+        Colormap for the SSH plot. Default is cmcrameri.cm.roma_r.
     sst_cmap : colormap, optional
-        Colormap for the SST plot, by default cmocean.cm.thermal
+        Colormap for the SST plot. Default is cmocean.cm.thermal.
     interactive : bool, optional
-        Whether to use an interactive backend for plotting.
+        Whether to use an interactive backend for plotting. Default is False.
     """
     if isinstance(variables, str):
         variables = [variables]
@@ -202,20 +204,20 @@ def GLORYS_annual(data_path: str,
         fig, axs = plt.subplots(1, 3, figsize=figsize, subplot_kw={'projection': ccrs.PlateCarree()})
         
         ax = axs[0]
-        ax.set_title("Annual Standard Deviation", size=9)
+        ax.set_title("Annual Standard Deviation")
         levels = np.linspace(0, np.round(np.nanmax(salt_SD), 1), 21)
         norm = mpl.colors.BoundaryNorm(levels, sss_cmap.N)
-        plot_map(ax, lon, lat, salt_SD, sss_cmap, norm, r'$SD_{SSS}$ [psu]', msk, msk_inv, gridline_style, levels = levels, interactive=interactive)
+        plot_map(ax, lon, lat, salt_SD, sss_cmap, norm, r'$SD_{SSS}$ [psu]', msk, msk_inv, gridline_style, interactive=interactive)
         
         ax = axs[1]
         levels = np.linspace(0, np.round(np.nanmax(zeta_SD), 1), 21)
         norm = mpl.colors.BoundaryNorm(levels, ssh_cmap.N)
-        plot_map(ax, lon, lat, zeta_SD, ssh_cmap, norm, r'$SD_{SSH}$ [m]', msk, msk_inv, gridline_style, levels = levels, interactive=interactive)
+        plot_map(ax, lon, lat, zeta_SD, ssh_cmap, norm, r'$SD_{SSH}$ [m]', msk, msk_inv, gridline_style, interactive=interactive)
         
         ax = axs[2]
         levels = np.linspace(0, np.round(np.nanmax(temp_SD), 1), 21)
         norm = mpl.colors.BoundaryNorm(levels, sst_cmap.N)
-        plot_map(ax, lon, lat, temp_SD, sst_cmap, norm, r'$SD_{SST}$ [m]', msk, msk_inv, gridline_style, levels = levels, iteractive=interactive)
+        plot_map(ax, lon, lat, temp_SD, sst_cmap, norm, r'$SD_{SST}$ [m]', msk, msk_inv, gridline_style, iteractive=interactive)
 
         plt.tight_layout()
         save_figure(fig, f"surface_SD_{os.path.splitext(data_path)[0]}.png")
@@ -225,31 +227,31 @@ def GLORYS_annual(data_path: str,
         fig, axs = plt.subplots(1, 3, figsize=figsize, subplot_kw={'projection': ccrs.PlateCarree()})
 
         ax = axs[0]
-        ax.set_title(f"SWIO {start_date} to {end_date}", size=9)
+        ax.set_title(f"SWIO {start_date} to {end_date}")
         a = 33
         b = 36
         c = b - a
         levels = np.linspace(a, b, 4 * c + 1)
         norm = mpl.colors.BoundaryNorm(levels, sss_cmap.N)
-        plot_map(ax, lon, lat, salt, sss_cmap, norm, r'$\overline{\overline{SSS}}$ [psu]', msk, msk_inv, gridline_style, levels = levels, interactive=interactive)
+        plot_map(ax, lon, lat, salt, sss_cmap, norm, r'$\overline{\overline{SSS}}$ [psu]', msk, msk_inv, gridline_style, interactive=interactive)
         
         ax = axs[1]
-        ax.set_title(f"SWIO {start_date} to {end_date}", size=9)
+        ax.set_title(f"SWIO {start_date} to {end_date}")
         a = np.round(np.nanmin(zeta), 1)
         b = np.round(np.nanmax(zeta), 1)
         c = int((b - a) * 10)
         levels = np.linspace(a, b, c + 1)
         norm = mpl.colors.BoundaryNorm(levels, ssh_cmap.N)
-        plot_map(ax, lon, lat, zeta, ssh_cmap, norm, r'$\overline{\overline{SSH}}$ [°C]', msk, msk_inv, gridline_style, levels = levels, interactive=interactive)
+        plot_map(ax, lon, lat, zeta, ssh_cmap, norm, r'$\overline{\overline{SSH}}$ [°C]', msk, msk_inv, gridline_style, interactive=interactive)
         
         ax = axs[2]
-        ax.set_title(f"SWIO {start_date} to {end_date}", size=9)
+        ax.set_title(f"SWIO {start_date} to {end_date}")
         a = int(np.nanmin(temp))
         b = int(np.nanmax(temp))
         c = b - a
         levels = np.linspace(a, b, c + 1)
         norm = mpl.colors.BoundaryNorm(levels, sst_cmap.N)
-        plot_map(ax, lon, lat, temp, sst_cmap, norm, r'$\overline{\overline{SST}}$ [°C]', msk, msk_inv, gridline_style, levels = levels, interactive=interactive)
+        plot_map(ax, lon, lat, temp, sst_cmap, norm, r'$\overline{\overline{SST}}$ [°C]', msk, msk_inv, gridline_style, interactive=interactive)
         
         plt.tight_layout()
         save_figure(fig, f"surface_all_{os.path.splitext(data_path)[0]}.png")

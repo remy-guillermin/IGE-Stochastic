@@ -1,7 +1,8 @@
 """
-Module plot pour croco_plot.
+Module for data visualization in CROCO.
 
-Ce module contient des fonctions pour l'affichage des données CROCO.
+This module provides functions to plot dynamical variables (e.g., velocity, energy, vorticity) 
+from CROCO simulation data or GLORYS datasets.
 """
 
 import numpy as np
@@ -137,7 +138,7 @@ def vorticity(
     ax.set_title(f"Vorticity SWIO {date}")
     levels = np.linspace(-0.15, 0.15, 21)
     norm = mpl.colors.BoundaryNorm(levels, cmap.N)
-    plot_map(ax, lon[:-1,:-1], lat[:-1,:-1], vorticity[:,:] * 3600, cmap, norm, 'Vorticity [$h^{-1}$]', msk[:-1,:-1], msk_inv[:-1,:-1], gridline_style, levels=levels)
+    plot_map(ax, lon[:-1,:-1], lat[:-1,:-1], vorticity[:,:] * 3600, cmap, norm, 'Vorticity [$h^{-1}$]', msk[:-1,:-1], msk_inv[:-1,:-1], gridline_style)
 
     plt.tight_layout()
     save_figure(fig, f"vorticity_{date}.png")
@@ -404,7 +405,7 @@ def all(
     
     levels = np.linspace(-0.15, 0.15, 21)
     norm = mpl.colors.BoundaryNorm(levels, vort_cmap.N)
-    plot_map(ax, lon[:-1,:-1], lat[:-1,:-1], vorticity[:,:] * 3600, vort_cmap, norm, 'Vorticity [$h^{-1}$]', msk[:-1,:-1], msk_inv[:-1,:-1], gridline_style, levels=levels)
+    plot_map(ax, lon[:-1,:-1], lat[:-1,:-1], vorticity[:,:] * 3600, vort_cmap, norm, 'Vorticity [$h^{-1}$]', msk[:-1,:-1], msk_inv[:-1,:-1], gridline_style)
     
     ax = axes[2]
     ax.set_title(f"Energy")
@@ -436,7 +437,7 @@ def all(
     
     levels = np.linspace(-0.15, 0.15, 21)
     norm = mpl.colors.BoundaryNorm(levels, vort_cmap.N)
-    plot_map(ax, lon[:-1,:-1], lat[:-1,:-1], vorticity_yr[:,:] * 3600, vort_cmap, norm, 'Vorticity [$h^{-1}$]', msk[:-1,:-1], msk_inv[:-1,:-1], gridline_style, levels=levels)
+    plot_map(ax, lon[:-1,:-1], lat[:-1,:-1], vorticity_yr[:,:] * 3600, vort_cmap, norm, 'Vorticity [$h^{-1}$]', msk[:-1,:-1], msk_inv[:-1,:-1], gridline_style)
     
     ax = axes[2]
     ax.set_title(f"Energy")
@@ -468,7 +469,7 @@ def all(
     
     levels = np.linspace(-0.15, 0.15, 21)
     norm = mpl.colors.BoundaryNorm(levels, vort_cmap.N)
-    plot_map(ax, lon[:-1,:-1], lat[:-1,:-1], vorticity_t[:,:] * 3600, vort_cmap, norm, 'Vorticity [$h^{-1}$]', msk[:-1,:-1], msk_inv[:-1,:-1], gridline_style, levels=levels)
+    plot_map(ax, lon[:-1,:-1], lat[:-1,:-1], vorticity_t[:,:] * 3600, vort_cmap, norm, 'Vorticity [$h^{-1}$]', msk[:-1,:-1], msk_inv[:-1,:-1], gridline_style)
     
     ax = axes[2]
     ax.set_title(f"Energy")

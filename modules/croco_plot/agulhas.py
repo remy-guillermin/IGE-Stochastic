@@ -12,15 +12,16 @@ import matplotlib as mpl
 import cmocean
 import cmcrameri
 import cartopy.crs as ccrs
+from typing import Optional, Tuple, List
 from .utils import load_grid, load_data, save_figure, plot_zoom, plot_map
 
 def zoom_velocity(
     data_path: str, 
     date: str,
-    figsize: tuple = (10, 8), 
-    cmap: mpl.colors.Colormap = cmocean.cm.speed, 
-    grid_path: str = None,
-    isFilm: bool = False
+    figsize: Optional[Tuple[int, int]] = (10, 8), 
+    cmap: Optional[mpl.colors.LinearSegmentedColormap] = cmocean.cm.speed, 
+    grid_path: Optional[str] = None,
+    isFilm: Optional[bool] = False
 ):
     """
     Plot velocity data on a map for a specific date.
@@ -89,7 +90,6 @@ def zoom_velocity(
     a = -1.2
     b = 0
     norm = mpl.colors.LogNorm(10**a, 10**b)
-    norm = mpl.colors.BoundaryNorm(levels, cmap.N)
     plot_zoom(ax, lon[:-1,:-1], lat[:-1,:-1], velocity[-1,:,:], cmap, norm, 'Velocity [$m.s^{-1}$]', msk[:-1,:-1], msk_inv[:-1,:-1], gridline_style)
 
     plt.tight_layout()
@@ -102,14 +102,14 @@ def zoom_velocity(
 def plot(
     data_path: str,
     date: str,
-    variables: str = 'all',
-    figsize: tuple = (10, 8),
-    tri_figsize: tuple = (24, 6),
-    vel_cmap: mpl.colors.Colormap = cmocean.cm.speed,
-    vort_cmap: mpl.colors.Colormap = cmcrameri.cm.vik,
-    mke_cmap: mpl.colors.Colormap = cmcrameri.cm.devon,
-    grid_path: str = None,
-    isFilm: bool = False
+    variables: Optional[str] = 'all',
+    figsize: Optional[Tuple[int, int]] = (10, 8),
+    tri_figsize: Optional[Tuple[int, int]] = (24, 6),
+    vel_cmap: Optional[mpl.colors.LinearSegmentedColormap] = cmocean.cm.speed,
+    vort_cmap: Optional[mpl.colors.ListedColormap] = cmcrameri.cm.vik,
+    mke_cmap: Optional[mpl.colors.ListedColormap] = cmcrameri.cm.devon,
+    grid_path: Optional[str] = None,
+    isFilm: Optional[bool] = False
 ): 
     """
     Plot various data on a map for a specific date.

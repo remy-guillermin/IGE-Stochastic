@@ -1,7 +1,7 @@
 """
-Module plot pour croco_plot.
+Module for plotting time series in CROCO.
 
-Ce module contient des fonctions pour l'affichage des données temporelles de CROCO.
+This module provides functions to visualize temporal data from CROCO simulations.
 """
 
 import numpy as np
@@ -10,38 +10,44 @@ import pandas as pd
 from pathlib import Path
 import matplotlib
 import matplotlib.pyplot as plt
+from typing import Optional, Tuple, List
 from .utils import load_grid, load_data, save_figure, plot_time_series
 
 def multiple_time_series(data_files, 
-                         variables='all',
-                         boxes=[(48, 60, -4, 3), (41, 47, -15, -8), (36.5, 42.5, -28, -19), (52, 60, -24, -16)], 
-                         names=['Equator', 'Mayotte-Comores', 'South-Moz', 'Mascarene'], 
-                         colors=['saddlebrown', 'darkorchid', 'navy', 'teal'],
-                         roll = 9,
-                         grid_path=None,
-                         interactive=False):
+                         variables: Optional[str] = 'all',
+                         boxes: Optional[List[Tuple[int, int, int, int]]] = [(48, 60, -4, 3), (41, 47, -15, -8), (36.5, 42.5, -28, -19), (52, 60, -24, -16)], 
+                         names: Optional[List[str]] = ['Equator', 'Mayotte-Comores', 'South-Moz', 'Mascarene'], 
+                         colors: Optional[List[str]] = ['saddlebrown', 'darkorchid', 'navy', 'teal'],
+                         roll: Optional[int] = 9,
+                         grid_path: Optional[str] = None,
+                         interactive: Optional[bool] = False):
     """
-    Calculate and plot multiple time series for specified regions.
+    Generate and plot multiple time series for specified regions and variables.
 
     Parameters
     ----------
-    data_files : list of str
-        List of paths to the simulation data files.
-    variables : list of str, optional
-        List of variables to plot, by default 'all'
-        options : 'ke', 'eke', 'mke', 'sla', 'ssa', 'sta', 'ssh', 'sss', 'sst'
-    boxes : list, optional
-        List of tuples defining the regions (lon1, lon2, lat1, lat2).
-    names : list, optional
-       Names of the regions.
-    colors : list, optional
-        Colors for the plot lines.
+    data_files : list of str or str
+        Paths to the simulation data files. Can be a single file or a list of files.
+    variables : list of str or str, optional
+        Variables to plot. Use 'all' to include all available variables. Default is 'all'.
+        Options: 'ke', 'eke', 'mke', 'sla', 'ssa', 'sta', 'ssh', 'sss', 'sst'.
+    boxes : list of tuple, optional
+        Geographic regions defined as (lon1, lon2, lat1, lat2). Default includes four predefined regions.
+    names : list of str, optional
+        Names corresponding to the regions in `boxes`. Default is ['Equator', 'Mayotte-Comores', 'South-Moz', 'Mascarene'].
+    colors : list of str, optional
+        Colors for the plot lines. Default is ['saddlebrown', 'darkorchid', 'navy', 'teal'].
     roll : int, optional
-        Rolling window size for smoothing the time series, by default 9.
+        Rolling window size for smoothing the time series. Default is 9.
     grid_path : str, optional
-        Path to the grid file, by default None
+        Path to the grid file. If None, a default grid is loaded. Default is None.
     interactive : bool, optional
-        Whether to use an interactive backend for plotting.
+        Whether to use an interactive plotting backend. Default is False.
+
+    Returns
+    -------
+    None
+        Saves the generated plots to files.
     """
     if isinstance(data_files, str):
         data_files = [data_files]
@@ -93,8 +99,8 @@ def multiple_time_series(data_files,
         cell_surface = 1 / (pm * pn).data
         cell_surface[(1-msk).astype(int)] = np.nan
         
-        depth = h * s_rho # Profondeur
-        depth = np.transpose(depth.data, (2, 0, 1)) # Transpose depth to match u, v, w shape
+        depth = h * s_rho 
+        depth = np.transpose(depth.data, (2, 0, 1)) 
         ddepth = np.diff(depth, axis=0)
         ddepth = ddepth.reshape(1,ddepth.shape[0], ddepth.shape[1], ddepth.shape[2])
         cell_volume = ddepth * cell_surface
@@ -180,33 +186,38 @@ def multiple_time_series(data_files,
             
 def time_series_from_dataset(
     datasets,
-    variables='all',
-    figwidth=12,
-    names=['Equator', 'Mayotte-Comores', 'South-Moz', 'Mascarene'],
-    roll = 9,
-    interactive: bool = False,
-    xlim=None
+    variables: Optional[str] = 'all',
+    figwidth: Optional[int] = 12,
+    names: Optional[List[str]] = ['Equator', 'Mayotte-Comores', 'South-Moz', 'Mascarene'],
+    roll: Optional[int] = 9,
+    interactive: Optional[bool] = False,
+    xlim: Optional[Tuple[pd.Timestamp, pd.Timestamp]] = None
 ):
     """
-    Plot time series from datasets for specified regions.
+    Plot time series from datasets for specified regions and variables.
 
     Parameters
     ----------
     datasets : dict
         Dictionary where keys are region names and values are lists of dataset file paths.
-    variables : list of str, optional
-        List of variables to plot, by default 'all'
-        options : 'Energies', 'Anomalies', 'Fields'
+    variables : list of str or str, optional
+        Variables to plot. Use 'all' to include all available categories. Default is 'all'.
+        Options: 'Energies', 'Anomalies', 'Fields'.
     figwidth : int, optional
-        Width of the figure, by default 12.
-    names : list, optional
-        Names of the regions.
+        Width of the figure in inches. Default is 12.
+    names : list of str, optional
+        Names of the regions to plot. Default is ['Equator', 'Mayotte-Comores', 'South-Moz', 'Mascarene'].
     roll : int, optional
-        Rolling window size for smoothing the time series, by default 9.
+        Rolling window size for smoothing the time series. Default is 9.
     interactive : bool, optional
-        Whether to use an interactive backend for plotting.
+        Whether to use an interactive plotting backend. Default is False.
     xlim : tuple of pd.Timestamp, optional
-        Limits for the x-axis in the form (pd.Timestamp('2017-01-01'), pd.Timestamp('2021-12-31')).
+        X-axis limits as a tuple of start and end timestamps. Default is None.
+
+    Returns
+    -------
+    None
+        Saves the generated plots to files.
     """
     if interactive:
         original_backend = matplotlib.get_backend()  # Store the original backend
@@ -396,4 +407,4 @@ def time_series_from_dataset(
         plt.close(fig_field)
         
     if interactive:
-        matplotlib.use(original_backend)  # Restore the original backend after processing
+        matplotlib.use(original_backend)

@@ -1,31 +1,31 @@
 """
-Un package Python créé pour faciliter la génération de graphiques dans le cadre de l'analyse des données du projet Croco. Ce package contient des utilitaires pour visualiser des données sous différents formats tels que `numpy` et `xarray`.
+A Python package designed to facilitate the generation of plots for data analysis in the Croco project. This package provides utilities for visualizing data in various formats such as `numpy` and `xarray`.
 
-Fonctionnalités principales :
-- Tracer des graphiques de données climatiques et océanographiques.
-- Supporte les bibliothèques `matplotlib`, `cartopy` et `cmocean` pour les visualisations.
+Main Features:
+- Plot climate and oceanographic data.
+- Supports visualization libraries such as `matplotlib`, `cartopy`, and `cmocean`.
 
-Modules :
-- utils.py : Contient des fonctions de base notamment pour charger des fichiers types grid ou his.
-- plot.py : Contient des fonctions pour l'affichage des données CROCO.
-- surf_plot.py : Contient des fonctions pour l'affichage des données de surface CROCO.
-- time_series.py : Contient des fonctions pour calculer et afficher les séries temporelles de l'énergie cinétique turbulente (EKE).
-- agulhas.py : Contient des fonctions pour afficher des valeurs zoomées sur la région du courant des Aiguilles.
-- dataset.py : Contient des fonctions pour manipuler les fichiers netCDF.
-- spectrum.py : Contient des fonctions pour afficher les spectres.
+Modules:
+- utils.py: Contains basic functions, including loading grid or his-type files.
+- time_series.py: Contains functions to compute and display time series of turbulent kinetic energy (EKE).
+- agulhas.py: Contains functions to display zoomed-in values for the Agulhas Current region.
+- dataset.py: Contains functions to manipulate netCDF files.
+- spectrum.py: Contains functions to display spectra.
+- physical_fields.py: Contains functions to analyze and visualize physical fields such as temperature and salinity.
+- dynamic_fields.py: Contains functions to analyze and visualize dynamic fields such as velocity and vorticity.
 
-Installation :
+Installation:
     pip install -e modules/
 
-Dépendances :
+Dependencies:
     numpy, xarray, matplotlib, cmocean, cmcrameri, cartopy, metpy
 """
 
-__version__ = '0.5.6'
+__version__ = '0.6.0'
 
 from . import utils
-from . import plot
-from . import surf_plot
+from . import dynamic_fields
+from . import physical_fields
 from . import time_series
 from . import agulhas
 from . import dataset

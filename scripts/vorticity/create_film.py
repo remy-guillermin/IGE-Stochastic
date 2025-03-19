@@ -8,6 +8,7 @@ import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 import xarray as xr
 import numpy as np
+import pandas as pd
 from scipy.ndimage import label, sum as ndi_sum
 from skimage.measure import regionprops
 import croco_plot as cplot
@@ -41,6 +42,8 @@ lon_g, lat_g = np.meshgrid(vorticity_g.longitude, vorticity_g.latitude)
 
 figsize = (24,12)
 dates = np.datetime_as_string(vorticity.time.data, 'D')
+threshold_date = "2020-02-09"
+dates = dates[dates >= threshold_date]
 
 for date in dates:
     print(f'Plotting {date}...')
