@@ -154,7 +154,7 @@ L'approche primaire afin de transformer un modèle déterministe en un modèle p
 	X^{(i)}_{t+1} = a^{(i)} X^{(i)}_t + b^{(i)} w + c^{(i)}
 \end{equation}
 
-Ici $t$ correspond à l'indice temporel du modèle, $a^{(i)}, b^{(i)}, c^{(i)}$ sont des paramètres qui définissent la moyenne $\mu^{(i)}$, l'écart type $\sigma^{(i)}$ et l'échelle temporelle de correlation $\tau^{(i)}$ de chaque processus.
+Ici $t$ correspond à l'indice temporel du modèle, $a^{(i)}, b^{(i)}, c^{(i)}$ sont des paramètres qui définissent la moyenne $\mu^{(i)}$, l'écart type $\sigma^{(i)}$ et l'échelle temporelle de correlation $\tau^{(i)}$ de chaque processus. $w$ sera la distribution stochastique que nous souhaitons appliquer à la variable, à l'ordre 0 cela correspond à un bruit blanc.
 
 \subsection{Implémentation}
 Ces processus stochastiques sont implémentés dans \textbf{CROCO} sous la forme d'un module Fortran \textsc{STOGEN} couplé au code \textbf{CROCO}. Dans notre cas, nous allons avoir les paramètres suivants
