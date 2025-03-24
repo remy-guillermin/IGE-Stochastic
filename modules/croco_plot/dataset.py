@@ -16,8 +16,8 @@ from .utils import load_grid, load_data, load_GLORYS, compute_dx_dy
 def create_TS_from_CROCO(
     data_path: str,
     variables: Optional[str] = 'all',
-    boxes: Optional[Tuple[int, int, int, int]] = [(48, 60, -4, 3), (41, 47, -15, -8), (36.5, 42.5, -28, -19), (52, 60, -24, -16)], 
-    names: Optional[Tuple[str, str, str, str]] = ['Equator', 'Mayotte-Comores', 'South-Moz', 'Mascarene'], 
+    boxes: Optional[Tuple[int, int, int, int]] = [(48, 60, -4, 3), (41, 47, -15, -8), (36.5, 42.5, -30, -21), (52, 60, -24, -16)], 
+    names: Optional[Tuple[str, str, str, str]] = ['Equator', 'Islands', 'South-Moz', 'Mascarene'], 
     grid_path: Optional[str]=None
 ):      
     """
@@ -134,8 +134,8 @@ def create_TS_from_CROCO(
 def create_TS_from_GLORYS(
     data_path: str,
     variables: Optional[str] = 'all',
-    boxes: Optional[Tuple[int, int, int, int]] = [(48, 60, -4, 3), (41, 47, -15, -8), (36.5, 42.5, -28, -19), (52, 60, -24, -16)], 
-    names: Optional[Tuple[str, str, str, str]] = ['Equator', 'Mayotte-Comores', 'South-Moz', 'Mascarene']
+    boxes: Optional[Tuple[int, int, int, int]] = [(48, 60, -4, 3), (41, 47, -15, -8), (36.5, 42.5, -30, -21), (52, 60, -24, -16)], 
+    names: Optional[Tuple[str, str, str, str]] = ['Equator', 'Islands', 'South-Moz', 'Mascarene']
 ):      
     """
     Generate time series netCDF files from GLORYS data for specified variables and geographical regions.
@@ -240,8 +240,8 @@ def create_spectrum_from_CROCO(
     data_path: str,
     grid_path: Optional[str] = None,
     num: Optional[int] = 200,
-    boxes: Optional[Tuple[int, int, int, int]] = [(48, 60, -4, 3), (41, 47, -15, -8), (36.5, 42.5, -28, -19), (52, 60, -24, -16)], 
-    names: Optional[Tuple[str, str, str, str]] = ['Equator', 'Mayotte-Comores', 'South-Moz', 'Mascarene']
+    boxes: Optional[Tuple[int, int, int, int]] = [(48, 60, -4, 3), (41, 47, -15, -8), (36.5, 42.5, -30, -21), (52, 60, -24, -16)], 
+    names: Optional[Tuple[str, str, str, str]] = ['Equator', 'Islands', 'South-Moz', 'Mascarene']
 ):  
     """
     Compute energy spectra from CROCO data for specified geographical regions.
@@ -435,8 +435,8 @@ def create_spectrum_from_CROCO(
 def create_spectrum_from_GLORYS(
     data_path: str,
     num: Optional[int]=200,
-    boxes: Optional[Tuple[int, int, int, int]] = [(48, 60, -4, 3), (41, 47, -15, -8), (36.5, 42.5, -28, -19), (52, 60, -24, -16)], 
-    names: Optional[Tuple[str, str, str, str]] = ['Equator', 'Mayotte-Comores', 'South-Moz', 'Mascarene']
+    boxes: Optional[Tuple[int, int, int, int]] = [(48, 60, -4, 3), (41, 47, -15, -8), (36.5, 42.5, -30, -21), (52, 60, -24, -16)], 
+    names: Optional[Tuple[str, str, str, str]] = ['Equator', 'Islands', 'South-Moz', 'Mascarene']
 ):  
     """
     Compute energy spectra from GLORYS data for specified geographical regions.

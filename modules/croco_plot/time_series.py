@@ -15,8 +15,8 @@ from .utils import load_grid, load_data, save_figure, plot_time_series
 
 def multiple_time_series(data_files, 
                          variables: Optional[str] = 'all',
-                         boxes: Optional[List[Tuple[int, int, int, int]]] = [(48, 60, -4, 3), (41, 47, -15, -8), (36.5, 42.5, -28, -19), (52, 60, -24, -16)], 
-                         names: Optional[List[str]] = ['Equator', 'Mayotte-Comores', 'South-Moz', 'Mascarene'], 
+                         boxes: Optional[List[Tuple[int, int, int, int]]] = [(48, 60, -4, 3), (41, 47, -15, -8), (36.5, 42.5, -30, -21), (52, 60, -24, -16)], 
+                         names: Optional[List[str]] = ['Equator', 'Islands', 'South-Moz', 'Mascarene'], 
                          colors: Optional[List[str]] = ['saddlebrown', 'darkorchid', 'navy', 'teal'],
                          roll: Optional[int] = 9,
                          grid_path: Optional[str] = None,
@@ -34,7 +34,7 @@ def multiple_time_series(data_files,
     boxes : list of tuple, optional
         Geographic regions defined as (lon1, lon2, lat1, lat2). Default includes four predefined regions.
     names : list of str, optional
-        Names corresponding to the regions in `boxes`. Default is ['Equator', 'Mayotte-Comores', 'South-Moz', 'Mascarene'].
+        Names corresponding to the regions in `boxes`. Default is ['Equator', 'Islands', 'South-Moz', 'Mascarene'].
     colors : list of str, optional
         Colors for the plot lines. Default is ['saddlebrown', 'darkorchid', 'navy', 'teal'].
     roll : int, optional
@@ -188,7 +188,7 @@ def time_series_from_dataset(
     datasets,
     variables: Optional[str] = 'all',
     figwidth: Optional[int] = 12,
-    names: Optional[List[str]] = ['Equator', 'Mayotte-Comores', 'South-Moz', 'Mascarene'],
+    names: Optional[List[str]] = ['Equator', 'Islands', 'South-Moz', 'Mascarene'],
     roll: Optional[int] = 9,
     interactive: Optional[bool] = False,
     xlim: Optional[Tuple[pd.Timestamp, pd.Timestamp]] = None
@@ -206,7 +206,7 @@ def time_series_from_dataset(
     figwidth : int, optional
         Width of the figure in inches. Default is 12.
     names : list of str, optional
-        Names of the regions to plot. Default is ['Equator', 'Mayotte-Comores', 'South-Moz', 'Mascarene'].
+        Names of the regions to plot. Default is ['Equator', 'Islands', 'South-Moz', 'Mascarene'].
     roll : int, optional
         Rolling window size for smoothing the time series. Default is 9.
     interactive : bool, optional
