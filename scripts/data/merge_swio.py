@@ -55,6 +55,16 @@ print('temperature concatenated')
 zeta_tot = xr.concat([zeta, zeta2, zeta3], dim='time')
 print('zeta concatenated')
 
+del u, u2, u3, v, v2, v3, w, w2, w3, salt, salt2, salt3, temp, temp2, temp3, zeta, zeta2, zeta3
+
+fill_value = 9.96921e+36
+u_tot = u_tot.where((u_tot != fill_value), np.nan)
+v_tot = v_tot.where((v_tot != fill_value), np.nan)
+w_tot = w_tot.where((w_tot != fill_value), np.nan)
+salt_tot = salt_tot.where((salt_tot != fill_value), np.nan)
+temp_tot = temp_tot.where((temp_tot != fill_value), np.nan)
+zeta_tot = zeta_tot.where((zeta_tot != fill_value), np.nan)
+
 
 angle_u = angle.rename({'eta_rho': 'eta_rho', 'xi_rho': 'xi_u'})
 angle_u['xi_u'] = angle_u.xi_u + 0.5
@@ -111,12 +121,12 @@ velocity_h.attrs = {
 	'units': 'meter second-1',
 	'field': 'geo-hor-velocity, scalar, series',
 	'standard_name': 'geographic_sea_water_horizontal_velocity_at_rho_location'
-	}
+}
 
 
 # Calculate derivatives
-dv_dlon = v_geo.differentiate('xi_rho') * pm[:-1,:-1]
-du_dlat = u_geo.differentiate('eta_rho') * pn[:-1,:-1]
+dv_dlon = v_geo.diff('xi_rho') * pm[:-1,:-2]
+du_dlat = u_geo.diff('eta_rho') * pn[:-2,:-1]
 
 vorticity = dv_dlon - du_dlat
 

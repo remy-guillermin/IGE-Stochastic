@@ -44,15 +44,18 @@ cs = ax.contour(lon, lat, h, levels=np.arange(0, 6000, 1000), colors='k', linest
 plt.clabel(cs, fmt='%d', inline=True, fontsize=5)
 cs2 = ax.contour(lon, lat, h, levels=np.arange(-300, 600, 400), colors='red', linestyles='dashed', linewidths=0.3, transform=ccrs.PlateCarree())
 plt.clabel(cs2, fmt='%d', inline=True, fontsize=5)
-ax.contour(lon, lat, msk, colors='k', linewidths=0.1)
-ax.contourf(lon, lat, msk_inv, colors='lightgray')
+
+# ax.coastlines(resolution='50m')
+# ax.add_feature(ccrs.cartopy.feature.LAND, edgecolor='black', zorder=3)
+# ax.add_feature(ccrs.cartopy.feature.COASTLINE, linewidth=0.5, zorder=3)
+# ax.add_feature(ccrs.cartopy.feature.BORDERS, linewidth=0.5, zorder=3)
 
 # Add gridlines
-gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True, linestyle='--', linewidth=0.2, color='k')
+gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True, linestyle='--', linewidth=0.2, color='k', zorder=4)
 gl.top_labels = False
 gl.right_labels = False
-gl.xlabel_style = {'size': 10, 'color': 'k'}
-gl.ylabel_style = {'size': 10, 'color': 'k'}
+gl.xlabel_style = {'color': 'k'}
+gl.ylabel_style = {'color': 'k'}
 
 # Add rectangles and labels
 for (xmin, xmax, ymin, ymax), name, color in zip(boxes, names, colors):

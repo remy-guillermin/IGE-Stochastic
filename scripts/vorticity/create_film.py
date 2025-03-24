@@ -6,11 +6,8 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
-import xarray as xr
 import numpy as np
-import pandas as pd
 from scipy.ndimage import label, sum as ndi_sum
-from skimage.measure import regionprops
 import croco_plot as cplot
 
 # Params

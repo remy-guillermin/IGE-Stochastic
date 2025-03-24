@@ -55,8 +55,8 @@ velocity_h.attrs = {
 
 
 # Calculate derivatives
-dv_dlon = v[:,:,:-1,:-1].differentiate('longitude') / dx[:-1,:]
-du_dlat = u[:,:,:-1,:-1].differentiate('latitude') / dy[:,:-1]
+dv_dlon = v[:,:,:-1,:-1].diff('longitude') / dx[:-1,:-1]
+du_dlat = u[:,:,:-1,:-1].diff('latitude') / dy[:-1,:-1]
 vorticity = dv_dlon - du_dlat
 
 vorticity.attrs = {
