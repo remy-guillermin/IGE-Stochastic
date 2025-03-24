@@ -648,7 +648,8 @@ def merge(
     print(f"Concatenation complete: {output_name}")
     
 def fetch_datasets(
-    file_pattern: Optional[str]  = '*.nc'  
+    file_pattern: Optional[str]  = '*.nc',
+    dir: Optional[str] = None  
 ) -> dict:
     """
     Fetch all netCDF files in the current directory and group them by dataset names.
@@ -663,11 +664,14 @@ def fetch_datasets(
     dict
         A dictionary where keys are dataset names and values are lists of file paths.
     """
-    current_directory = Path.cwd()
+    if dir is not None:
+        directory = Path(dir)
+    else:
+        directory = Path.cwd()
     file_groups = {}
 
     # Iterate over all .nc files
-    for file in current_directory.rglob(file_pattern):
+    for file in directory.rglob(file_pattern):
         # Extract the name part (e.g., 'Equator' from 'box_data_Equator.nc')
         name = file.stem.replace('box_data_', '')  # Remove 'box_data_' from the filename stem
 

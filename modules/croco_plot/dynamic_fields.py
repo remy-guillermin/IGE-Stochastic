@@ -11,6 +11,7 @@ import matplotlib as mpl
 import cmocean
 import cmcrameri
 import cartopy.crs as ccrs
+import os
 from .utils import load_grid, load_data, save_figure, plot_map
 
 def velocity(
@@ -136,8 +137,7 @@ def vorticity(
     gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.3}
 
     ax.set_title(f"Vorticity SWIO {date}")
-    levels = np.linspace(-0.15, 0.15, 21)
-    norm = mpl.colors.BoundaryNorm(levels, cmap.N)
+    norm = mpl.colors.Normalize(vmin=-0.15, vmax=0.15)
     plot_map(ax, lon[:-1,:-1], lat[:-1,:-1], vorticity[:,:] * 3600, cmap, norm, 'Vorticity [$h^{-1}$]', msk[:-1,:-1], msk_inv[:-1,:-1], gridline_style)
 
     plt.tight_layout()
@@ -391,20 +391,25 @@ def all(
     
     fig.suptitle(f"SWIO {date}")
     
+    if os.getcwd().startswith('/home'):
+        for ax in axes:
+            ax.coastlines(resolution='50m')
+            ax.add_feature(ccrs.cartopy.feature.LAND, edgecolor='black', zorder=3)
+            ax.add_feature(ccrs.cartopy.feature.COASTLINE, linewidth=0.5, zorder=3)
+            ax.add_feature(ccrs.cartopy.feature.BORDERS, linewidth=0.5, zorder=3)
+
     ax = axes[0]
     ax.set_title(f"Velocity")
     
     a = -1.5
     b = 0.2
     norm = mpl.colors.LogNorm(10**a, 10**b)
-    
     plot_map(ax, lon[:-1,:-1], lat[:-1,:-1], velocity[:,:], vel_cmap, norm, 'Velocity [$m.s^{-1}$]', msk[:-1,:-1], msk_inv[:-1,:-1], gridline_style)
     
     ax = axes[1]
     ax.set_title(f"Vorticity")
     
-    levels = np.linspace(-0.15, 0.15, 21)
-    norm = mpl.colors.BoundaryNorm(levels, vort_cmap.N)
+    norm = mpl.colors.Normalize(vmin=-0.15, vmax=0.15)
     plot_map(ax, lon[:-1,:-1], lat[:-1,:-1], vorticity[:,:] * 3600, vort_cmap, norm, 'Vorticity [$h^{-1}$]', msk[:-1,:-1], msk_inv[:-1,:-1], gridline_style)
     
     ax = axes[2]
@@ -421,6 +426,13 @@ def all(
     
     fig, axes = plt.subplots(1,3,figsize=figsize, subplot_kw={'projection': ccrs.PlateCarree()})
     
+    if os.getcwd().startswith('/home'):
+        for ax in axes:
+            ax.coastlines(resolution='50m')
+            ax.add_feature(ccrs.cartopy.feature.LAND, edgecolor='black', zorder=3)
+            ax.add_feature(ccrs.cartopy.feature.COASTLINE, linewidth=0.5, zorder=3)
+            ax.add_feature(ccrs.cartopy.feature.BORDERS, linewidth=0.5, zorder=3)
+    
     fig.suptitle(f"SWIO")
     
     ax = axes[0]
@@ -435,8 +447,7 @@ def all(
     ax = axes[1]
     ax.set_title(f"Vorticity")
     
-    levels = np.linspace(-0.15, 0.15, 21)
-    norm = mpl.colors.BoundaryNorm(levels, vort_cmap.N)
+    norm = mpl.colors.Normalize(vmin=-0.15, vmax=0.15)
     plot_map(ax, lon[:-1,:-1], lat[:-1,:-1], vorticity_yr[:,:] * 3600, vort_cmap, norm, 'Vorticity [$h^{-1}$]', msk[:-1,:-1], msk_inv[:-1,:-1], gridline_style)
     
     ax = axes[2]
@@ -453,6 +464,13 @@ def all(
     
     fig, axes = plt.subplots(1,3,figsize=figsize, subplot_kw={'projection': ccrs.PlateCarree()})
     
+    if os.getcwd().startswith('/home'):
+        for ax in axes:
+            ax.coastlines(resolution='50m')
+            ax.add_feature(ccrs.cartopy.feature.LAND, edgecolor='black', zorder=3)
+            ax.add_feature(ccrs.cartopy.feature.COASTLINE, linewidth=0.5, zorder=3)
+            ax.add_feature(ccrs.cartopy.feature.BORDERS, linewidth=0.5, zorder=3)
+    
     fig.suptitle(f"SWIO turbulent {date}")
     
     ax = axes[0]
@@ -467,8 +485,7 @@ def all(
     ax = axes[1]
     ax.set_title(f"Vorticity")
     
-    levels = np.linspace(-0.15, 0.15, 21)
-    norm = mpl.colors.BoundaryNorm(levels, vort_cmap.N)
+    norm = mpl.colors.Normalize(vmin=-0.15, vmax=0.15)
     plot_map(ax, lon[:-1,:-1], lat[:-1,:-1], vorticity_t[:,:] * 3600, vort_cmap, norm, 'Vorticity [$h^{-1}$]', msk[:-1,:-1], msk_inv[:-1,:-1], gridline_style)
     
     ax = axes[2]
