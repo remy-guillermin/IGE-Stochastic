@@ -36,7 +36,7 @@ def create_TS_from_CROCO(
     grid_path : str, optional
         Path to the grid data file, default is None.
     """
-    output_dir = f'/lus/work/CT1/c1601279/rguillermin/datasets/{os.path.splitext(data_path)[0]}'
+    output_dir = f"/lus/work/CT1/c1601279/rguillermin/datasets/{os.path.splitext(data_path)[0].split('/')[-1]}"
     os.makedirs(output_dir, exist_ok=True)
     if isinstance(variables, str):
         variables = [variables]
@@ -151,7 +151,7 @@ def create_TS_from_GLORYS(
     names : tuple, optional
         Names corresponding to the geographical regions, default is predefined names.
     """
-    output_dir = f'/lus/work/CT1/c1601279/rguillermin/datasets/{os.path.splitext(data_path)[0]}'
+    output_dir = f"/lus/work/CT1/c1601279/rguillermin/datasets/{os.path.splitext(data_path)[0].split('/')[-1]}"
     os.makedirs(output_dir, exist_ok=True)
     if isinstance(variables, str):
         variables = [variables]
@@ -614,6 +614,7 @@ def create_spectrum_from_GLORYS(
 
 def merge(
     file_pattern: str, 
+    input_dir:str,
     output_dir: str,
     output_name: Optional[str] = None
 ):
@@ -629,23 +630,30 @@ def merge(
     output_name : str, optional
         Name of the concatenated file, default is the file pattern.
     """
-    os.makedirs(f'/lus/work/CT1/c1601279/rguillermin/{output_dir}', exist_ok=True)
+    os.makedirs(output_dir, exist_ok=True)
     if output_name is None:
         output_name = file_pattern
     
-    file_list = sorted(glob.glob(f'{file_pattern}*.nc'))
+    file_list = sorted(glob.glob(os.path.join(input_dir, f'{file_pattern}.nc')))
     if not file_list:
-        print(f"No files found matching {file_pattern}*.nc")
+        print(f"No files found matching {input_dir}/{file_pattern}*.nc")
         return
 
-    ds = xr.open_mfdataset(file_list, combine='by_coords')
-    output_file = f"/lus/work/CT1/c1601279/rguillermin/{output_dir}/{output_name}.nc"
+    datasets = [xr.open_dataset(f) for f in file_list]
+
+    # Concatenate datasets along the time dimension while allowing duplicates
+    ds = xr.concat(datasets, dim="time")
+
+    # Ensure time index is sorted and remove duplicates, keeping the last occurrence
+    ds = ds.sortby("time").drop_duplicates("time", keep="last")
+    
+    output_file = os.path.join(output_dir, f'{output_name}.nc')
     
     print(f'{len(file_list)} files matching {output_name} concatenated.')
     ds.to_netcdf(output_file)
     ds.close()
     
-    print(f"Concatenation complete: {output_name}")
+    print(f"Concatenation complete: {output_file}")
     
 def fetch_datasets(
     file_pattern: Optional[str]  = '*.nc',
