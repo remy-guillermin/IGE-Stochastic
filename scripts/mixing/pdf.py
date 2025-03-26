@@ -32,10 +32,14 @@ Cs_rho = ds.Cs_rho
 hc = ds.hc.values
 ds.close()
 
+lon, lat, pm, pn, msk, msk_inv, angle, h = cplot.utils.load_grid(grid_path)
+
 date_index = -1
 date = np.datetime_as_string(AKv.time.data[date_index], 'h')
 
 s_rho_index = -1
+
+SWIO = (25, 69, -36, 7)
 
 fig, axes = plt.subplots(1, 3, figsize=(20, 6), subplot_kw={'projection': ccrs.PlateCarree()})
 

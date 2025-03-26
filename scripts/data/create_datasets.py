@@ -5,9 +5,9 @@ import xarray as xr
 import pandas as pd
 
 #path = '/Volumes/Elements'
-path = '/home/guilremy/IGE-Stochastic/data/RAW'
+path = '/home/guilremy/IGE-Stochastic/Data/data/RAW'
 #output_dir = '/Users/remyguillermin/Programmation/Stage/IGE-Stochastic/data'
-output_dir = '/home/guilremy/IGE-Stochastic/data/PROCESSED'
+output_dir = '/home/guilremy/IGE-Stochastic/Data/data/PROCESSED'
 sss_path = os.path.join(path, 'SSS_CMEMS')
 sst_path = os.path.join(path, 'SST_OSTIA')
 sla_path = os.path.join(path, 'SLA_CMEMS') # os.path.join(path, 'SLA_CMEMS')
@@ -47,7 +47,6 @@ for i, file in enumerate(sss_files):
         sss_err_box = sss_err.sel(lon=slice(box[0], box[1]), lat=slice(box[2], box[3]))
         sss_values[name].append(np.nanmean(sss_box.values))
         sss_errors[name].append(np.nanmean(sss_err_box.values))
-        sss_errors[name].append(np.sqrt(np.nansum(sss_err_box.values**2)/(sss_err_box.size - np.sum(np.isnan(sss_err_box)))))
         
 for i, file in enumerate(sst_files):
     print(f'Opening {i+1}/{len(sst_files)}')
@@ -63,7 +62,6 @@ for i, file in enumerate(sst_files):
         sst_err_box = sst_err.sel(lon=slice(box[0], box[1]), lat=slice(box[2], box[3]))
         sst_values[name].append(np.nanmean(sst_box.values))
         sst_errors[name].append(np.nanmean(sst_err_box.values))
-        sst_errors[name].append(np.sqrt(np.nansum(sst_err_box.values**2)/(sst_err_box.size - np.sum(np.isnan(sst_err_box)))))
         
 for i, file in enumerate(sla_files):
     print(f'Opening {i+1}/{len(sss_files)}')
@@ -79,7 +77,6 @@ for i, file in enumerate(sla_files):
         sla_err_box = sla_err.sel(longitude=slice(box[0], box[1]), latitude=slice(box[2], box[3]))
         sla_values[name].append(np.nanmean(sla_box.values))
         sla_errors[name].append(np.nanmean(sla_err_box.values))
-        sla_errors[name].append(np.sqrt(np.nansum(sla_err_box.values**2)/(sla_err_box.size - np.sum(np.isnan(sla_err_box))))) 
         
 sta_values = {name: np.array(sst_values[name]) - np.mean(sst_values[name]) for name in names}
 ssa_values = {name: np.array(sss_values[name]) - np.mean(sss_values[name]) for name in names}
