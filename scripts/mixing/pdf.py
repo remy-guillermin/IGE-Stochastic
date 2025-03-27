@@ -1,29 +1,14 @@
-import cmcrameri
 import cmocean
-import matplotlib as mpl
 import matplotlib.pyplot as plt
-import cartopy.crs as ccrs
-import cartopy.io.shapereader as shpreader
-from shapely.ops import unary_union
 import numpy as np
 import xarray as xr
-import pandas as pd
-from pathlib import Path
-import croco_plot as cplot
 
-data_path = '/home/guilremy/IGE-Stochastic/Data/swio_avg_suf.nc'
-#data_path = '/lus/work/CT1/c1601279/rguillermin/RUN_CROCO/run_swio2_deter2_2017_2023/swio_avg_suf.nc'
-grid_path = '/home/guilremy/IGE-Stochastic/Data/croco_grid_swio2.nc'
-#grid_path = '/lus/work/CT1/c1601279/lweiss/CROCO/RUN/SWIOSE/CROCO_FILES/grid/croco_grid_swio2.nc'
-glorys_path = '/home/guilremy/IGE-Stochastic/Data/glorys_avg_suf.nc'
-#glorys_path = '/lus/work/CT1/c1601279/rguillermin/GLORYS/glorys_avg_suf.nc'
-data_path2 = '/home/guilremy/IGE-Stochastic/Data/swio_his.nc'
-dataset_path = '/home/guilremy/IGE-Stochastic/Data/datasets'
+data_path = '/home/guilremy/IGE-Stochastic/Data/swio_his.nc'
 
 visc_cmap = cmocean.cm.amp
 diff_cmap = cmocean.cm.tempo
 
-ds = xr.open_dataset(data_path2)
+ds = xr.open_dataset(data_path)
 AKv = ds.AKv
 AKt = ds.AKt
 AKs = ds.AKs
@@ -32,75 +17,10 @@ Cs_rho = ds.Cs_rho
 hc = ds.hc.values
 ds.close()
 
-lon, lat, pm, pn, msk, msk_inv, angle, h = cplot.utils.load_grid(grid_path)
-
 date_index = -1
 date = np.datetime_as_string(AKv.time.data[date_index], 'h')
 
 s_rho_index = -1
-
-SWIO = (25, 69, -36, 7)
-
-fig, axes = plt.subplots(1, 3, figsize=(20, 6), subplot_kw={'projection': ccrs.PlateCarree()})
-
-fig.suptitle(rf'Vertical Coefficients [m²/s] - {date} - $\sigma=${s_rho[s_rho_index]:.2f}')
-
-for ax in axes:
-    ax.set_extent(SWIO)   
-    ax.coastlines(resolution='50m')
-    ax.add_feature(ccrs.cartopy.feature.LAND, edgecolor='black', zorder=3)
-    ax.add_feature(ccrs.cartopy.feature.COASTLINE, linewidth=0.5, zorder=3)
-    ax.add_feature(ccrs.cartopy.feature.BORDERS, linewidth=0.5, zorder=3)
-    
-    gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True, linestyle='--', linewidth=0.2, color='k')
-    gl.top_labels = False
-    gl.right_labels = False
-    gl.xlabel_style = {'color': 'k'}
-    gl.ylabel_style = {'color': 'k'}
-    
-
-
-ax = axes[0]
-ax.set_title('Temperature Diffusion ($AKt$)')
-
-data = AKt[date_index,s_rho_index,:,:]
-data = data.where((data != 0), np.nan)
-print(f'AKt: min={np.nanmin(data):.2e}, max={np.nanmax(data):.2e}')
-
-norm = mpl.colors.LogNorm(vmin=np.nanmin(data), vmax=np.nanmax(data))
-
-pcm_t = ax.pcolormesh(lon[:,:], lat[:,:], data, cmap=diff_cmap, norm=norm, transform=ccrs.PlateCarree())
-cb_t = plt.colorbar(pcm_t, ax=ax, orientation='vertical', label='[m²/s]')
-
-ax = axes[1]
-ax.set_title('Viscosity ($AKv$)')
-
-data = AKv[date_index,s_rho_index,:,:]
-data = data.where((data != 0), np.nan)
-print(f'AKv: min={np.nanmin(data):.2e}, max={np.nanmax(data):.2e}')
-
-norm = mpl.colors.LogNorm(vmin=np.nanmin(data), vmax=np.nanmax(data))
-
-pcm_v = ax.pcolormesh(lon[:,:], lat[:,:], data, cmap=visc_cmap, norm=norm, transform=ccrs.PlateCarree())
-cb_v = plt.colorbar(pcm_v, ax=ax, orientation='vertical', label='[m²/s]')
-
-ax = axes[2]
-ax.set_title('Salinity Diffusion ($AKs$)')
-
-data = AKs[date_index,s_rho_index,:,:]
-data = data.where((data != 0), np.nan)
-print(f'AKs: min={np.nanmin(data):.2e}, max={np.nanmax(data):.2e}')
-
-norm = mpl.colors.LogNorm(vmin=np.nanmin(data), vmax=np.nanmax(data))
-pcm_v = ax.pcolormesh(lon[:,:], lat[:,:], data, cmap=diff_cmap, norm=norm, transform=ccrs.PlateCarree())
-cb_v = plt.colorbar(pcm_v, ax=ax, orientation='vertical', label='[m²/s]')
-
-plt.tight_layout()
-
-plt.savefig(f'/home/guilremy/IGE-Stochastic/figures/coefficients_{date}.png', dpi=300, transparent=True)
-plt.show()
-
-
 
 dates_index = (-36, -1)
 dates = np.datetime_as_string(AKv.time.data[dates_index[0]: dates_index[1]], 'D')
