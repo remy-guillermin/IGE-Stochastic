@@ -10,6 +10,7 @@ setup(
     install_requires=[
         'numpy',
         'xarray',
+        'xesmf',
         'matplotlib',
         'cmocean',
         'cmcrameri',
