@@ -3,7 +3,7 @@ Dans ce dossier, je vais regrouper tous les scripts que je vais utiliser à un m
 
 # Install CARTOPY offline
 
-To install cartopy offline on ADASTRA (to be able to use cartopy's feature such as land and coastlines), one should manually download all the [Natural Earth shapefiles](https://www.naturalearthdata.com/downloads/) first. In my cas I will download LAND, COASTLINES, OCEAN and BOUNDARY LINES in 10m, 50m and 110m as well as MINOR ISLANDS in 10m. The first three will need to be extracted in `.cartopy/shapefiles/natural_earth/physical` and the last one in `.cartopy/shapefiles/natural_earth/cultural`.
+To install cartopy offline on ADASTRA (to be able to use cartopy's feature such as land and coastlines), one should manually download all the [Natural Earth shapefiles](https://www.naturalearthdata.com/downloads/) first. In my case I have downloaded LAND, COASTLINES, OCEAN and BOUNDARY LINES in 10m, 50m and 110m as well as MINOR ISLANDS in 10m. The first three and MINOR ISLANDS will need to be extracted in `.cartopy/shapefiles/natural_earth/physical` and the last one in `.cartopy/shapefiles/natural_earth/cultural`.
 
 In the home directory,
 ```bash
@@ -59,6 +59,28 @@ if __name__ == '__main__':
     main()
 ```
 
+The structure of the `.cartopy` folder should be
+```bash
+.cartopy
+└── shapefiles
+    └── natural_earth
+        ├── cultural
+        │   ├── ne_10m_admin_0_boundary_lines_land.***
+        │   ├── ne_110m_admin_0_boundary_lines_land.***
+        │   └── ne_50m_admin_0_boundary_lines_land.***
+        └── physical
+            ├── ne_10m_coastline.***
+            ├── ne_10m_land.***
+            ├── ne_10m_minor_islands_coastline.***
+            ├── ne_10m_minor_islands.***
+            ├── ne_10m_ocean.***
+            ├── ne_110m_coastline.***
+            ├── ne_110m_land.***
+            ├── ne_110m_ocean.***
+            ├── ne_50m_coastline.***
+            ├── ne_50m_land.***
+            └── ne_50m_ocean.***
+```
 
 ## Notes
 ### [wind_stress.py](wind_stress.py)
