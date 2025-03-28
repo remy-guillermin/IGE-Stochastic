@@ -16,7 +16,7 @@ glob_start = time.time()
 
 # CLUSTER
 grid_path = '/lus/work/CT1/c1601279/lweiss/CROCO/RUN/SWIOSE/CROCO_FILES/grid/croco_grid_swio2.nc'
-data_path = '/lus/work/CT1/c1601279/rguillermin/OBS/SST_OSTIA/'
+data_path = '/lus/work/CT1/c1601279/rguillermin/OBS/'
 
 grid = xr.open_dataset(grid_path)
 lon = grid.lon_rho.values
@@ -30,7 +30,6 @@ grid_out = xr.Dataset(
         "lat" : (["y", "x"], lat),
         "lon" : (["y", "x"], lon),
     }
-    
 )
 
 # data = glob(os.path.join(data_path, 'SSS_CMEMS', '*.nc'))     # SSS
@@ -56,7 +55,7 @@ datasets = []
 
 for path in data[:1000]:
     file_start = time.time()
-    ds = xr.open_dataset(path)
+    ds = xr.open_dataset(path)[['analysed_sst', 'analysis_error', 'sea_ice_fraction']]
     ds_regridded = regridder(ds)
     ds.close()
     # datasets.append(ds_regridded[['sos', 'sos_error']])                 # SSS
