@@ -71,3 +71,4 @@ modules/*/__pycache__/*
 
 # Dev notebooks
 *dev.ipynb
+*dev*.ipynb
