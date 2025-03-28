@@ -5,6 +5,7 @@ import matplotlib as mpl
 import cmocean
 import cartopy.crs as ccrs
 from matplotlib.patches import Rectangle
+import os
 
 # Load data (same as your existing code)
 # data = '/lus/store/CT1/c1601279/lweiss/RUN_CROCO/'
@@ -45,10 +46,11 @@ plt.clabel(cs, fmt='%d', inline=True, fontsize=5)
 cs2 = ax.contour(lon, lat, h, levels=np.arange(-300, 600, 400), colors='red', linestyles='dashed', linewidths=0.3, transform=ccrs.PlateCarree())
 plt.clabel(cs2, fmt='%d', inline=True, fontsize=5)
 
-# ax.coastlines(resolution='50m')
-# ax.add_feature(ccrs.cartopy.feature.LAND, edgecolor='black', zorder=3)
-# ax.add_feature(ccrs.cartopy.feature.COASTLINE, linewidth=0.5, zorder=3)
-# ax.add_feature(ccrs.cartopy.feature.BORDERS, linewidth=0.5, zorder=3)
+if os.getcwd().startswith('/home'):
+    ax.coastlines(resolution='50m')
+    ax.add_feature(ccrs.cartopy.feature.LAND, edgecolor='black', zorder=3)
+    ax.add_feature(ccrs.cartopy.feature.COASTLINE, linewidth=0.5, zorder=3)
+    ax.add_feature(ccrs.cartopy.feature.BORDERS, linewidth=0.5, zorder=3)
 
 # Add gridlines
 gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True, linestyle='--', linewidth=0.2, color='k', zorder=4)

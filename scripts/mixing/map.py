@@ -6,10 +6,8 @@ import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 import numpy as np
 import xarray as xr
-import pandas as pd
-from pathlib import Path
 import croco_plot as cplot
-from matplotlib.patches import Rectangle
+import os
 
 SWIO = (25, 69, -36, 7)
 
@@ -52,11 +50,12 @@ fig, axes = plt.subplots(1, 3, figsize=(20, 6), subplot_kw={'projection': ccrs.P
 fig.suptitle(rf'Vertical Coefficients [m²/s] - {date} - $\sigma=${s_rho[s_rho_index]:.2f}')
 
 for ax in axes:
-    ax.set_extent(SWIO)   
-    ax.coastlines(resolution='50m')
-    ax.add_feature(ccrs.cartopy.feature.LAND, edgecolor='black', zorder=3)
-    ax.add_feature(ccrs.cartopy.feature.COASTLINE, linewidth=0.5, zorder=3)
-    ax.add_feature(ccrs.cartopy.feature.BORDERS, linewidth=0.5, zorder=3)
+    ax.set_extent(SWIO)  
+    if os.getcwd().startswith('/home'):
+        ax.coastlines(resolution='50m')
+        ax.add_feature(ccrs.cartopy.feature.LAND, edgecolor='black', zorder=3)
+        ax.add_feature(ccrs.cartopy.feature.COASTLINE, linewidth=0.5, zorder=3)
+        ax.add_feature(ccrs.cartopy.feature.BORDERS, linewidth=0.5, zorder=3)
     
     gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True, linestyle='--', linewidth=0.2, color='k')
     gl.top_labels = False
