@@ -59,6 +59,35 @@ if __name__ == '__main__':
     main()
 ```
 
+If an error message mentionning `Downloading: ...50m/cultural/ne_50m_admin_1_states_provinces_lines_shp.zip` or anything like that appears, there was a problem, probably when setting the environment variable.
+
+The following script,
+```python
+import cartopy
+cartopy.config
+```
+
+should display
+```bash
+{
+    'pre_existing_data_dir': PosixPath('/lus/home/CT1/c1601279/rguillermin/.cartopy'),
+    'data_dir': PosixPath('/lus/home/CT1/c1601279/rguillermin/.local/share/cartopy'),
+    'cache_dir': PosixPath('/tmp/cartopy_cache_dir'),
+    'repo_data_dir': PosixPath('/lus/home/CT1/c1601279/rguillermin/python_environment/lib/python3.11/site-packages/cartopy/data'),
+    'downloaders': {
+        (
+            'shapefiles',
+            'natural_earth'
+        ): <cartopy.io.shapereader.NEShpDownloader at 0x7fc091a39b10>,
+        (
+            'shapefiles',
+            'gshhs'
+        ): <cartopy.io.shapereader.GSHHSShpDownloader at 0x7fc091a39cd0>
+    }
+}
+```
+If `'pre_existing_data_dir': PosixPath('.')`, this means that `CARTOPY_DATA_DIR` was not set successfully.
+
 The structure of the `.cartopy` folder should be
 ```bash
 .cartopy
