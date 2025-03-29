@@ -47,8 +47,8 @@ def main():
 
     ax.add_feature(minor_islands)
 
-    text = AnchoredText('South West Indian Ocean',
-                        loc=4, prop={'size': 12}, frameon=True)
+    text = AnchoredText('South West Indian Ocean', loc=4, prop={'size': 12}, frameon=True)
+    
     ax.add_artist(text)
 
     plt.tight_layout()

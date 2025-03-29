@@ -5,15 +5,15 @@ import matplotlib as mpl
 import cmocean
 import cartopy.crs as ccrs
 from matplotlib.patches import Rectangle
-import os
 
 # Load data (same as your existing code)
-# data = '/lus/store/CT1/c1601279/lweiss/RUN_CROCO/'
-# simu = 'run_swio2_deter_2017_2023_complet/'
-# grid = '/lus/store/CT1/c1601279/lweiss/GRID/croco_grid_swio2.nc'
-grid = '/home/guilremy/IGE-Stochastic/Data/croco_grid_swio2.nc'
-# figures = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures'
-figures = '/home/guilremy/IGE-Stochastic/figures'
+# LOCAL
+# grid = '/home/guilremy/IGE-Stochastic/Data/croco_grid_swio2.nc'
+# figures = '/home/guilremy/IGE-Stochastic/figures'
+
+# CLUSTER
+grid = '/lus/store/CT1/c1601279/lweiss/grid/croco_grid_swio2.nc'
+figures = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures'
 
 g = xr.open_dataset(grid)
 h = g['h'][:, :] # Bathymetry
@@ -25,8 +25,8 @@ msk_inv = np.where(msk == 0, msk, np.nan)
 g.close()
 
 # Define zones
-boxes = [(48, 60, -4, 3), (41, 47, -15, -8), (36.5, 42.5, -28, -19), (52, 60, -24, -16)]
-names = ['Equator', 'Mayotte-Comores', 'South-Moz', 'Mascarene']
+boxes = [(48, 60, -4, 3), (41, 47, -15, -8), (36.5, 42.5, -30, -21), (52, 60, -24, -16)]
+names = ['Equator', 'Islands', 'South-Moz', 'Mascarene']
 colors = ['saddlebrown', 'darkorchid', 'navy', 'teal']
 
 # Create figure
@@ -46,11 +46,22 @@ plt.clabel(cs, fmt='%d', inline=True, fontsize=5)
 cs2 = ax.contour(lon, lat, h, levels=np.arange(-300, 600, 400), colors='red', linestyles='dashed', linewidths=0.3, transform=ccrs.PlateCarree())
 plt.clabel(cs2, fmt='%d', inline=True, fontsize=5)
 
-if os.getcwd().startswith('/home'):
-    ax.coastlines(resolution='50m')
-    ax.add_feature(ccrs.cartopy.feature.LAND, edgecolor='black', zorder=3)
-    ax.add_feature(ccrs.cartopy.feature.COASTLINE, linewidth=0.5, zorder=3)
-    ax.add_feature(ccrs.cartopy.feature.BORDERS, linewidth=0.5, zorder=3)
+ax.coastlines(resolution='50m')
+ax.add_feature(ccrs.cartopy.feature.LAND, edgecolor='black', zorder=3)
+ax.add_feature(ccrs.cartopy.feature.COASTLINE, linewidth=0.5, zorder=3)
+ax.add_feature(ccrs.cartopy.feature.BORDERS, linewidth=0.5, zorder=3)
+
+land_color = ccrs.cartopy.feature.COLORS['land']
+
+minor_islands = ccrs.cartopy.feature.NaturalEarthFeature(
+    category='physical',
+    name='minor_islands',
+    scale='10m',
+    facecolor=land_color,
+    edgecolor='black'
+)
+
+ax.add_feature(minor_islands)
 
 # Add gridlines
 gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True, linestyle='--', linewidth=0.2, color='k', zorder=4)
@@ -77,6 +88,6 @@ text = cb.ax.yaxis.label
 font = mpl.font_manager.FontProperties(size=10)
 text.set_font_properties(font)
 
-plt.tight_layout()
-plt.savefig(f'{figures}/bathy_zones.png', dpi=300, transparent=True)
+fig.tight_layout()
+fig.savefig(f'{figures}/bathy_zones.png', dpi=300, transparent=True)
 plt.show()

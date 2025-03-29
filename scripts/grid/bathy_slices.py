@@ -27,21 +27,16 @@ lon_index = (160, 335)
 visc_cmap = cmocean.cm.amp
 diff_cmap = cmocean.cm.tempo
 
-grid_path = '/home/guilremy/IGE-Stochastic/Data/croco_grid_swio2.nc'
-data_path = '/home/guilremy/IGE-Stochastic/Data/swio_his.nc'
+# LOCAL
+# grid_path = '/home/guilremy/IGE-Stochastic/Data/croco_grid_swio2.nc'
+# figures = '/home/guilremy/IGE-Stochastic/figures'
+
+# CLUSTER
+grid_path = '/lus/store/CT1/c1601279/lweiss/grid/croco_grid_swio2.nc'
+figures = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures'
 
 lon, lat, _, _, msk, msk_inv, _, h = cplot.utils.load_grid(grid_path)
 
-ds = xr.open_dataset(data_path)
-AKv = ds.AKv
-AKt = ds.AKt
-AKs = ds.AKs
-s_rho = ds.s_rho
-Cs_rho = ds.Cs_rho
-hc = ds.hc.values
-ds.close()
-
-depth_sigma = cplot.utils.calc_depth(s_rho, Cs_rho, hc, h)
 
 # Create figure
 fig = plt.figure(figsize=(8, 6))
@@ -103,6 +98,6 @@ for index in lon_index:
 for index in lat_index:
     ax.plot(lon[index, :], lat[index, :], 'r-')
 
-plt.tight_layout()
-plt.savefig(f'/home/guilremy/IGE-Stochastic/figures/bathy_slices.png', dpi=300, transparent=True)
+fig.tight_layout()
+fig.savefig(f'{figures}/bathy_slices.png', dpi=300, transparent=True)
 plt.show()

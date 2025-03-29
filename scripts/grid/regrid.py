@@ -15,7 +15,7 @@ glob_start = time.time()
 # data_path = '/home/guilremy/IGE-Stochastic/Data/data/RAW'
 
 # CLUSTER
-grid_path = '/lus/work/CT1/c1601279/lweiss/CROCO/RUN/SWIOSE/CROCO_FILES/grid/croco_grid_swio2.nc'
+grid_path = '/lus/store/CT1/c1601279/lweiss/grid/croco_grid_swio2.nc'
 data_path = '/lus/work/CT1/c1601279/rguillermin/OBS/'
 
 grid = xr.open_dataset(grid_path)

@@ -26,8 +26,14 @@ lon_index = (160, 335)
 visc_cmap = cmocean.cm.amp
 diff_cmap = cmocean.cm.tempo
 
-grid_path = '/home/guilremy/IGE-Stochastic/Data/croco_grid_swio2.nc'
-data_path = '/home/guilremy/IGE-Stochastic/Data/swio_his.nc'
+# LOCAL
+# grid_path = '/home/guilremy/IGE-Stochastic/Data/croco_grid_swio2.nc'
+# figures = '/home/guilremy/IGE-Stochastic/figures'
+
+# CLUSTER
+grid_path = '/lus/store/CT1/c1601279/lweiss/grid/croco_grid_swio2.nc'
+figures = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures'
+data_path = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/data/swio_his.nc'
 
 lon, lat, _, _, msk, msk_inv, _, h = cplot.utils.load_grid(grid_path)
 
@@ -40,30 +46,19 @@ Cs_rho = ds.Cs_rho
 hc = ds.hc.values
 ds.close()
 
+fill_value = 9.96921e+36
+AKv = AKv.where((AKv != fill_value), np.nan)
+AKt = AKt.where((AKt != fill_value), np.nan)
+AKs = AKs.where((AKs != fill_value), np.nan)
+
 date_index = -1
-date = np.datetime_as_string(AKv.time.data[date_index], 'h')
+date = np.datetime_as_string(AKv.isel(time=date_index).time, 'h')
 
 s_rho_index = -1
 
 fig, axes = plt.subplots(1, 3, figsize=(20, 6), subplot_kw={'projection': ccrs.PlateCarree()})
 
 fig.suptitle(rf'Vertical Coefficients [m²/s] - {date} - $\sigma=${s_rho[s_rho_index]:.2f}')
-
-for ax in axes:
-    ax.set_extent(SWIO)  
-    if os.getcwd().startswith('/home'):
-        ax.coastlines(resolution='50m')
-        ax.add_feature(ccrs.cartopy.feature.LAND, edgecolor='black', zorder=3)
-        ax.add_feature(ccrs.cartopy.feature.COASTLINE, linewidth=0.5, zorder=3)
-        ax.add_feature(ccrs.cartopy.feature.BORDERS, linewidth=0.5, zorder=3)
-    
-    gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True, linestyle='--', linewidth=0.2, color='k')
-    gl.top_labels = False
-    gl.right_labels = False
-    gl.xlabel_style = {'color': 'k'}
-    gl.ylabel_style = {'color': 'k'}
-    
-
 
 ax = axes[0]
 ax.set_title('Temperature Diffusion ($AKt$)')
@@ -100,7 +95,35 @@ norm = mpl.colors.LogNorm(vmin=np.nanmin(data), vmax=np.nanmax(data))
 pcm_v = ax.pcolormesh(lon[:,:], lat[:,:], data, cmap=diff_cmap, norm=norm, transform=ccrs.PlateCarree())
 cb_v = plt.colorbar(pcm_v, ax=ax, orientation='vertical', label='[m²/s]')
 
-plt.tight_layout()
+for ax in axes:
+    ax.set_extent(SWIO)  
+    ax.coastlines(resolution='50m')
+    ax.add_feature(ccrs.cartopy.feature.LAND, edgecolor='black', zorder=3)
+    ax.add_feature(ccrs.cartopy.feature.COASTLINE, linewidth=0.5, zorder=3)
+    ax.add_feature(ccrs.cartopy.feature.BORDERS, linewidth=0.5, zorder=3)
+    
+    land_color = ccrs.cartopy.feature.COLORS['land']
 
-plt.savefig(f'/home/guilremy/IGE-Stochastic/figures/coefficients_{date}.png', dpi=300, transparent=True)
+    minor_islands = ccrs.cartopy.feature.NaturalEarthFeature(
+        category='physical',
+        name='minor_islands',
+        scale='10m',
+        facecolor=land_color,
+        edgecolor='black'
+    )
+
+    ax.add_feature(minor_islands, zorder=3)
+    
+    gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True, linestyle='--', linewidth=0.2, color='k')
+    gl.top_labels = False
+    gl.right_labels = False
+    gl.xlabel_style = {'color': 'k'}
+    gl.ylabel_style = {'color': 'k'}
+    
+
+fig.tight_layout()
+
+filename = f'{figures}/coefficients_{date}.png'
+fig.savefig(filename, dpi=300, transparent=True)
+print(f'Saved in {filename}')
 plt.show()
