@@ -4,10 +4,12 @@ import xarray as xr
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import matplotlib.colors as mcolors
+import metpy.calc as mpcalc
 import cmocean
 import cmcrameri
 import cartopy.crs as ccrs
 import os
+
 
 
 # PARAMETERS
@@ -24,53 +26,123 @@ SWIO = (25, 69, -36, 7)
 # Plot
 gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.5}
 figsize = (20, 6)
-sst_cmap = cmocean.cm.thermal
-sss_cmap = cmocean.cm.haline
-ssh_cmap = cmcrameri.cm.roma_r
+velo_cmap = cmocean.cm.speed
+vort_cmap = cmcrameri.cm.vik
+ener_cmap = cmcrameri.cm.devon
+
+
 
 g = xr.open_dataset(grid)
 lon = g['lon_rho'][:, :]
 lat = g['lat_rho'][:, :]
+msk = g['mask_rho'][:, :]
+pm = g['pm'][:,:] 
+pn = g['pn'][:,:]
+msk_inv = np.where(msk == 0, msk, np.nan)
+h = g['h'][:, :]
+angle = g['angle'][:, :]
 g.close()
 print("Grid loaded.")
 
 d = xr.open_dataset(os.path.join(simu, file))
-salt = d.salt
-temp = d.temp
-zeta = d.zeta
+u = d.u[:,-1,:,:]
+v = d.v[:,-1,:,:]
+w = d.w[:,-1,:,:]
 time = d.time
 d.close()
 print('Data loaded.')
+
+
 
 if np.datetime64(date) not in time.values.astype('datetime64[D]'):
     print(f'{date} not found in simulation.')
     date = np.datetime_as_string(time.values.astype('datetime64[D]')[0])
     print(f'Setting {date} as the new date.')
-    
+
 years = np.unique(time.astype('datetime64[Y]')).astype('datetime64[Y]')
 year = np.datetime64(date).astype('datetime64[Y]')
 
-salt = salt.sel(time=str(year))
-temp = temp.sel(time=str(year))
-zeta = zeta.sel(time=str(year))
+u = u.sel(time=str(year))
+v = v.sel(time=str(year))
+w = w.sel(time=str(year))
 
 fill_value = 9.96921e+36
-salt = salt[:, -1, :, :]
-salt = salt.where((salt != fill_value), np.nan)
-zeta = zeta.where((zeta != fill_value), np.nan)
-temp = temp[:, -1, :, :]
-temp = temp.where((temp != fill_value), np.nan)
+u = u.where((u != fill_value), np.nan)
+v = v.where((v != fill_value), np.nan)
+w = w.where((w != fill_value), np.nan)
 print('NaN values added')
 
-salt_mean = salt.mean(dim='time')
-zeta_mean = zeta.mean(dim='time')
-temp_mean = temp.mean(dim='time')
 
-salt = salt.sel(time=date).mean(dim='time')
-zeta = zeta.sel(time=date).mean(dim='time')
-temp = temp.sel(time=date).mean(dim='time')
 
-print('Temporal mean computed.')
+# Moyenne annuelle
+u_yr = u.mean(dim='time')
+v_yr = v.mean(dim='time')
+w_yr = w.mean(dim='time')
+print("Time mean calculated")
+
+u = u.sel(time=date).mean(dim='time')
+v = v.sel(time=date).mean(dim='time')
+w = w.sel(time=date).mean(dim='time')
+print("Data sliced")
+
+# Vitesse turbulente
+ut = (u - u_yr).data[:,:]
+vt = (v - v_yr).data[:,:]
+wt = (w - w_yr).data[:,:]
+print("Turbulent velocity calculated")
+
+u = u.data
+v = v.data
+w = w.data
+    
+u_yr = u_yr.data
+v_yr = v_yr.data
+w_yr = w_yr.data
+
+angle = angle.data
+
+u_geo = u[:-1,:] * np.cos(angle[:-1,:-1]) - v[:,:-1] * np.sin(angle[:-1,:-1])
+v_geo = u[:-1,:] * np.sin(angle[:-1,:-1]) + v[:,:-1] * np.cos(angle[:-1,:-1])
+w_geo = w[:-1,:-1]
+
+ut_geo = ut[:-1,:] * np.cos(angle[:-1,:-1]) - vt[:,:-1] * np.sin(angle[:-1,:-1])
+vt_geo = ut[:-1,:] * np.sin(angle[:-1,:-1]) + vt[:,:-1] * np.cos(angle[:-1,:-1])
+wt_geo = wt[:-1,:-1]
+
+u_yr_geo = u_yr[:-1,:] * np.cos(angle[:-1,:-1]) - v_yr[:,:-1] * np.sin(angle[:-1,:-1])
+v_yr_geo = u_yr[:-1,:] * np.sin(angle[:-1,:-1]) + v_yr[:,:-1] * np.cos(angle[:-1,:-1])
+w_yr_geo = w_yr[:-1,:-1]
+print("Velocity transformed")
+
+velocity = np.sqrt(u_geo ** 2 + v_geo ** 2)
+velocity_t = np.sqrt(ut_geo ** 2 + vt_geo ** 2)
+velocity_yr = np.sqrt(u_yr_geo ** 2 + v_yr_geo ** 2)
+print('Velocity calculated')
+
+# Calculate derivatives
+dv_dlon = np.gradient(v_geo, axis=1) * pm[:-1,:-1]
+du_dlat = np.gradient(u_geo, axis=0) * pn[:-1,:-1]
+
+# Calculate vorticity
+vorticity = dv_dlon - du_dlat
+
+dvt_dlon = np.gradient(vt_geo, axis=1) * pm[:-1,:-1]
+dut_dlat = np.gradient(ut_geo, axis=0) * pn[:-1,:-1]
+
+vorticity_t = dvt_dlon - dut_dlat
+
+dv_yr_dlon = np.gradient(v_yr_geo, axis=1) * pm[:-1,:-1]
+du_yr_dlat = np.gradient(u_yr_geo, axis=0) * pn[:-1,:-1]
+
+vorticity_yr = dv_yr_dlon - du_yr_dlat
+print('Vorticity calculated')
+
+KE = 1 / 2 * ( u_geo ** 2 + v_geo ** 2 + w_geo ** 2)
+MKE = 1 / 2 * ( u_yr_geo ** 2 + v_yr_geo ** 2 + w_yr_geo ** 2)    
+EKE = 1 / 2 * ( ut_geo ** 2 + vt_geo ** 2 + wt_geo ** 2)
+print('Energy calculated')
+
+
 
 fig, axs = plt.subplots(1, 3, figsize=figsize, subplot_kw={'projection': ccrs.PlateCarree()})
 fig.suptitle(f"CROCO {date}")
@@ -98,49 +170,57 @@ for ax in axs:
     gl.top_labels = False
     gl.right_labels = False
     gl.xlabel_style = gl.ylabel_style = {'color': 'k'}
-
-# Salinity
+    
+    
+# Velocity
 ax = axs[0]
-ax.set_title("Salinity")
+ax.set_title("Velocity")
 
-norm = mpl.colors.Normalize(vmin=34, vmax=36)
-data = salt
-cmap = sss_cmap
-label = 'SSS [psu]'
+a = -1.5
+b = 0.2
+norm = mpl.colors.LogNorm(10**a, 10**b)
+data = velocity
+cmap = velo_cmap
+label = r'$v$ [m/s]'
 
 pcm = ax.pcolormesh(lon[:, :], lat[:, :], data, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
 cb = plt.colorbar(pcm, ax=ax, label=label, orientation='vertical')
-cb.set_ticks(np.arange(norm.vmin, norm.vmax + 0.5, 0.5))
 
-# Free surface
+# Vorticity
 ax = axs[1]
-ax.set_title("Free Surface")
+ax.set_title("Vorticity")
 
-norm = mpl.colors.Normalize(vmin=0, vmax=1)
-data = zeta
-cmap = ssh_cmap
-label = 'SSH [m]'
+norm = mpl.colors.Normalize(vmin=-5e-5, vmax=5e-5)
+data = vorticity
+cmap = vort_cmap
+label = r'$\omega$ [h⁻¹]'
 pcm = ax.pcolormesh(lon[:, :], lat[:, :], data, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
 cb = plt.colorbar(pcm, ax=ax, label=label, orientation='vertical')
+ticks = cb.get_ticks()[1:-1]
+cb.set_ticks(ticks)
+cb.set_ticklabels([f'{tick:.0e}' for tick in ticks])
 
-# Temperature
+# Energy
 ax = axs[2]
-ax.set_title("Temperature")
+ax.set_title("Energy")
 
-norm = mpl.colors.Normalize(vmin=20, vmax=30)
-data = temp
-cmap = sst_cmap
-label = 'SST [°C]'
+a = int(np.log10(np.nanmax(KE)))
+b = a-2.5
+norm = mpl.colors.LogNorm(vmin=10**b, vmax=10**a)
+data = KE
+cmap = ener_cmap
+label = r'$KE$ [m².s⁻²]'
 
 pcm = ax.pcolormesh(lon[:, :], lat[:, :], data, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
 cb = plt.colorbar(pcm, ax=ax, label=label, orientation='vertical')
-
-
+    
 fig.tight_layout()
-filename = os.path.join(figures, f"physical_croco_{simu.split('/')[-1]}_{date}.png")
+filename = os.path.join(figures, f"dynamical_croco_{simu.split('/')[-1]}_{date}.png")
 fig.savefig(filename, dpi=300, transparent=True)
 print(f'{filename} saved.')
 plt.show()
+
+
 
 fig, axs = plt.subplots(1, 3, figsize=figsize, subplot_kw={'projection': ccrs.PlateCarree()})
 fig.suptitle(f"CROCO")
@@ -168,52 +248,60 @@ for ax in axs:
     gl.top_labels = False
     gl.right_labels = False
     gl.xlabel_style = gl.ylabel_style = {'color': 'k'}
-
-# Salinity
+    
+    
+# Velocity
 ax = axs[0]
-ax.set_title("Salinity")
+ax.set_title("Velocity")
 
-norm = mpl.colors.Normalize(vmin=34, vmax=36)
-data = salt_mean
-cmap = sss_cmap
-label = r'$\overline{\overline{SSS}}$ [psu]'
+a = -1.5
+b = 0.2
+norm = mpl.colors.LogNorm(10**a, 10**b)
+data = velocity_yr
+cmap = velo_cmap
+label = r'$v$ [m/s]'
 
 pcm = ax.pcolormesh(lon[:, :], lat[:, :], data, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
 cb = plt.colorbar(pcm, ax=ax, label=label, orientation='vertical')
-cb.set_ticks(np.arange(norm.vmin, norm.vmax + 0.5, 0.5))
 
-# Free surface
+# Vorticity
 ax = axs[1]
-ax.set_title("Free Surface")
+ax.set_title("Vorticity")
 
-norm = mpl.colors.Normalize(vmin=0, vmax=1)
-data = zeta_mean
-cmap = ssh_cmap
-label = r'$\overline{\overline{SSH}}$ [m]'
+norm = mpl.colors.Normalize(vmin=-5e-5, vmax=5e-5)
+data = vorticity_yr
+cmap = vort_cmap
+label = r'$\omega$ [h⁻¹]'
 pcm = ax.pcolormesh(lon[:, :], lat[:, :], data, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
 cb = plt.colorbar(pcm, ax=ax, label=label, orientation='vertical')
+ticks = cb.get_ticks()[1:-1]
+cb.set_ticks(ticks)
+cb.set_ticklabels([f'{tick:.0e}' for tick in ticks])
 
-# Temperature
+# Energy
 ax = axs[2]
-ax.set_title("Temperature")
+ax.set_title("Energy")
 
-norm = mpl.colors.Normalize(vmin=20, vmax=30)
-data = temp_mean
-cmap = sst_cmap
-label = r'$\overline{\overline{SST}}$ [°C]'
+a = int(np.log10(np.nanmax(MKE)))
+b = a-2.5
+norm = mpl.colors.LogNorm(vmin=10**b, vmax=10**a)
+data = MKE
+cmap = ener_cmap
+label = r'$KE$ [m².s⁻²]'
 
 pcm = ax.pcolormesh(lon[:, :], lat[:, :], data, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
 cb = plt.colorbar(pcm, ax=ax, label=label, orientation='vertical')
-
-
+    
 fig.tight_layout()
-filename = os.path.join(figures, f'physical_croco_{year}_mean.png')
+filename = os.path.join(figures, f"dynamical_croco_{simu.split('/')[-1]}_{year}_mean.png")
 fig.savefig(filename, dpi=300, transparent=True)
 print(f'{filename} saved.')
 plt.show()
 
+
+
 fig, axs = plt.subplots(1, 3, figsize=figsize, subplot_kw={'projection': ccrs.PlateCarree()})
-fig.suptitle(f"CROCO {date}")
+fig.suptitle(f"CROCO Turbulent {date}")
 
 for ax in axs:
     ax.set_extent(SWIO)
@@ -238,46 +326,52 @@ for ax in axs:
     gl.top_labels = False
     gl.right_labels = False
     gl.xlabel_style = gl.ylabel_style = {'color': 'k'}
-
-# Salinity
+    
+    
+# Velocity
 ax = axs[0]
-ax.set_title("Salinity")
+ax.set_title("Velocity")
 
-norm = mpl.colors.Normalize(vmin=-1, vmax=1)
-data = salt - salt_mean
-cmap = sss_cmap
-label = r'SSA [psu]'
+a = -1.5
+b = 0.2
+norm = mpl.colors.LogNorm(10**a, 10**b)
+data = velocity_t
+cmap = velo_cmap
+label = r'$v$ [m/s]'
 
-pcm = ax.pcolormesh(lon[:, :], lat[:, :], data, cmap=cmocean.cm.tarn, norm=norm, transform=ccrs.PlateCarree())
-cb = plt.colorbar(pcm, ax=ax, label=label, orientation='vertical')
-cb.set_ticks(np.arange(norm.vmin, norm.vmax + 0.5, 0.5))
-
-# Free surface
-ax = axs[1]
-ax.set_title("Free Surface")
-
-norm = mpl.colors.Normalize(vmin=-0.5, vmax=0.5)
-data = zeta - zeta_mean
-cmap = ssh_cmap
-label = r'SLA [m]'
 pcm = ax.pcolormesh(lon[:, :], lat[:, :], data, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
 cb = plt.colorbar(pcm, ax=ax, label=label, orientation='vertical')
 
-# Temperature
-ax = axs[2]
-ax.set_title("Temperature")
+# Vorticity
+ax = axs[1]
+ax.set_title("Vorticity")
 
-norm = mpl.colors.Normalize(vmin=-4, vmax=4)
-data = temp - temp_mean
-cmap = sst_cmap
-label = r'STA [°C]'
-
-pcm = ax.pcolormesh(lon[:, :], lat[:, :], data, cmap=cmocean.cm.balance, norm=norm, transform=ccrs.PlateCarree())
+norm = mpl.colors.Normalize(vmin=-5e-5, vmax=5e-5)
+data = vorticity_t
+cmap = vort_cmap
+label = r'$\omega$ [h⁻¹]'
+pcm = ax.pcolormesh(lon[:, :], lat[:, :], data, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
 cb = plt.colorbar(pcm, ax=ax, label=label, orientation='vertical')
+ticks = cb.get_ticks()[1:-1]
+cb.set_ticks(ticks)
+cb.set_ticklabels([f'{tick:.0e}' for tick in ticks])
 
+# Energy
+ax = axs[2]
+ax.set_title("Energy")
 
+a = int(np.log10(np.nanmax(EKE)))
+b = a-2.5
+norm = mpl.colors.LogNorm(vmin=10**b, vmax=10**a)
+data = EKE
+cmap = ener_cmap
+label = r'$KE$ [m².s⁻²]'
+
+pcm = ax.pcolormesh(lon[:, :], lat[:, :], data, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
+cb = plt.colorbar(pcm, ax=ax, label=label, orientation='vertical')
+    
 fig.tight_layout()
-filename = os.path.join(figures, f"anomalies_croco_{simu.split('/')[-1]}_{date}.png")
+filename = os.path.join(figures, f"dynamical_croco_{simu.split('/')[-1]}_{date}_turbulent.png")
 fig.savefig(filename, dpi=300, transparent=True)
 print(f'{filename} saved.')
 plt.show()
