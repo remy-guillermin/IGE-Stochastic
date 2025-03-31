@@ -25,10 +25,16 @@ lon_index = (160, 335)
 visc_cmap = cmocean.cm.amp
 diff_cmap = cmocean.cm.tempo
 
-data_path = '/home/guilremy/IGE-Stochastic/Data/swio_avg_suf.nc'
-grid_path = '/home/guilremy/IGE-Stochastic/Data/croco_grid_swio2.nc'
-glorys_path = '/home/guilremy/IGE-Stochastic/Data/glorys_avg_suf.nc'
 
+# LOCAL
+# data_path = '/home/guilremy/IGE-Stochastic/Data/swio_avg_suf.nc'
+# grid_path = '/home/guilremy/IGE-Stochastic/Data/croco_grid_swio2.nc'
+# glorys_path = '/home/guilremy/IGE-Stochastic/Data/glorys_avg_suf.nc'
+
+# CLUSTER
+data_path = ''
+grid_path = '/lus/store/CT1/c1601279/lweiss/grid/croco_grid_swio2.nc'
+glorys_path = ''
 
 vort_g, velo_g = cplot.utils.load_data(glorys_path, ('vort','V_hor'))
 vort_c, velo_c = cplot.utils.load_data(data_path, ('vort','V_hor'))
@@ -50,11 +56,23 @@ fig.suptitle('Surface velocity [m/s]')
 
 for ax in axes:
     ax.set_extent(SWIO) 
-    if os.getcwd().startswith('/home'):  
-        ax.coastlines(resolution='50m')
-        ax.add_feature(ccrs.cartopy.feature.LAND, edgecolor='black', zorder=3)
-        ax.add_feature(ccrs.cartopy.feature.COASTLINE, linewidth=0.5, zorder=3)
-        ax.add_feature(ccrs.cartopy.feature.BORDERS, linewidth=0.5, zorder=3)
+    
+    ax.coastlines(resolution='50m')
+    ax.add_feature(ccrs.cartopy.feature.LAND, edgecolor='black', zorder=3)
+    ax.add_feature(ccrs.cartopy.feature.COASTLINE, linewidth=0.5, zorder=3)
+    ax.add_feature(ccrs.cartopy.feature.BORDERS, linewidth=0.5, zorder=3)
+    
+    land_color = ccrs.cartopy.feature.COLORS['land']
+
+    minor_islands = ccrs.cartopy.feature.NaturalEarthFeature(
+        category='physical',
+        name='minor_islands',
+        scale='10m',
+        facecolor=land_color,
+        edgecolor='black'
+    )
+
+    ax.add_feature(minor_islands, zorder=3)
     
     gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True, linestyle='--', linewidth=0.2, color='k')
     gl.top_labels = False
@@ -83,11 +101,22 @@ fig.suptitle(f'Surface vorticity [1/s] - {date}')
 
 for ax in axes:
     ax.set_extent(SWIO)   
-    if os.getcwd().startswith('/home'):  
-        ax.coastlines(resolution='50m')
-        ax.add_feature(ccrs.cartopy.feature.LAND, edgecolor='black', zorder=3)
-        ax.add_feature(ccrs.cartopy.feature.COASTLINE, linewidth=0.5, zorder=3)
-        ax.add_feature(ccrs.cartopy.feature.BORDERS, linewidth=0.5, zorder=3)
+    ax.coastlines(resolution='50m')
+    ax.add_feature(ccrs.cartopy.feature.LAND, edgecolor='black', zorder=3)
+    ax.add_feature(ccrs.cartopy.feature.COASTLINE, linewidth=0.5, zorder=3)
+    ax.add_feature(ccrs.cartopy.feature.BORDERS, linewidth=0.5, zorder=3)
+    
+    land_color = ccrs.cartopy.feature.COLORS['land']
+
+    minor_islands = ccrs.cartopy.feature.NaturalEarthFeature(
+        category='physical',
+        name='minor_islands',
+        scale='10m',
+        facecolor=land_color,
+        edgecolor='black'
+    )
+
+    ax.add_feature(minor_islands, zorder=3)
     
     gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True, linestyle='--', linewidth=0.2, color='k')
     gl.top_labels = False

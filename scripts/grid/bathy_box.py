@@ -89,5 +89,7 @@ font = mpl.font_manager.FontProperties(size=10)
 text.set_font_properties(font)
 
 fig.tight_layout()
-fig.savefig(f'{figures}/bathy_zones.png', dpi=300, transparent=True)
+filename = f'{figures}/bathy_zones.png'
+fig.savefig(filename, dpi=300, transparent=True)
+print(f'{filename} saved.')
 plt.show()
