@@ -4,16 +4,20 @@ import xarray as xr
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import matplotlib.colors as mcolors
+import metpy.calc as mpcalc
 import cmocean
 import cmcrameri
 import cartopy.crs as ccrs
+import glob
 import os
+from functools import partial
+
 
 
 # PARAMETERS
 # Path
 figures = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures'
-data = '/lus/scratch/CT1/c1601279/rguillermin/GLORYS/raw_cli_mercator_Y2018_surf.nc'
+data = '/lus/work/CT1/c1601279/rguillermin/RAW'
 
 # Selection
 date = '2018-06-15'
@@ -26,43 +30,63 @@ sst_cmap = cmocean.cm.thermal
 sss_cmap = cmocean.cm.haline
 ssh_cmap = cmcrameri.cm.roma_r
 
-d = xr.open_dataset(data)
-salt = d.so
-temp = d.thetao
-zeta = d.zos
-time = d.time
-d.close()
-print('Data loaded.')
 
-Lon = salt.longitude
-Lat = salt.latitude
 
-lon, lat = np.meshgrid(Lon, Lat)
-
-if np.datetime64(date) not in time.values.astype('datetime64[D]'):
-    print(f'{date} not found in simulation.')
-    date = np.datetime_as_string(time.values.astype('datetime64[D]')[0])
-    print(f'Setting {date} as the new date.')
-    
-years = np.unique(time.astype('datetime64[Y]')).astype('datetime64[Y]')
 year = np.datetime64(date).astype('datetime64[Y]')
+year
 
-salt = salt.sel(time=str(year))
-temp = temp.sel(time=str(year))
-zeta = zeta.sel(time=str(year))
 
-salt_mean = salt.mean(dim='time')
+
+sss_files = glob.glob(data + f'/SSS*/*{year}*')
+sst_files = glob.glob(data + f'/SST*/*{year}*')
+sla_files = glob.glob(data + f'/SLA*/*{year}*')
+
+
+
+def _preprocess(x, lon_bnds, lat_bnds):
+    return x.sel(lon=slice(*lon_bnds), lat=slice(*lat_bnds))
+
+lon_bnds, lat_bnds = (SWIO[0]-5, SWIO[1]+5), (SWIO[2]-5, SWIO[3]+5)
+partial_func = partial(_preprocess, lon_bnds=lon_bnds, lat_bnds=lat_bnds)
+
+ds = xr.open_mfdataset(sss_files, preprocess=partial_func)[["sos", "sos_error"]]
+salt = ds.sos
+ds.close()
+
+ds = xr.open_mfdataset(sst_files, preprocess=partial_func)[["analysed_sst", "analysis_error"]]
+temp = ds.analysed_sst - 273.15
+ds.close()
+
+def _preprocess(x, lon_bnds, lat_bnds):
+    return x.sel(longitude=slice(*lon_bnds), latitude=slice(*lat_bnds))
+
+partial_func = partial(_preprocess, lon_bnds=lon_bnds, lat_bnds=lat_bnds)
+
+ds = xr.open_mfdataset(sla_files, preprocess=partial_func)[["adt"]]
+zeta = ds.adt
+ds.close()
+
+
+
+salt_mean = salt.mean(dim=('time', 'depth'))
 zeta_mean = zeta.mean(dim='time')
 temp_mean = temp.mean(dim='time')
 
-salt = salt.sel(time=date)
+salt = salt.sel(time=date).mean(dim='depth')
 zeta = zeta.sel(time=date)
 temp = temp.sel(time=date)
 
-print('Temporal mean computed.')
+
+
+
+
+salt = salt.mean(dim='time')
+temp = temp.mean(dim='time')
+
+
 
 fig, axs = plt.subplots(1, 3, figsize=figsize, subplot_kw={'projection': ccrs.PlateCarree()})
-fig.suptitle(f"GLORYS {date}")
+fig.suptitle(f"MEASURES {date}")
 
 for ax in axs:
     ax.set_extent(SWIO)
@@ -97,7 +121,7 @@ data = salt
 cmap = sss_cmap
 label = 'SSS [psu]'
 
-pcm = ax.pcolormesh(lon[:, :], lat[:, :], data, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
+pcm = ax.pcolormesh(data.lon, data.lat, data, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
 cb = plt.colorbar(pcm, ax=ax, label=label, orientation='vertical')
 cb.set_ticks(np.arange(norm.vmin, norm.vmax + 0.5, 0.5))
 
@@ -105,11 +129,11 @@ cb.set_ticks(np.arange(norm.vmin, norm.vmax + 0.5, 0.5))
 ax = axs[1]
 ax.set_title("Free Surface")
 
-norm = mpl.colors.Normalize(vmin=0, vmax=1)
+norm = mpl.colors.Normalize(vmin=0, vmax=1.5)
 data = zeta
 cmap = ssh_cmap
 label = 'SSH [m]'
-pcm = ax.pcolormesh(lon[:, :], lat[:, :], data, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
+pcm = ax.pcolormesh(data.longitude, data.latitude, data, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
 cb = plt.colorbar(pcm, ax=ax, label=label, orientation='vertical')
 
 # Temperature
@@ -121,18 +145,20 @@ data = temp
 cmap = sst_cmap
 label = 'SST [°C]'
 
-pcm = ax.pcolormesh(lon[:, :], lat[:, :], data, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
+pcm = ax.pcolormesh(data.lon, data.lat, data, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
 cb = plt.colorbar(pcm, ax=ax, label=label, orientation='vertical')
 
 
 fig.tight_layout()
-filename = os.path.join(figures, f"physical_glorys_{date}.png")
+filename = os.path.join(figures, f"physical_measures_{date}.png")
 fig.savefig(filename, dpi=300, transparent=True)
 print(f'{filename} saved.')
 plt.show()
 
+
+
 fig, axs = plt.subplots(1, 3, figsize=figsize, subplot_kw={'projection': ccrs.PlateCarree()})
-fig.suptitle(f"GLORYS")
+fig.suptitle(f"MEASURES")
 
 for ax in axs:
     ax.set_extent(SWIO)
@@ -167,7 +193,7 @@ data = salt_mean
 cmap = sss_cmap
 label = r'$\overline{\overline{SSS}}$ [psu]'
 
-pcm = ax.pcolormesh(lon[:, :], lat[:, :], data, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
+pcm = ax.pcolormesh(data.lon, data.lat, data, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
 cb = plt.colorbar(pcm, ax=ax, label=label, orientation='vertical')
 cb.set_ticks(np.arange(norm.vmin, norm.vmax + 0.5, 0.5))
 
@@ -175,11 +201,11 @@ cb.set_ticks(np.arange(norm.vmin, norm.vmax + 0.5, 0.5))
 ax = axs[1]
 ax.set_title("Free Surface")
 
-norm = mpl.colors.Normalize(vmin=0, vmax=1)
+norm = mpl.colors.Normalize(vmin=0, vmax=1.5)
 data = zeta_mean
 cmap = ssh_cmap
 label = r'$\overline{\overline{SSH}}$ [m]'
-pcm = ax.pcolormesh(lon[:, :], lat[:, :], data, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
+pcm = ax.pcolormesh(data.longitude, data.latitude, data, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
 cb = plt.colorbar(pcm, ax=ax, label=label, orientation='vertical')
 
 # Temperature
@@ -191,18 +217,20 @@ data = temp_mean
 cmap = sst_cmap
 label = r'$\overline{\overline{SST}}$ [°C]'
 
-pcm = ax.pcolormesh(lon[:, :], lat[:, :], data, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
+pcm = ax.pcolormesh(data.lon, data.lat, data, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
 cb = plt.colorbar(pcm, ax=ax, label=label, orientation='vertical')
 
 
 fig.tight_layout()
-filename = os.path.join(figures, f'physical_glorys_{year}_mean.png')
+filename = os.path.join(figures, f'physical_measures_{year}_mean.png')
 fig.savefig(filename, dpi=300, transparent=True)
 print(f'{filename} saved.')
 plt.show()
 
+
+
 fig, axs = plt.subplots(1, 3, figsize=figsize, subplot_kw={'projection': ccrs.PlateCarree()})
-fig.suptitle(f"GLORYS {date}")
+fig.suptitle(f"MEASURES {date}")
 
 for ax in axs:
     ax.set_extent(SWIO)
@@ -237,7 +265,7 @@ data = salt - salt_mean
 cmap = sss_cmap
 label = r'SSA [psu]'
 
-pcm = ax.pcolormesh(lon[:, :], lat[:, :], data, cmap=cmocean.cm.tarn, norm=norm, transform=ccrs.PlateCarree())
+pcm = ax.pcolormesh(data.lon, data.lat, data, cmap=cmocean.cm.tarn, norm=norm, transform=ccrs.PlateCarree())
 cb = plt.colorbar(pcm, ax=ax, label=label, orientation='vertical')
 cb.set_ticks(np.arange(norm.vmin, norm.vmax + 0.5, 0.5))
 
@@ -249,7 +277,7 @@ norm = mpl.colors.Normalize(vmin=-0.5, vmax=0.5)
 data = zeta - zeta_mean
 cmap = ssh_cmap
 label = r'SLA [m]'
-pcm = ax.pcolormesh(lon[:, :], lat[:, :], data, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
+pcm = ax.pcolormesh(data.longitude, data.latitude, data, cmap=cmap, norm=norm, transform=ccrs.PlateCarree())
 cb = plt.colorbar(pcm, ax=ax, label=label, orientation='vertical')
 
 # Temperature
@@ -261,12 +289,12 @@ data = temp - temp_mean
 cmap = sst_cmap
 label = r'STA [°C]'
 
-pcm = ax.pcolormesh(lon[:, :], lat[:, :], data, cmap=cmocean.cm.balance, norm=norm, transform=ccrs.PlateCarree())
+pcm = ax.pcolormesh(data.lon, data.lat, data, cmap=cmocean.cm.balance, norm=norm, transform=ccrs.PlateCarree())
 cb = plt.colorbar(pcm, ax=ax, label=label, orientation='vertical')
 
 
 fig.tight_layout()
-filename = os.path.join(figures, f"anomalies_glorys_{date}.png")
+filename = os.path.join(figures, f"anomalies_measures_{date}.png")
 fig.savefig(filename, dpi=300, transparent=True)
 print(f'{filename} saved.')
 plt.show()
