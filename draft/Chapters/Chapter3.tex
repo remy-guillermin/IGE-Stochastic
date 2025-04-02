@@ -10,7 +10,7 @@ Il est possible d'afficher les cartes de chacun de ces traceurs qui sont la temp
 	\label{fig:annu SS}
 \end{figure}
 
-On constate une salinité plus faible au niveau de l'embouchure du fleuve Pungue (35°E 20°S environ) due au champ initial qui prend en compte l'injection des eaux fluviales contrairement au modèle qui ne les prend pas en compte sur cette simulation. 
+On constate une salinité plus faible au niveau de l'embouchure du fleuve Pungue (35$\degree$E 20$\degree$S environ) due au champ initial qui prend en compte l'injection des eaux fluviales contrairement au modèle qui ne les prend pas en compte sur cette simulation. 
 \begin{figure}[h]
 	\includegraphics[width=\textwidth]{Figures/sea_anomaly_annual_2019.png}
 	\caption{Cartes des anomalies de surface pour l'année 2019 - De gauche à droite: Salinité, Surface libre, Température}
@@ -54,6 +54,9 @@ Ces cartes nous permettent de savoir les zones sujettes à de fortes vitesses mo
 
 Il est possible d'enregistrer les champs spatiaux paramétrisés par le modèle tels que les coefficeints de diffusivité et de viscosité turbulente, ainsi que la longueur de mélange. Ces variables nous permettront d'identifier les structures turbulentes ainsi que d'étudier les caractéristiques propres à différentes zones géographiques.
  
+=======
+Ces cartes nous permettent d'identifier les zones sujettes à de fortes vitesses moyennes et ainsi permettre une validation rapide par des données issues de la réanalyse GLORYS. Comme ces deux jeux de données ne sont pas sur la même grille nous allons simplement les comparer visuellement avant de d'interpoler CROCO sur la même grille que GLORYS afin d'effectuer des comparaisons plus poussées des divergences du modèles. Des comparaisons à des produits de mesures issues du CMEMS permettront une analyse qualitative du modèle contre des conditions réelles.
+
 
 \section{Zones d'intérêts}
 \subsection{Séries temporelles des traceurs}
@@ -83,7 +86,7 @@ Nous pouvons également étudier les series temporelles d'énergies en \autoref{
 		\includegraphics[width=\textwidth]{Figures/South-Moz_energies_time_series}
 		\caption{Séries temporelles pour la région du Sud du canal du Mozambique}
 	\end{subfigure}
-    \caption{Carte des champs physiques}
+    \caption{Séries temporelles des énergies}
     \label{fig:ST Energy deter}
 \end{figure}
 

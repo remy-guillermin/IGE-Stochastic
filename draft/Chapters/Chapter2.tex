@@ -154,7 +154,7 @@ L'approche primaire afin de transformer un modèle déterministe en un modèle p
 	X^{(i)}_{t+1} = a^{(i)} X^{(i)}_t + b^{(i)} w + c^{(i)}
 \end{equation}
 
-Ici $t$ correspond à l'indice temporel du modèle, $a^{(i)}, b^{(i)}, c^{(i)}$ sont des paramètres qui définissent la moyenne $\mu^{(i)}$, l'écart type $\sigma^{(i)}$ et l'échelle temporelle de correlation $\tau^{(i)}$ de chaque processus.
+Ici $t$ correspond à l'indice temporel du modèle, $a^{(i)}, b^{(i)}, c^{(i)}$ sont des paramètres qui définissent la moyenne $\mu^{(i)}$, l'écart type $\sigma^{(i)}$ et l'échelle temporelle de correlation $\tau^{(i)}$ de chaque processus. $w$ sera la distribution stochastique que nous souhaitons appliquer à la variable, à l'ordre 0 cela correspond à un bruit blanc.
 
 \subsection{Champs d'étude}
 Nous allons étudier différentes sources d'incertitudes du modèle. La première, et la plus importante, est la variabilité du champ de conditions initiales. Ce premier ensemble permettra de quantifier la variabilité intrinsèque du modèle qui sera toujours présente dans les ensembles suivants. D'autres pistes seront étudiées par Lisa notamment la variabilité due au forçage atmosphérique ainsi que celle crée par les conditions aux frontières. Une autre voie d'étude est la variabilité induite par la paramétrisation du mélange vertical. Durant mon stage, je me focaliserai sur l'implémentation d'un ensemble stochastique sur la paramétrisation verticale.
