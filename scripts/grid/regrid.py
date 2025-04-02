@@ -16,7 +16,7 @@ glob_start = time.time()
 
 # CLUSTER
 grid_path = '/lus/store/CT1/c1601279/lweiss/grid/croco_grid_swio2.nc'
-data_path = '/lus/work/CT1/c1601279/rguillermin/OBS/'
+data_path = '/lus/work/CT1/c1601279/rguillermin/RAW'
 
 grid = xr.open_dataset(grid_path)
 lon = grid.lon_rho.values
@@ -27,8 +27,8 @@ print('Grid loaded')
 
 grid_out = xr.Dataset(
     {
-        "lat" : (["y", "x"], lat),
-        "lon" : (["y", "x"], lon),
+        "lat" : (["eta_rho", "xi_rho"], lat),
+        "lon" : (["eta_rho", "xi_rho"], lon),
     }
 )
 
@@ -49,7 +49,7 @@ print(f'Regridder created in {time.time() - regridder_start:.2f} s')
 
 datasets = []
 
-for path in data:
+for path in data[:]:
     file_start = time.time()
     ds = xr.open_dataset(path)[['analysed_sst', 'analysis_error', 'sea_ice_fraction']]
     ds_regridded = regridder(ds)
@@ -60,6 +60,7 @@ for path in data:
     print(f'{path} regridded in {time.time() - file_start:.2f} s')
 
 ds_combined = xr.concat(datasets, dim='time')
+ds_combined['time'] = ds_combined.time.astype('datetime64[D]')
 
 # output_path = '/home/guilremy/IGE-Stochastic/Data/data/REGRIDDED/SST_OSTIA_part1.nc'      # On local
 output_path = '/lus/work/CT1/c1601279/rguillermin/OBS/SST_OSTIA.nc'                       # On cluster

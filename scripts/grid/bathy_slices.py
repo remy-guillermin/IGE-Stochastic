@@ -9,6 +9,7 @@ import numpy as np
 import xarray as xr
 import croco_plot as cplot
 from matplotlib.patches import Rectangle
+import matplotlib.colors as mcolors
 
 SWIO = (25, 69, -36, 7)
 
@@ -19,7 +20,11 @@ gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.3}
 # Define zones
 boxes = [(48, 60, -4, 3), (41, 47, -15, -8), (36.5, 42.5, -30, -21), (52, 60, -24, -16)]
 names = ['Equator', 'Islands', 'South-Moz', 'Mascarene']
-colors = ['saddlebrown', 'darkorchid', 'navy', 'teal']
+cmap = cmocean.cm.tempo_r
+n_colors = 4
+colors = [cmap(i / (n_colors - 1)) for i in range(n_colors)]
+colors[0] = mcolors.to_rgba('palevioletred')
+colors[-1] = mcolors.to_rgba('sandybrown')
 
 lat_index = (172, 280, 430)
 lon_index = (160, 335)
