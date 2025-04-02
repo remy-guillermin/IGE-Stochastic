@@ -1,7 +1,8 @@
 """
-Module plot pour croco_plot.
+Module for plotting and processing CROCO and GLORYS datasets.
 
-Ce module contient des fonctions pour la création et l'affichage de fichiers netCDF issues des fichiers CROCO brut.
+This module provides functions to create and manipulate netCDF files derived from CROCO and GLORYS data.
+It includes functionality for creating time series, computing spectra, and merging datasets.
 """
 import os
 import xarray as xr
@@ -9,32 +10,33 @@ import glob
 import numpy as np
 import pandas as pd
 from pathlib import Path
+from typing import Optional, Tuple, List
 from .utils import load_grid, load_data, load_GLORYS, compute_dx_dy
 
 def create_TS_from_CROCO(
-    data_path:str,
-    variables:str = 'all',
-    boxes:tuple=[(48, 60, -4, 3), (41, 47, -15, -8), (36.5, 42.5, -28, -19), (52, 60, -24, -16)], 
-    names:tuple=['Equator', 'Mayotte-Comores', 'South-Moz', 'Mascarene'], 
-    grid_path:str=None
+    data_path: str,
+    variables: Optional[str] = 'all',
+    boxes: Optional[Tuple[int, int, int, int]] = [(48, 60, -4, 3), (41, 47, -15, -8), (36.5, 42.5, -30, -21), (52, 60, -24, -16)], 
+    names: Optional[Tuple[str, str, str, str]] = ['Equator', 'Islands', 'South-Moz', 'Mascarene'], 
+    grid_path: Optional[str]=None
 ):      
     """
-    Create netCDF files from CROCO data for specified variables and geographical boxes.
+    Generate time series netCDF files from CROCO data for specified variables and geographical regions.
 
     Parameters
     ----------
     data_path : str
         Path to the CROCO data file.
     variables : str, optional
-        Variables to process, by default 'all'.
+        Variables to process, default is 'all'.
     boxes : tuple, optional
-        Geographical boxes defined by (lon1, lon2, lat1, lat2), by default specific regions.
+        Geographical regions defined by (lon1, lon2, lat1, lat2), default is predefined regions.
     names : tuple, optional
-        Names corresponding to the geographical boxes, by default specific names.
+        Names corresponding to the geographical regions, default is predefined names.
     grid_path : str, optional
-        Path to the grid data file, by default None.
+        Path to the grid data file, default is None.
     """
-    output_dir = f'/lus/work/CT1/c1601279/rguillermin/datasets/{os.path.splitext(data_path)[0]}'
+    output_dir = f"/lus/work/CT1/c1601279/rguillermin/datasets/{os.path.splitext(data_path)[0].split('/')[-1]}"
     os.makedirs(output_dir, exist_ok=True)
     if isinstance(variables, str):
         variables = [variables]
@@ -130,26 +132,26 @@ def create_TS_from_CROCO(
         del ds, results
                     
 def create_TS_from_GLORYS(
-    data_path:str,
-    variables:str = 'all',
-    boxes:tuple=[(48, 60, -4, 3), (41, 47, -15, -8), (36.5, 42.5, -28, -19), (52, 60, -24, -16)], 
-    names:tuple=['Equator', 'Mayotte-Comores', 'South-Moz', 'Mascarene']
+    data_path: str,
+    variables: Optional[str] = 'all',
+    boxes: Optional[Tuple[int, int, int, int]] = [(48, 60, -4, 3), (41, 47, -15, -8), (36.5, 42.5, -30, -21), (52, 60, -24, -16)], 
+    names: Optional[Tuple[str, str, str, str]] = ['Equator', 'Islands', 'South-Moz', 'Mascarene']
 ):      
     """
-    Create netCDF files from GLORYS data for specified variables and geographical boxes.
+    Generate time series netCDF files from GLORYS data for specified variables and geographical regions.
 
     Parameters
     ----------
     data_path : str
         Path to the GLORYS data file.
     variables : str, optional
-        Variables to process, by default 'all'.
+        Variables to process, default is 'all'.
     boxes : tuple, optional
-        Geographical boxes defined by (lon1, lon2, lat1, lat2), by default specific regions.
+        Geographical regions defined by (lon1, lon2, lat1, lat2), default is predefined regions.
     names : tuple, optional
-        Names corresponding to the geographical boxes, by default specific names.
+        Names corresponding to the geographical regions, default is predefined names.
     """
-    output_dir = f'/lus/work/CT1/c1601279/rguillermin/datasets/{os.path.splitext(data_path)[0]}'
+    output_dir = f"/lus/work/CT1/c1601279/rguillermin/datasets/{os.path.splitext(data_path)[0].split('/')[-1]}"
     os.makedirs(output_dir, exist_ok=True)
     if isinstance(variables, str):
         variables = [variables]
@@ -235,12 +237,28 @@ def create_TS_from_GLORYS(
         del ds, results
             
 def create_spectrum_from_CROCO(
-    data_path:str,
-    grid_path:str=None,
-    num:int=200,
-    boxes:tuple=[(48, 60, -4, 3), (41, 47, -15, -8), (36.5, 42.5, -28, -19), (52, 60, -24, -16)], 
-    names:tuple=['Equator', 'Mayotte-Comores', 'South-Moz', 'Mascarene']
+    data_path: str,
+    grid_path: Optional[str] = None,
+    num: Optional[int] = 200,
+    boxes: Optional[Tuple[int, int, int, int]] = [(48, 60, -4, 3), (41, 47, -15, -8), (36.5, 42.5, -30, -21), (52, 60, -24, -16)], 
+    names: Optional[Tuple[str, str, str, str]] = ['Equator', 'Islands', 'South-Moz', 'Mascarene']
 ):  
+    """
+    Compute energy spectra from CROCO data for specified geographical regions.
+
+    Parameters
+    ----------
+    data_path : str
+        Path to the CROCO data file or list of files.
+    grid_path : str, optional
+        Path to the grid data file, default is None.
+    num : int, optional
+        Number of wavenumber bins, default is 200.
+    boxes : tuple, optional
+        Geographical regions defined by (lon1, lon2, lat1, lat2), default is predefined regions.
+    names : tuple, optional
+        Names corresponding to the geographical regions, default is predefined names.
+    """
     output_dir = f'/lus/work/CT1/c1601279/rguillermin/datasets/SWIO'
     os.makedirs(output_dir, exist_ok=True)
     # Load grid data
@@ -415,11 +433,25 @@ def create_spectrum_from_CROCO(
     print(f'File {file_path} saved')
     
 def create_spectrum_from_GLORYS(
-    data_path:str,
-    num:int=200,
-    boxes:tuple=[(48, 60, -4, 3), (41, 47, -15, -8), (36.5, 42.5, -28, -19), (52, 60, -24, -16)], 
-    names:tuple=['Equator', 'Mayotte-Comores', 'South-Moz', 'Mascarene']
+    data_path: str,
+    num: Optional[int]=200,
+    boxes: Optional[Tuple[int, int, int, int]] = [(48, 60, -4, 3), (41, 47, -15, -8), (36.5, 42.5, -30, -21), (52, 60, -24, -16)], 
+    names: Optional[Tuple[str, str, str, str]] = ['Equator', 'Islands', 'South-Moz', 'Mascarene']
 ):  
+    """
+    Compute energy spectra from GLORYS data for specified geographical regions.
+
+    Parameters
+    ----------
+    data_path : str
+        Path to the GLORYS data file or list of files.
+    num : int, optional
+        Number of wavenumber bins, default is 200.
+    boxes : tuple, optional
+        Geographical regions defined by (lon1, lon2, lat1, lat2), default is predefined regions.
+    names : tuple, optional
+        Names corresponding to the geographical regions, default is predefined names.
+    """
     output_dir = f'/lus/work/CT1/c1601279/rguillermin/datasets/GLORYS'
     os.makedirs(output_dir, exist_ok=True)
         
@@ -582,8 +614,9 @@ def create_spectrum_from_GLORYS(
 
 def merge(
     file_pattern: str, 
+    input_dir:str,
     output_dir: str,
-    output_name: str = None
+    output_name: Optional[str] = None
 ):
     """
     Merge multiple netCDF files matching a pattern into a single file.
@@ -594,43 +627,59 @@ def merge(
         Pattern to match the files to concatenate.
     output_dir : str
         Directory to save the concatenated file.
-    output_name : str
-        Name of the concatenated file.
+    output_name : str, optional
+        Name of the concatenated file, default is the file pattern.
     """
-    os.makedirs(f'/lus/work/CT1/c1601279/rguillermin/{output_dir}', exist_ok=True)
+    os.makedirs(output_dir, exist_ok=True)
     if output_name is None:
         output_name = file_pattern
     
-    file_list = sorted(glob.glob(f'{file_pattern}*.nc'))
+    file_list = sorted(glob.glob(os.path.join(input_dir, f'{file_pattern}.nc')))
     if not file_list:
-        print(f"No files found matching {file_pattern}*.nc")
+        print(f"No files found matching {input_dir}/{file_pattern}*.nc")
         return
 
-    ds = xr.open_mfdataset(file_list, combine='by_coords')
-    output_file = f"/lus/work/CT1/c1601279/rguillermin/{output_dir}/{output_name}.nc"
+    datasets = [xr.open_dataset(f) for f in file_list]
+
+    # Concatenate datasets along the time dimension while allowing duplicates
+    ds = xr.concat(datasets, dim="time")
+
+    # Ensure time index is sorted and remove duplicates, keeping the last occurrence
+    ds = ds.sortby("time").drop_duplicates("time", keep="last")
+    
+    output_file = os.path.join(output_dir, f'{output_name}.nc')
     
     print(f'{len(file_list)} files matching {output_name} concatenated.')
     ds.to_netcdf(output_file)
     ds.close()
     
-    print(f"Concatenation complete: {output_name}")
+    print(f"Concatenation complete: {output_file}")
     
 def fetch_datasets(
-    file_pattern: str  = '*.nc'  
+    file_pattern: Optional[str]  = '*.nc',
+    dir: Optional[str] = None  
 ) -> dict:
     """
-    Fetch all netCDF files in the current directory and group them by their dataset names.
+    Fetch all netCDF files in the current directory and group them by dataset names.
+
+    Parameters
+    ----------
+    file_pattern : str, optional
+        Pattern to match the files, default is '*.nc'.
 
     Returns
     -------
     dict
         A dictionary where keys are dataset names and values are lists of file paths.
     """
-    current_directory = Path.cwd()
+    if dir is not None:
+        directory = Path(dir)
+    else:
+        directory = Path.cwd()
     file_groups = {}
 
     # Iterate over all .nc files
-    for file in current_directory.rglob(file_pattern):
+    for file in directory.rglob(file_pattern):
         # Extract the name part (e.g., 'Equator' from 'box_data_Equator.nc')
         name = file.stem.replace('box_data_', '')  # Remove 'box_data_' from the filename stem
 

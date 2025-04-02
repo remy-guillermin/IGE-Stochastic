@@ -1,7 +1,7 @@
 """
-Module utils pour croco_plot.
+Utility module for croco_plot.
 
-Ce module contient des fonctions utilitaires pour le traitement et le chargement des données CROCO.
+This module contains utility functions for processing and loading CROCO data.
 """
 
 import numpy as np
@@ -17,7 +17,7 @@ from typing import Optional, Tuple, Union, Dict, List
 import ffmpeg
 import glob
 
-R = 6371.0  
+R = 6371000.0  
 
 def load_grid(
     path: Optional[str] = None
@@ -32,7 +32,7 @@ def load_grid(
     np.ndarray   # h
 ]:
     """
-    Load the grid file into this iPython instance.
+    Load the grid file and extract relevant grid parameters.
 
     Parameters
     ----------
@@ -71,7 +71,7 @@ def load_data(
     fields: Tuple[str, ...]
 ) -> Union[Tuple[xr.DataArray, ...], xr.DataArray]:
     """
-    Load the specified fields from the simulation data file.
+    Load specified fields from a simulation data file.
 
     Parameters
     ----------
@@ -82,9 +82,9 @@ def load_data(
 
     Returns
     -------
-    tuple or DataArray
-        Tuple of loaded fields in the same order as requested if multiple fields are requested,
-        otherwise a single DataArray if only one field is requested.
+    Union[Tuple[xr.DataArray, ...], xr.DataArray]
+        - If multiple fields are requested, returns a tuple of DataArray objects in the same order as requested.
+        - If only one field is requested, returns a single DataArray object.
     """
     d = xr.open_dataset(path)
     if len(fields) == 1:
@@ -99,7 +99,7 @@ def load_GLORYS(
     path: str,
 ) -> Tuple[xr.DataArray, ...]:
     """
-    Load the specified fields from the GLORYS data file.
+    Load fields from a GLORYS data file.
 
     Parameters
     ----------
@@ -141,7 +141,7 @@ def calc_depth(
     h: xr.DataArray
 ) -> xr.DataArray:
     """
-    Compute the depth of the mask using the S-coordinate transformation.
+    Compute depth using the S-coordinate transformation.
 
     Parameters
     ----------
@@ -175,8 +175,17 @@ def haversine(
     lon2
 ):
     """
-    Compute the Haversine distance between two points on the Earth.
-    Inputs are assumed to be in degrees.
+    Compute the Haversine distance between two points on Earth.
+
+    Parameters
+    ----------
+    lat1, lon1, lat2, lon2 : float
+        Latitude and longitude of the two points in degrees.
+
+    Returns
+    -------
+    float
+        Distance between the two points in meters.
     """
     lat1, lon1, lat2, lon2 = map(np.radians, [lat1, lon1, lat2, lon2])
     
@@ -186,22 +195,32 @@ def haversine(
     a = np.sin(dlat / 2)**2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon / 2)**2
     c = 2 * np.arctan2(np.sqrt(a), np.sqrt(1 - a))
     
-    return R * c  # Distance in kilometers
+    return R * c 
 
 def compute_dx_dy(
     lat, 
     lon
 ):
     """
-    Compute dx_eff and dy_eff for a given 2D grid of latitudes and longitudes.
-    """
-    # Compute dy_eff (meridional spacing) - Difference between adjacent latitudes
-    dy_eff = haversine(lat[:-1, :], lon[:-1, :], lat[1:, :], lon[1:, :])
+    Compute effective grid spacing (dx_eff and dy_eff) for a 2D grid.
 
-    # Compute dx_eff (zonal spacing) - Difference between adjacent longitudes
+    Parameters
+    ----------
+    lat : np.ndarray
+        2D array of latitudes.
+    lon : np.ndarray
+        2D array of longitudes.
+
+    Returns
+    -------
+    tuple
+        - dx_eff: Effective zonal spacing in meters.
+        - dy_eff: Effective meridional spacing in meters.
+    """
+    dy_eff = haversine(lat[:-1, :], lon[:-1, :], lat[1:, :], lon[1:, :])
     dx_eff = haversine(lat[:, :-1], lon[:, :-1], lat[:, 1:], lon[:, 1:])
 
-    return dx_eff * 1000, dy_eff * 1000 # Convert to m
+    return dx_eff, dy_eff
 
 def plot_map(
     ax: Axes,
@@ -216,10 +235,10 @@ def plot_map(
     gridline_style: Dict,
     levels: Optional[np.ndarray] = None,
     bounds: Optional[Tuple[float, float, float, float]] = None,
-    interactive: bool = False
+    interactive: Optional[bool] = False
 ) -> None:
     """
-    Helper function to plot data on a given axis.
+    Plot data on a map with optional gridlines and bounds.
 
     Parameters
     ----------
@@ -266,13 +285,13 @@ def plot_map(
         gl = ax.gridlines(crs=ccrs.PlateCarree(), **gridline_style)
         gl.top_labels = False
         gl.right_labels = False
-        gl.xlabel_style = gl.ylabel_style = {'size': 8, 'color': 'k'}
+        gl.xlabel_style = gl.ylabel_style = {'color': 'k'}
 
         cb = plt.colorbar(pcm, ax=ax, label=label, orientation='vertical')
         if levels is not None:
             ticks = levels
             cb.set_ticks(ticks)
-            cb.ax.set_yticklabels(np.round(ticks, 2), fontsize=8)
+            cb.ax.set_yticklabels(np.round(ticks, 2))
     except Exception as e:
         print(f"Error in plot_map: {e}")
     finally:
@@ -291,10 +310,10 @@ def plot_zoom(
     msk_inv: np.ndarray,
     gridline_style: Dict,
     levels: Optional[np.ndarray] = None,
-    interactive: bool = False
+    interactive: Optional[bool] = False
 ) -> None:
     """
-    Helper function to plot data on a given axis with a zoomed inset.
+    Plot data with a zoomed inset on a map.
 
     Parameters
     ----------
@@ -349,7 +368,7 @@ def plot_zoom(
         gl = ax.gridlines(crs=ccrs.PlateCarree(), **gridline_style)
         gl.top_labels = False
         gl.right_labels = False
-        gl.xlabel_style = gl.ylabel_style = {'size': 8, 'color': 'k'}
+        gl.xlabel_style = gl.ylabel_style = {'color': 'k'}
         
         ax.plot([x1, x2], [y1, y1], "k--")
         ax.plot([x2, x2], [y1, y2], "k--")
@@ -360,11 +379,11 @@ def plot_zoom(
         if levels is not None:
             ticks = levels
             cb.set_ticks(ticks)
-            cb.ax.set_yticklabels(np.round(ticks, 2), fontsize=8)
+            cb.ax.set_yticklabels(np.round(ticks, 2))
     except Exception as e:
         print(f"Error in plot_zoom: {e}") 
     finally:
-        matplotlib.use(original_backend)  # Restore the original backend after processing
+        matplotlib.use(original_backend) 
         
 def plot_time_series(
     time_results: np.ndarray,
@@ -375,7 +394,7 @@ def plot_time_series(
     colors: List[str],
     filename: str,
     title: str,
-    interactive: bool = False
+    interactive: Optional[bool] = False
 ) -> None:
     """
     Plot time series data with rolling mean for multiple variables.
@@ -457,10 +476,10 @@ def prepare_film(
 def create_film(
     filmDir: str, 
     filmName: str,
-    framerate: int = 25,
+    framerate: Optional[int] = 25,
 ) -> None:
     """
-    Create a film from the saved figures.
+    Create a film from saved figures.
 
     Parameters
     ----------
@@ -487,8 +506,9 @@ Film created as {film_file}.mp4.
 def save_figure(
     fig: plt.Figure, 
     filename: str,
-    isFilm: bool = False,
-    filmDir: Optional[str] = None
+    filmDir: Optional[str] = None,
+    isFilm: Optional[bool] = False,
+    isTransparent: Optional[bool] = True
 ) -> None:
     """
     Save the figure to the specified filename.
@@ -499,10 +519,12 @@ def save_figure(
         The figure to save.
     filename : str
         The path to save the figure.
-    isFilm : bool, optional
-        Whether the figure is part of a film sequence, by default False.
     filmDir : str, optional
         Directory for film frames, required if isFilm is True.
+    isFilm : bool, optional
+        Whether the figure is part of a film sequence, by default False.
+    isTransparent : bool, optional
+        Whether to save the figure with a transparent background, by default True.
     """
     home_dir = os.path.expanduser("~") # Get the home directory
     output_dir = os.path.join(home_dir, "Images")
@@ -512,7 +534,7 @@ def save_figure(
         raise ValueError(f"Film directory (filmDir) is not specified")
     os.makedirs(output_dir, exist_ok=True)
     
-    fig.savefig(os.path.join(output_dir, filename), dpi=300)
+    fig.savefig(os.path.join(output_dir, filename), dpi=300, transparent=isTransparent)
     if isFilm:
         print(f"Figure saved as {os.path.join(output_dir, filename)}.")
     else:
@@ -525,7 +547,7 @@ def open_figure(
     filenames: Union[str, List[str]]
 ) -> None:
     """
-    Open the saved figure(s) using a terminal command without blocking the IPython session.
+    Open saved figure(s) using a terminal command.
 
     Parameters
     ----------
@@ -549,9 +571,26 @@ def open_figure(
         
 def get_color_from_filename(
     filename, 
-    names=['Equator', 'Mascarene', 'Mayotte-Comores', 'South-Moz'], 
-    colors=['saddlebrown', 'teal', 'darkorchid', 'navy']
+    names:  Optional[List[str]] = ['Equator', 'Mascarene', 'Mayotte-Comores', 'South-Moz'], 
+    colors: Optional[List[str]] = ['saddlebrown', 'teal', 'darkorchid', 'navy']
 ):
+    """
+    Get a color based on the filename.
+
+    Parameters
+    ----------
+    filename : str
+        The filename to check.
+    names : list of str, optional
+        List of region names to match.
+    colors : list of str, optional
+        List of colors corresponding to the region names.
+
+    Returns
+    -------
+    str
+        The color corresponding to the matched region, or 'black' if no match is found.
+    """
     return_color = 'black'
     for name, color in zip(names, colors):
         if name in filename:
@@ -562,6 +601,21 @@ def get_name_from_filename(
     filename, 
     names=['Equator', 'Mascarene', 'Mayotte-Comores', 'South-Moz']
 ):
+    """
+    Get a region name based on the filename.
+
+    Parameters
+    ----------
+    filename : str
+        The filename to check.
+    names : list of str
+        List of region names to match.
+
+    Returns
+    -------
+    str
+        The matched region name, or 'global' if no match is found.
+    """
     return_name = 'global'
     for name in names:
         if name in filename:

@@ -124,12 +124,12 @@ Comme nous étudions une zone spécifique de l'océan indien, nous avons besoin 
 Dans ce modèle, le mélange vertical peut être géré de différentes manières. Ici, nous allons utiliser une paramétrisation en échelle de longueur caractéristiques (\textbf{GLS}). Plusieurs modèles existent pour cette paramétrisation, notamment le modèle $k-\omega$ et le modèle $k-\varepsilon$, où $k$ représente l'énergie turbulente, $\omega$ la fréquence de dissipation de $k$ et $\varepsilon$ son taux de dissipation. Nous avons choisi d'utiliser le modèle $k-\varepsilon$ \cite{launder_numerical_1974}, qui est le plus simple dans notre cas. En effet, le modèle $k - \omega$ convient davantage aux écoulements en présence de parois, tandis que nous paramétriserons ici également les effets de friction de fond. Ce choix implique l'approximation d'une turbulence isotrope dans l'océan. Dans \textbf{CROCO}, ce modèle est représenté par deux équations : \autoref{eq:dkdt} pour l'énergie cinétique et \autoref{eq:dpsidt} pour l'échelle de longueur caractéristique.
 \begin{subequations}
 	\begin{align}
-		\pd{k}{t} & = \pd{}{z} \left( K_k \pd{k}{z} \right) + P + B - \varepsilon \label{eq:dkdt} \\
+		\pd{k}{t} & = \pd{}{z} \left( K_k \pd{k}{z} \right) + P + D - \varepsilon \label{eq:dkdt} \\
 		\pd{\psi}{t} & = \pd{}{z} \left( K_\psi \pd{\psi}{z} \right) + \psi k^{-1} \left( \beta_1 P + \beta_3^\pm B - \beta_2 \varepsilon \right) \label{eq:dpsidt}
 	\end{align}
 \end{subequations}
 
-Avec $K_k = K_m / Sc_k$, $K_\psi = K_m / Sc_\psi$, ici $K_m$ est la viscosité turbulente et $Sc_i$ sont des paramètres appelés nombres de Schmidt. $P = K_m \left[ (\partial_z u)^2 + (\partial_z v)^2 \right]$ et $B = - K_s N^2$ représentent respectivement la production de TKE par frottement vertical et la destruction de TKE par stratification, ici $K_s$ est la diffusivité turbulente et $N^2$ est la fréquence de Brunt-Väisälä locale. Les termes $\beta_i$ sont des constantes. Nous pouvons ensuite calculer $\varepsilon$ et $\psi$ en \autoref{eq:varepsilon} ainsi que $l$ la longueur de mélange.
+Avec $K_k = K_m / Sc_k$, $K_\psi = K_m / Sc_\psi$, ici $K_m$ est la viscosité turbulente et $Sc_i$ sont des paramètres appelés nombres de Schmidt. $P = K_m \left[ (\partial_z u)^2 + (\partial_z v)^2 \right]$ et $D = - K_s N^2$ représentent respectivement la production de TKE par frottement vertical et la destruction de TKE par stratification, ici $K_s$ est la diffusivité turbulente et $N^2$ est la fréquence de Brunt-Väisälä locale. Les termes $\beta_i$ sont des constantes. Nous pouvons ensuite calculer $\varepsilon$ et $\psi$ en \autoref{eq:varepsilon} ainsi que $l$ la longueur de mélange.
 \begin{equation} \label{eq:varepsilon}
 	\varepsilon = (c_\mu^0)^{3+p/n} k^{3/2+m/n} \psi^{-1/n} \qquad \psi = (c_\mu^0)^p k^m l^n \qquad  l = (c_\mu^0)^{3} k^{3/2} \varepsilon^{-1}
 \end{equation}
@@ -156,6 +156,9 @@ L'approche primaire afin de transformer un modèle déterministe en un modèle p
 
 Ici $t$ correspond à l'indice temporel du modèle, $a^{(i)}, b^{(i)}, c^{(i)}$ sont des paramètres qui définissent la moyenne $\mu^{(i)}$, l'écart type $\sigma^{(i)}$ et l'échelle temporelle de correlation $\tau^{(i)}$ de chaque processus. $w$ sera la distribution stochastique que nous souhaitons appliquer à la variable, à l'ordre 0 cela correspond à un bruit blanc.
 
+\subsection{Champs d'étude}
+Nous allons étudier différentes sources d'incertitudes du modèle. La première, et la plus importante, est la variabilité du champ de conditions initiales. Ce premier ensemble permettra de quantifier la variabilité intrinsèque du modèle qui sera toujours présente dans les ensembles suivants. D'autres pistes seront étudiées par Lisa notamment la variabilité due au forçage atmosphérique ainsi que celle crée par les conditions aux frontières. Une autre voie d'étude est la variabilité induite par la paramétrisation du mélange vertical. Durant mon stage, je me focaliserai sur l'implémentation d'un ensemble stochastique sur la paramétrisation verticale.
+
 \subsection{Implémentation}
 Ces processus stochastiques sont implémentés dans \textbf{CROCO} sous la forme d'un module Fortran \textsc{STOGEN} couplé au code \textbf{CROCO}. Dans notre cas, nous allons avoir les paramètres suivants
 \begin{align}
@@ -166,8 +169,8 @@ Les statistiques de $X$ sont supposés constantes dans l'espace (homogénéité)
  
 Nous pouvons donc initialiser $a = \exp{\left(-1/\tau^{(i)} \right)}$ et $b = \sqrt{1 - a^2}$ en donnant comme paramètre d'entrée l'échelle de corrélation temporelle. Nous devons ensuite affiner ces valeurs afin d'obtenir des statistiques cohérentes avec celles des paramètres que nous souhaitons étudier.
 
-\subsection{Champs d'étude}
-Nous allons étudier différentes sources d'incertitudes du modèle. La première, et la plus importante, est la variabilité du champ de conditions initiales. Ce premier ensemble permettra de quantifier la variabilité intrinsèque du modèle qui sera toujours présente dans les ensembles suivants. D'autres pistes seront étudiées par Lisa notamment la variabilité due au forçage atmosphérique ainsi que celle crée par les conditions aux frontières. Une autre voie d'étude est la variabilité induite par la paramétrisation du mélange vertical.
+Concernant l'implémentation de ces processus dans le cadre d'une simulation ensembliste étudiant la paramétrisation verticale, il est intéressant de perturber les termes de production et de destruction de l'\autoref{eq:dkdt} de manière indépendante \cite{juricke_stochastic_2017}
+
 
 \subsection{Méthodes d'analyse}
 \subsubsection{Histogramme de rang} 
