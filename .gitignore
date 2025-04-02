@@ -20,6 +20,7 @@ Data
 !bibliography/*.pdf
 
 # Figures
+figures
 *.png
 !bibliography/*.png
 !book/*.png
@@ -67,3 +68,6 @@ modules/*/__pycache__/*
 
 # Input files
 *.in
+
+# Dev notebooks
+*dev.ipynb

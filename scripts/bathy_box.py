@@ -7,10 +7,12 @@ import cartopy.crs as ccrs
 from matplotlib.patches import Rectangle
 
 # Load data (same as your existing code)
-data = '/lus/store/CT1/c1601279/lweiss/RUN_CROCO/'
-simu = 'run_swio2_deter_2017_2023_complet/'
-grid = '/lus/store/CT1/c1601279/lweiss/GRID/croco_grid_swio2.nc'
-figures = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures'
+# data = '/lus/store/CT1/c1601279/lweiss/RUN_CROCO/'
+# simu = 'run_swio2_deter_2017_2023_complet/'
+# grid = '/lus/store/CT1/c1601279/lweiss/GRID/croco_grid_swio2.nc'
+grid = '/home/guilremy/IGE-Stochastic/Data/croco_grid_swio2.nc'
+# figures = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures'
+figures = '/home/guilremy/IGE-Stochastic/figures'
 
 g = xr.open_dataset(grid)
 h = g['h'][:, :] # Bathymetry
@@ -27,7 +29,7 @@ names = ['Equator', 'Mayotte-Comores', 'South-Moz', 'Mascarene']
 colors = ['saddlebrown', 'darkorchid', 'navy', 'teal']
 
 # Create figure
-fig = plt.figure(figsize=(8, 8))
+fig = plt.figure(figsize=(10, 8))
 ax = fig.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
 
 # Bathymetry plot
@@ -42,33 +44,37 @@ cs = ax.contour(lon, lat, h, levels=np.arange(0, 6000, 1000), colors='k', linest
 plt.clabel(cs, fmt='%d', inline=True, fontsize=5)
 cs2 = ax.contour(lon, lat, h, levels=np.arange(-300, 600, 400), colors='red', linestyles='dashed', linewidths=0.3, transform=ccrs.PlateCarree())
 plt.clabel(cs2, fmt='%d', inline=True, fontsize=5)
-ax.contour(lon, lat, msk, colors='k', linewidths=0.1)
-ax.contourf(lon, lat, msk_inv, colors='lightgray')
+
+# ax.coastlines(resolution='50m')
+# ax.add_feature(ccrs.cartopy.feature.LAND, edgecolor='black', zorder=3)
+# ax.add_feature(ccrs.cartopy.feature.COASTLINE, linewidth=0.5, zorder=3)
+# ax.add_feature(ccrs.cartopy.feature.BORDERS, linewidth=0.5, zorder=3)
 
 # Add gridlines
-gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True, linestyle='--', linewidth=0.2, color='k')
+gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True, linestyle='--', linewidth=0.2, color='k', zorder=4)
 gl.top_labels = False
 gl.right_labels = False
-gl.xlabel_style = {'size': 6, 'color': 'k'}
-gl.ylabel_style = {'size': 6, 'color': 'k'}
+gl.xlabel_style = {'color': 'k'}
+gl.ylabel_style = {'color': 'k'}
 
 # Add rectangles and labels
 for (xmin, xmax, ymin, ymax), name, color in zip(boxes, names, colors):
     ax.add_patch(Rectangle((xmin, ymin), xmax - xmin, ymax - ymin,
                            linewidth=2, edgecolor=color, facecolor='none', transform=ccrs.PlateCarree()))
-    ax.text((xmin + xmax) / 2, ymax + 0.5, name, color=color, fontsize=8, ha='center', va='bottom', transform=ccrs.PlateCarree())
+    ax.text((xmin + xmax) / 2, ymax + 0.5, name, color=color, fontsize=10, ha='center', va='bottom', transform=ccrs.PlateCarree())
 
 # Add bathymetry colorbar
-cb = fig.colorbar(pcm, ax=ax, label='Bathymetrie (m)')
+cb = fig.colorbar(pcm, ax=ax, label='Bathymetry (m)')
 colorbaryticks = np.linspace(a, b, c)
 posax = ax.get_position()
 poscb = cb.ax.get_position()
 cb.ax.set_position([0.76, posax.y0, poscb.width, posax.height])
 cb.set_ticks(colorbaryticks)
-cb.ax.set_yticklabels(colorbaryticks.astype(int), fontsize=6)
+cb.ax.set_yticklabels(colorbaryticks.astype(int), fontsize=10)
 text = cb.ax.yaxis.label
-font = mpl.font_manager.FontProperties(size=6)
+font = mpl.font_manager.FontProperties(size=10)
 text.set_font_properties(font)
 
-plt.savefig(f'{figures}/bathy_zones.png', dpi=300)
+plt.tight_layout()
+plt.savefig(f'{figures}/bathy_zones.png', dpi=300, transparent=True)
 plt.show()
