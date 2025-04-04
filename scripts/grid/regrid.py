@@ -32,15 +32,14 @@ grid_out = xr.Dataset(
     }
 )
 
-# data = glob(os.path.join(data_path, 'SSS_CMEMS', '*.nc'))     # SSS
-# data = glob(os.path.join(data_path, 'SLA_CMEMS', '*.nc'))     # SLA
-data = glob(os.path.join(data_path, 'SST_OSTIA', '*.nc'))     # SST
+# data = glob(os.path.join(data_path, 'SSS_CMEMS', '*.nc'))     # SSS
+data = glob(os.path.join(data_path, 'SLA_CMEMS', '*.nc'))     # SLA
+# data = glob(os.path.join(data_path, 'SST_OSTIA', '*.nc'))     # SST
 data.sort()
 
 path = data[0]
 
-#ds = xr.open_dataset(path)
-ds = xr.open_dataset(path)[['analysed_sst', 'analysis_error', 'sea_ice_fraction']]
+ds = xr.open_dataset(path)
 
 regridder_start = time.time()
 regridder = xe.Regridder(ds, grid_out, 'bilinear')
@@ -49,20 +48,20 @@ print(f'Regridder created in {time.time() - regridder_start:.2f} s')
 
 datasets = []
 
-for path in data[:]:
+for path in data[1200:]:
     file_start = time.time()
-    ds = xr.open_dataset(path)[['analysed_sst', 'analysis_error', 'sea_ice_fraction']]
+    ds = xr.open_dataset(path)
     ds_regridded = regridder(ds)
     ds.close()
     # datasets.append(ds_regridded[['sos', 'sos_error']])                 # SSS
-    # datasets.append(ds_regridded[['sla', 'err_sla']])                   # SLA  
-    datasets.append(ds_regridded[['analysed_sst', 'analysis_error']])   # SST
-    print(f'{path} regridded in {time.time() - file_start:.2f} s')
+    datasets.append(ds_regridded[['adt', 'sla', 'err_sla']])            # SLA
+    # datasets.append(ds_regridded[['analysed_sst', 'analysis_error']])   # SST
+    print(f'{path} regridded in {time.time() - file_start:.2f} s - {time.time() - glob_start:.2f} since beginning.')
 
 ds_combined = xr.concat(datasets, dim='time')
 ds_combined['time'] = ds_combined.time.astype('datetime64[D]')
 
 # output_path = '/home/guilremy/IGE-Stochastic/Data/data/REGRIDDED/SST_OSTIA_part1.nc'      # On local
-output_path = '/lus/work/CT1/c1601279/rguillermin/OBS/SST_OSTIA.nc'                       # On cluster
+output_path = '/lus/work/CT1/c1601279/rguillermin/OBS/SLA_SSALTO_part3.nc'                 # On cluster
 ds_combined.to_netcdf(output_path)
 print(f'Saved in {output_path} in {time.time() - glob_start:.2f} s')
