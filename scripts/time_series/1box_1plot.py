@@ -13,9 +13,9 @@ matplotlib.use('agg')
 # Path
 grid = '/lus/store/CT1/c1601279/lweiss/grid/croco_grid_swio2.nc'
 figures = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures'
-simu = '/lus/store/CT1/c1601279/lweiss/run_croco/run_swio2_deter2_2017_202*'
-file = 'swio_avg.nc'
-obs = '/lus/scratch/CT1/c1601279/rguillermin/REGRIDDED/OBS'
+simu = '/lus/store/CT1/c1601279/lweiss/run_croco/SWIO/run_swio2_deter2_2017_2023'
+file = 'swio_avg_201*.nc'
+obs = '/lus/work/CT1/c1601279/rguillermin/REGRIDDED/OBS'
 
 # Boxes
 boxes = [(48, 60, -4, 3), (41, 47, -15, -8), (36.5, 42.5, -30, -21), (52, 60, -24, -16)]
@@ -45,6 +45,7 @@ plt.close()
 # FILES
 croco = glob.glob(os.path.join(simu, file))
 croco.sort()
+print(croco)
 
 sss_files = glob.glob(os.path.join(obs, 'SSS*'))
 sss_files.sort()
@@ -64,12 +65,12 @@ obs_temp = xr.open_dataset(sst_files[0])["analysed_sst"].sel(time = slice(np.dat
     
 obs_zeta = xr.open_dataset(zeta_files[0])["sla"].sel(time = slice(np.datetime64('2017'), np.datetime64('2020')))
 
-obs_ds = xr.merge([obs_zeta, obs_temp, obs_salt]).rename({'x': 'xi_rho', 'y': 'eta_rho'}).isel(depth=0, drop=True)
+obs_ds = xr.merge([obs_zeta, obs_temp, obs_salt])
 
-croco_ds = xr.open_dataset(croco[0])[['temp', 'salt', 'zeta']].isel(s_rho=-1, drop=True)
+croco_ds = xr.open_mfdataset(croco)[['temp', 'salt', 'zeta']].isel(s_rho=-1, drop=True)
 croco_ds = croco_ds.where((croco_ds != fill_value), np.nan)
 
-
+print('Concat done')
 
 # GRID
 g = xr.open_dataset(grid)[['lon_rho', 'lat_rho']]
