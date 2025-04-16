@@ -8,6 +8,8 @@ import sys
 import matplotlib.colors as mcolors
 import time
 
+
+
 # PARAMETERS
 # Path
 figures = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures/Ensembles'
@@ -28,9 +30,6 @@ n_colors = 4
 box_colors = [cmap(i / (n_colors - 1)) for i in range(n_colors)]
 box_colors[0] = mcolors.to_rgba('palevioletred')
 box_colors[-1] = mcolors.to_rgba('sandybrown')
-
-fill_value = 9.96921e+36
-roll = 9
 
 
 
@@ -79,12 +78,25 @@ for f in ensemble_str_files:
 
 print('members : ', len(ensemble_str_datasets), 'time dim : ', len(ensemble_str_datasets[0]['time']))
 
+
+
 combined_ini = xr.concat(ensemble_ini_datasets, dim='ensemble')
 combined_str = xr.concat(ensemble_str_datasets, dim='ensemble')
+
+
 
 ensemble_mean2d_ini = combined_ini.mean(dim='ensemble')
 ensemble_mean2d_str = combined_str.mean(dim='ensemble')
 print('Ensemble mean computed.')
+
+# member_deviations2d_ini = combined_ini - ensemble_mean2d_ini
+# member_deviations2d_str = combined_ini - ensemble_mean2d_str
+# print('Member deviation computed.')
+
+# sq_deviation2d_ini = member_deviations2d_ini ** 2
+# sq_deviation2d_str = member_deviations2d_str ** 2
+# print('Member STD computed.')
+
 
 
 variables = {'sst': ('temp', 'analysed_sst'), 'sss': ('salt', 'sos'), 'ssh': ('zeta', 'adt')}
