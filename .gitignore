@@ -69,6 +69,11 @@ modules/*/__pycache__/*
 # Input files
 *.in
 
+# Output files
+*.out
+*.err
+scripts/output/*
+
 # Dev notebooks
 *dev.ipynb
 *dev*.ipynb
