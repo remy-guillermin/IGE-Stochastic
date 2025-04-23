@@ -3,6 +3,7 @@ import numpy as np
 import xarray as xr
 import matplotlib
 import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
 import cmocean
 import cartopy.crs as ccrs
 import glob
@@ -77,19 +78,29 @@ for path in ensemble_str_files:
 
 
 ensemble_ini_datasets = []       
-for _, paths in ensemble_ini_dict.items():
-    ds = xr.open_mfdataset(paths)
+for key, paths in ensemble_str_dict.items():
+    print(f'Merging member{key}.')
+    ds = xr.Dataset()
+    for path in paths:
+        temp_ds = xr.open_dataset(path)
+        mask = np.full(temp_ds.time.size, True)
+        if ds.variables !=  {}:
+            mask = ~np.isin(temp_ds.time, ds.time)
+        ds = xr.merge([ds, temp_ds.isel(time=mask)])
     ensemble_ini_datasets.append(ds)
-
 print('members : ', len(ensemble_ini_datasets), 'time dim : ', len(ensemble_ini_datasets[0]['time']))
 
 ensemble_str_datasets = []       
-for _, paths in ensemble_str_dict.items():
+for key, paths in ensemble_str_dict.items():
+    print(f'Merging member{key}.')
     ds = xr.Dataset()
     for path in paths:
-        ds = xr.merge([ds, xr.open_dataset(path)], compat='override')
+        temp_ds = xr.open_dataset(path)
+        mask = np.full(temp_ds.time.size, True)
+        if ds.variables !=  {}:
+            mask = ~np.isin(temp_ds.time, ds.time)
+        ds = xr.merge([ds, temp_ds.isel(time=mask)])
     ensemble_str_datasets.append(ds)
-
 print('members : ', len(ensemble_str_datasets), 'time dim : ', len(ensemble_str_datasets[0]['time']))
 
 
@@ -136,22 +147,25 @@ for i in range(combined_ini.time.size):
     # Salinity
     ax = axs[0]
     ax.set_title("Salinity")
+    norm = mcolors.Normalize(vmin=0, vmax=0.3)
 
-    pcm = ax.pcolormesh(lon, lat, std.salt, cmap=cmocean.cm.dense, transform=ccrs.PlateCarree())
+    pcm = ax.pcolormesh(lon, lat, std.salt, cmap=cmocean.cm.dense, transform=ccrs.PlateCarree(), norm=norm)
     cb = plt.colorbar(pcm, ax=ax, label='Salinity standard deviation [psu]', orientation='vertical')
 
     # Free surface
     ax = axs[1]
     ax.set_title("Free Surface")
+    norm = mcolors.Normalize(vmin=0, vmax=0.25)
 
-    pcm = ax.pcolormesh(lon, lat, std.zeta, cmap=cmocean.cm.dense, transform=ccrs.PlateCarree())
+    pcm = ax.pcolormesh(lon, lat, std.zeta, cmap=cmocean.cm.dense, transform=ccrs.PlateCarree(), norm=norm)
     cb = plt.colorbar(pcm, ax=ax, label='Free surface standard deviation [m]', orientation='vertical')
 
     # Temperature
     ax = axs[2]
     ax.set_title("Temperature")
+    norm = mcolors.Normalize(vmin=0, vmax=1.0)
 
-    pcm = ax.pcolormesh(lon, lat, std.temp, cmap=cmocean.cm.dense, transform=ccrs.PlateCarree())
+    pcm = ax.pcolormesh(lon, lat, std.temp, cmap=cmocean.cm.dense, transform=ccrs.PlateCarree(), norm=norm)
     cb = plt.colorbar(pcm, ax=ax, label='Temperature standard deviation [°C]', orientation='vertical')
 
     fig.tight_layout()

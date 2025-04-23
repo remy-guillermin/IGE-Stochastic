@@ -4,20 +4,21 @@ import matplotlib.pyplot as plt
 import os
 import cmocean
 import glob
-import sys
+import matplotlib
 import matplotlib.colors as mcolors
 import time
+matplotlib.use('agg')
 
 
 
 # PARAMETERS
 # Path
 figures = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures/Ensembles'
-work = '/lus/work/CT1/c1601279/lweiss/CROCO/'
+work = '/lus/work/CT1/c1601279/rguillermin/'
 nan_rem = '/lus/work/CT1/c1601279/rguillermin/NaN_CORRECTED/'
 stoens = ['run_swio2_stoens30_2017_ini', 'run_swio2_stoens30_2017_CD']
 obs = '/lus/store/CT1/c1601279/rguillermin/REGRIDDED/OBS'
-grid = '/lus/store/CT1/c1601279/lweiss/grid/croco_grid_swio2.nc'
+grid = os.path.join(work, 'grid/croco_grid_swio2.nc')
 
 ensembles = ['INI', 'STR']
 linestyles = ['solid', 'dashed']
@@ -51,15 +52,13 @@ g = xr.open_dataset(grid)[['lon_rho', 'lat_rho', 'mask_rho']]
 
 
 
-# DATASET
-obs_salt = xr.open_dataset(sss_files[0]).sel(time = slice(np.datetime64('2017'), np.datetime64('2020')))
+# OBS DATASET
+# obs_salt = xr.open_dataset(sss_files[0]).sel(time = slice(np.datetime64('2017'), np.datetime64('2020')))
     
-obs_temp = xr.open_dataset(sst_files[0]).sel(time = slice(np.datetime64('2017'), np.datetime64('2020'))) - 273.15
+# obs_temp = xr.open_dataset(sst_files[0]).sel(time = slice(np.datetime64('2017'), np.datetime64('2020'))) - 273.15
     
-obs_zeta = xr.open_dataset(zeta_files[0]).sel(time = slice(np.datetime64('2017'), np.datetime64('2020')))
-obs_ds = xr.merge([obs_zeta, obs_temp, obs_salt])
-
-
+# obs_zeta = xr.open_dataset(zeta_files[0]).sel(time = slice(np.datetime64('2017'), np.datetime64('2020')))
+# obs_ds = xr.merge([obs_zeta, obs_temp, obs_salt])
 
 ensemble_ini_datasets = []
 start = time.time()
@@ -78,33 +77,17 @@ for f in ensemble_str_files:
 
 print('members : ', len(ensemble_str_datasets), 'time dim : ', len(ensemble_str_datasets[0]['time']))
 
-
-
 combined_ini = xr.concat(ensemble_ini_datasets, dim='ensemble')
 combined_str = xr.concat(ensemble_str_datasets, dim='ensemble')
-
-
 
 ensemble_mean2d_ini = combined_ini.mean(dim='ensemble')
 ensemble_mean2d_str = combined_str.mean(dim='ensemble')
 print('Ensemble mean computed.')
 
-# member_deviations2d_ini = combined_ini - ensemble_mean2d_ini
-# member_deviations2d_str = combined_ini - ensemble_mean2d_str
-# print('Member deviation computed.')
-
-# sq_deviation2d_ini = member_deviations2d_ini ** 2
-# sq_deviation2d_str = member_deviations2d_str ** 2
-# print('Member STD computed.')
-
-
-
 variables = {'sst': ('temp', 'analysed_sst'), 'sss': ('salt', 'sos'), 'ssh': ('zeta', 'adt')}
 fig_types = ['mean_comparison', 'deviation', 'rms_deviation']
 rms_list = {ensemble : {} for ensemble in ensembles}
 rms_uv_list = {}
-
-
 
 for (lon1, lon2, lat1, lat2), name in zip(boxes, names):        
     region_mask = g.lon_rho.where((g.lon_rho > lon1) & (g.lon_rho < lon2) & (g.lat_rho > lat1) & (g.lat_rho < lat2), False)
@@ -120,7 +103,7 @@ for (lon1, lon2, lat1, lat2), name in zip(boxes, names):
     member_deviations_ini = member_deviations2d_ini.mean(dim=['eta_rho', 'xi_rho'], skipna=True)
     sq_deviation_ini = (member_deviations2d_ini ** 2).mean(dim=['eta_rho', 'xi_rho'], skipna=True)
     
-    rms_ini = sq_deviation_ini.sum(dim='ensemble') / len(sq_deviation_ini)
+    rms_ini = np.sqrt(sq_deviation_ini.sum(dim='ensemble') / len(sq_deviation_ini))
     rms_list['INI'][name] = rms_ini
     
     member_means2d_str = combined_str.where(region_mask, drop=True)
@@ -133,16 +116,16 @@ for (lon1, lon2, lat1, lat2), name in zip(boxes, names):
     member_deviations_str = member_deviations2d_str.mean(dim=['eta_rho', 'xi_rho'], skipna=True)
     sq_deviation_str = (member_deviations2d_str ** 2).mean(dim=['eta_rho', 'xi_rho'], skipna=True)
     
-    rms_str = sq_deviation_str.sum(dim='ensemble') / len(sq_deviation_str)
+    rms_str = np.sqrt(sq_deviation_str.sum(dim='ensemble') / len(sq_deviation_str))
     rms_list['STR'][name] = rms_str
        
-    obs_mean = obs_ds.where(region_mask, drop=True).mean(dim=['eta_rho', 'xi_rho'], skipna=True)
+    # obs_mean = obs_ds.where(region_mask, drop=True).mean(dim=['eta_rho', 'xi_rho'], skipna=True)
     
     for var_name, (var, obs_var) in variables.items():
         print(name, var_name,var)
         
         # MEAN
-        fig, ax = plt.subplots(figsize=(10, 4))
+        fig, ax = plt.subplots(figsize=(10, 5))
         
         for i in range(member_means_ini.sizes['ensemble']):
             member = member_means_ini.isel(ensemble=i)
@@ -160,7 +143,7 @@ for (lon1, lon2, lat1, lat2), name in zip(boxes, names):
         
         ax.plot(ensemble_mean_str.time, ensemble_mean_str[var], color='royalblue', label='STR - Ensemble mean', linewidth=1)
         
-        ax.plot(obs_mean.time, obs_mean[obs_var], color='red', label='OBS', linewidth=2)
+        # ax.plot(obs_mean.time, obs_mean[obs_var], color='red', label='OBS', linewidth=2)
         
         fig.suptitle(f'Average {var_name.upper()} in the {name} zone')        
         ax.set_xlim(np.datetime64('2017-01-01'), np.datetime64('2017-12-31'))
@@ -173,13 +156,13 @@ for (lon1, lon2, lat1, lat2), name in zip(boxes, names):
         plt.close()
         
         # DEVIATION
-        fig, ax = plt.subplots(figsize=(10, 4))
+        fig, ax = plt.subplots(figsize=(10, 5))
+
+        std_str = member_deviations_str.std(dim='ensemble')
+        ax.fill_between(std_str.time, - std_str[var], std_str[var], color='royalblue', alpha=0.5, label='STR - Member', linewidth=0.5)
 
         std_ini = member_deviations_ini.std(dim='ensemble')
         ax.fill_between(std_ini.time, - std_ini[var], std_ini[var], color='firebrick', alpha=0.5, label='INI - Member', linewidth=0.5)
-
-        std_ini = member_deviations_str.std(dim='ensemble')
-        ax.fill_between(std_ini.time, - std_ini[var], std_ini[var], color='royalblue', alpha=0.5, label='STR - Member', linewidth=0.5)
         
         fig.suptitle(f'{var_name.upper()} deviation from the ensemble mean in the {name} zone')        
         ax.set_xlim(np.datetime64('2017-01-01'), np.datetime64('2017-12-31'))
@@ -193,7 +176,7 @@ for (lon1, lon2, lat1, lat2), name in zip(boxes, names):
         plt.close()
 
 for var_name, (var, obs_var) in variables.items():
-    fig, ax = plt.subplots(figsize=(10, 4))
+    fig, ax = plt.subplots(figsize=(10, 5))
     for i, (ensemble, ensemble_rms_list) in enumerate(rms_list.items()):
         for j, (name, rms) in enumerate(ensemble_rms_list.items()):
             ax.plot(rms[var].time, rms[var], label=name if (ensemble == 'INI') else None, linestyle=linestyles[i], color=box_colors[j])

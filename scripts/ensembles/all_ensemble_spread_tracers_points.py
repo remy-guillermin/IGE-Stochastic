@@ -23,14 +23,11 @@ ensembles = ['INI', 'STR']
 linestyles = ['solid', 'dashed']
 
 # Plot
-points = [(290, 245), (285, 182)]
-names = ['North-Mad', 'Islands']
+points = [(285, 182), (425, 300), (185, 320), (120, 135)]#, (290, 245)]
+points_names = ['Islands', 'Equator', 'Mascarene', 'South-Moz']#, 'North-Mad']
 cmap = cmocean.cm.tempo_r
-n_colors = 2
+n_colors = 4
 box_colors = [cmap(i / (n_colors - 1)) for i in range(n_colors)]
-box_colors[0] = mcolors.to_rgba('palevioletred')
-box_colors[-1] = mcolors.to_rgba('sandybrown')
-
 
 
 # DATASET
@@ -103,13 +100,13 @@ zeta_files.sort()
 # GRID
 g = xr.open_dataset(grid)[['lon_rho', 'lat_rho', 'mask_rho']]
 
-# DATASET
-obs_salt = xr.open_dataset(sss_files[0]).sel(time = slice(np.datetime64('2017'), np.datetime64('2020')))
+# # DATASET
+# obs_salt = xr.open_dataset(sss_files[0]).sel(time = slice(np.datetime64('2017'), np.datetime64('2020')))
     
-obs_temp = xr.open_dataset(sst_files[0]).sel(time = slice(np.datetime64('2017'), np.datetime64('2020'))) - 273.15
+# obs_temp = xr.open_dataset(sst_files[0]).sel(time = slice(np.datetime64('2017'), np.datetime64('2020'))) - 273.15
     
-obs_zeta = xr.open_dataset(zeta_files[0]).sel(time = slice(np.datetime64('2017'), np.datetime64('2020')))
-obs_ds = xr.merge([obs_zeta, obs_temp, obs_salt])
+# obs_zeta = xr.open_dataset(zeta_files[0]).sel(time = slice(np.datetime64('2017'), np.datetime64('2020')))
+# obs_ds = xr.merge([obs_zeta, obs_temp, obs_salt])
 
 combined_ini = xr.concat(ensemble_ini_datasets, dim='ensemble')
 combined_str = xr.concat(ensemble_str_datasets, dim='ensemble')
@@ -127,7 +124,7 @@ fig_types = ['mean_comparison', 'deviation', 'rms_deviation']
 
 
 
-for (ilon, ilat), name in zip(points, names):        
+for (ilon, ilat), name in zip(points, points_names):        
     member_means_ini = combined_ini.isel(eta_rho=ilon, xi_rho=ilat)
     
     ensemble_mean_ini = ensemble_mean2d_ini.isel(eta_rho=ilon, xi_rho=ilat)
@@ -142,7 +139,7 @@ for (ilon, ilat), name in zip(points, names):
     member_deviations_str = (member_means_str - ensemble_mean_str)
     sq_deviation_str = (member_deviations_str ** 2)
     
-    obs_mean = obs_ds.isel(eta_rho=ilon, xi_rho=ilat)
+    # obs_mean = obs_ds.isel(eta_rho=ilon, xi_rho=ilat)
     
     for var_name, (var, obs_var) in variables.items():
         print(name, var_name,var)
