@@ -1,14 +1,11 @@
 all:
-	make cleanpdf && make report.pdf && make slides.pdf
+	make cleanpdf && make report.pdf && make draft.pdf
 
 draft.pdf:
 	cd draft && latexmk -halt-on-error -f -shell-escape -pdf -quiet draft.tex && rsync draft.pdf ../draft.pdf 
 
 report.pdf:
 	cd report && latexmk -halt-on-error -f -shell-escape -pdf -quiet report.tex && rsync report.pdf ../report.pdf 
-
-slides.pdf:
-	cd slides && latexmk -halt-on-error -f -shell-escape -pdf -quiet slides.tex && rsync slides.pdf ../slides.pdf 
 
 install:
 	pip install -e modules/
