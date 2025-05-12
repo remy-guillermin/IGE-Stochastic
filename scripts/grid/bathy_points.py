@@ -14,7 +14,7 @@ from matplotlib.patches import Rectangle
 
 # PATH
 figures = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures'
-scratch = '/lus/scratch/CT1/c1601279/lweiss/CROCO/SWIOSE_dev/'
+store = '/lus/store/CT1/c1601279/lweiss/run_croco/SWIOSE_dev/'
 stoens = 'run_swio2_stoens30_2018_CD'
 grid = '/lus/store/CT1/c1601279/lweiss/grid/croco_grid_swio2.nc'
 
@@ -34,8 +34,8 @@ box_colors[0] = mcolors.to_rgba('palevioletred')
 box_colors[-1] = mcolors.to_rgba('sandybrown')
 
 lat_index = [430, 280]
-points = [(290, 245), (285, 182)]
-points_names = ['North-Mad', 'Islands']
+points = [(280, 380), (280, 190), (430, 180)]
+points_names = ['Mascarene', 'Islands', 'Somali']
 
 def calc_depth(
     s: xr.DataArray, 
@@ -79,7 +79,7 @@ xi_rho = g.xi_rho
 h = g.h
 g.close()
 
-ensemble_str_files = [os.path.join(scratch, stoens, f"{i:03d}swiose_avg.nc") for i in range(1, 31)]
+ensemble_str_files = [os.path.join(store, stoens, f"{i:03d}swiose_avg.nc") for i in range(1, 31)]
 
 ds = xr.open_dataset(ensemble_str_files[0])
 depth_sigma = calc_depth(ds.s_rho, ds.Cs_rho, ds.hc, h)
@@ -140,7 +140,7 @@ for index in lat_index:
 
 for k, (i, j) in enumerate(points):
     ax.scatter(lon[i, j], lat[i, j], 10, color='red')
-    ax.text(lon[i, j], lat[i, j] + 0.5, points_names[k], color='red', ha='center', va='bottom')
+    ax.text(lon[i, j], lat[i, j] - 0.5, points_names[k], color='red', ha='center', va='top')
 
 fig.tight_layout()
 fig.savefig(f'{figures}/bathy_slices.png', dpi=300, transparent=True)

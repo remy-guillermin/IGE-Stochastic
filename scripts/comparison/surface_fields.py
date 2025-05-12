@@ -1,67 +1,100 @@
-# Libs
-import cmcrameri
-import cmocean
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-import cartopy.crs as ccrs
+# LIBRAIRIES
 import numpy as np
-import croco_plot as cplot
+import xarray as xr
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+import matplotlib.colors as mcolors
+import metpy.calc as mpcalc
+import cmocean
+import cartopy.crs as ccrs
+import glob
 import os
+from functools import partial
+
+# PARAMETERS
+# Path
+figures = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures/Ensembles'
+work = '/lus/work/CT1/c1601279/lweiss/CROCO/'
+obs_dir = '/lus/store/CT1/c1601279/rguillermin/REGRIDDED/OBS'
+grid = '/lus/store/CT1/c1601279/lweiss/grid/croco_grid_swio2.nc'
+data = '/lus/store/CT1/c1601279/lweiss/run_croco/SWIO/run_swio2_deter2_2017_2023'
+
+ensembles = ['INI', 'STR']
+linestyles = ['solid', 'dashed']
+
+date = '2017-06-15'
+trimonth = {"DJF": slice('2016-12', '2017-02'), 'MAM': slice('2017-03', '2017-05'), 'JJA': slice('2017-06', '2017-08'), 'SON': slice('2017-09', '2017-11')}
+months = 'JJA'
+year = '2019'
 
 SWIO = (25, 69, -36, 7)
-
-vort_cmap=cmcrameri.cm.vik
-velo_cmap=cmocean.cm.speed
-gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.3}
-
-# Define zones
-boxes = [(48, 60, -4, 3), (41, 47, -15, -8), (36.5, 42.5, -30, -21), (52, 60, -24, -16)]
-names = ['Equator', 'Islands', 'South-Moz', 'Mascarene']
-colors = ['saddlebrown', 'darkorchid', 'navy', 'teal']
-
-lat_index = (172, 280, 430)
-lon_index = (160, 335)
-
-visc_cmap = cmocean.cm.amp
-diff_cmap = cmocean.cm.tempo
+# Plot
+gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.5}
+figsize = (15, 6)
+cmap = cmocean.cm.balance
 
 
-# LOCAL
-# data_path = '/home/guilremy/IGE-Stochastic/Data/swio_avg_suf.nc'
-# grid_path = '/home/guilremy/IGE-Stochastic/Data/croco_grid_swio2.nc'
-# glorys_path = '/home/guilremy/IGE-Stochastic/Data/glorys_avg_suf.nc'
 
-# CLUSTER
-data_path = ''
-grid_path = '/lus/store/CT1/c1601279/lweiss/grid/croco_grid_swio2.nc'
-glorys_path = ''
+data_files = glob.glob(os.path.join(data, 'swio_avg_201*.nc'))
+data_files.sort()
 
-vort_g, velo_g = cplot.utils.load_data(glorys_path, ('vort','V_hor'))
-vort_c, velo_c = cplot.utils.load_data(data_path, ('vort','V_hor'))
-lon, lat, pm, pn, msk, msk_inv, angle, h = cplot.utils.load_grid(grid_path)
+sss_files = glob.glob(os.path.join(obs_dir, 'SSS*'))
+sss_files.sort()
 
-mask = np.zeros_like(msk, dtype=bool)
-mask[msk == 0] = True
-mask[msk == 1] = False
+sst_files = glob.glob(os.path.join(obs_dir, 'SST*'))
+sst_files.sort()
 
-velo_c, vort_c, velo_g, vort_g = velo_c[0, 0, :, :], vort_c[0, 0, :, :], velo_g[0, 0, :, :], vort_g[0, 0, :, :]
-velo_c.data[mask] = np.nan
-vort_c.data[mask] = np.nan
 
-date = np.datetime_as_string(vort_g.time.data, 'D')
 
-fig, axes = plt.subplots(1, 2, figsize=(14, 6), subplot_kw={'projection': ccrs.PlateCarree()})
-
-fig.suptitle('Surface velocity [m/s]')
-
-for ax in axes:
-    ax.set_extent(SWIO) 
+obs_salt = xr.open_dataset(sss_files[0]).sel(time = slice(np.datetime64('2017'), np.datetime64('2020')))
     
+obs_temp = xr.open_dataset(sst_files[0]).sel(time = slice(np.datetime64('2017'), np.datetime64('2020'))) - 273.15
+    
+obs_ds = xr.merge([obs_temp, obs_salt])
+
+
+
+data_ds = xr.open_dataset(data_files[0])[['temp', 'salt']].isel(s_rho=-1)
+
+for file in data_files[1:]:
+    ds = xr.open_dataset(file)[['temp', 'salt']].isel(s_rho=-1)
+    data_ds = xr.concat([data_ds, ds], dim='time')
+
+
+
+data_ds['time'] = data_ds.time.astype('datetime64[D]')
+obs_ds['time'] = obs_ds.time.astype('datetime64[D]')
+
+
+
+g = xr.open_dataset(grid)
+lon = g['lon_rho'][:, :]
+lat = g['lat_rho'][:, :]
+msk = g['mask_rho'][:, :]
+pm = g['pm'][:,:] 
+pn = g['pn'][:,:]
+msk_inv = np.where(msk == 0, msk, np.nan)
+h = g['h'][:, :]
+angle = g['angle'][:, :]
+g.close()
+print("Grid loaded.")
+
+
+
+data_ds = data_ds.where(msk)
+
+
+
+fig, axs = plt.subplots(1, 2, figsize=figsize, subplot_kw={'projection': ccrs.PlateCarree()})
+fig.suptitle(f"Deviation from Observation {year}")
+
+for ax in axs:
+    ax.set_extent(SWIO)
     ax.coastlines(resolution='50m')
     ax.add_feature(ccrs.cartopy.feature.LAND, edgecolor='black', zorder=3)
     ax.add_feature(ccrs.cartopy.feature.COASTLINE, linewidth=0.5, zorder=3)
     ax.add_feature(ccrs.cartopy.feature.BORDERS, linewidth=0.5, zorder=3)
-    
+
     land_color = ccrs.cartopy.feature.COLORS['land']
 
     minor_islands = ccrs.cartopy.feature.NaturalEarthFeature(
@@ -74,74 +107,35 @@ for ax in axes:
 
     ax.add_feature(minor_islands, zorder=3)
     
-    gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True, linestyle='--', linewidth=0.2, color='k')
+    gl = ax.gridlines(crs=ccrs.PlateCarree(), **gridline_style)
     gl.top_labels = False
     gl.right_labels = False
-    gl.xlabel_style = {'color': 'k'}
-    gl.ylabel_style = {'color': 'k'}
+    gl.xlabel_style = gl.ylabel_style = {'color': 'k'}
 
-ax = axes[0]
-ax.set_title('GLORYS')
+member = data_ds.sel(time=year)
+obs = obs_ds.sel(time=year)[['analysed_sst', "sos"]].rename({'analysed_sst': 'temp', 'sos': 'salt'})
 
-pcm_g = ax.pcolormesh(velo_g.longitude, velo_g.latitude, velo_g, cmap=velo_cmap, norm=mpl.colors.LogNorm(vmin=0.1, vmax=2), transform=ccrs.PlateCarree())
-cb_g = plt.colorbar(pcm_g, ax=ax, orientation='vertical')
+diff = (member - obs).mean(dim='time')
+maximum = np.abs(diff).max()
 
-ax = axes[1]
-ax.set_title('CROCO')
+# Salinity
+ax = axs[0]
+ax.set_title("Salinity")
 
-pcm_c = ax.pcolormesh(lon.data, lat.data, velo_c, cmap=velo_cmap, norm=mpl.colors.LogNorm(vmin=0.1, vmax=2), transform=ccrs.PlateCarree())
-cb_c = plt.colorbar(pcm_c, ax=ax, orientation='vertical')
+pcm = ax.pcolormesh(lon, lat, diff.salt, cmap=cmap, transform=ccrs.PlateCarree(), vmin=-maximum.salt, vmax=maximum.salt)
+cb = plt.colorbar(pcm, ax=ax, label='Salinity deviation [psu]', orientation='vertical')
 
-plt.tight_layout()
-plt.savefig(f'/home/guilremy/IGE-Stochastic/figures/velocity_dual_{date}.png', dpi=300, transparent=True)
+# Salinity
+ax = axs[1]
+ax.set_title("Temperature")
 
-fig, axes = plt.subplots(1, 2, figsize=(14, 6), subplot_kw={'projection': ccrs.PlateCarree()})
+pcm = ax.pcolormesh(lon, lat, diff.temp, cmap=cmap, transform=ccrs.PlateCarree(), vmin=-maximum.temp, vmax=maximum.temp)
+cb = plt.colorbar(pcm, ax=ax, label='Temperature deviation [°C]', orientation='vertical')
 
-fig.suptitle(f'Surface vorticity [1/s] - {date}')
-
-for ax in axes:
-    ax.set_extent(SWIO)   
-    ax.coastlines(resolution='50m')
-    ax.add_feature(ccrs.cartopy.feature.LAND, edgecolor='black', zorder=3)
-    ax.add_feature(ccrs.cartopy.feature.COASTLINE, linewidth=0.5, zorder=3)
-    ax.add_feature(ccrs.cartopy.feature.BORDERS, linewidth=0.5, zorder=3)
-    
-    land_color = ccrs.cartopy.feature.COLORS['land']
-
-    minor_islands = ccrs.cartopy.feature.NaturalEarthFeature(
-        category='physical',
-        name='minor_islands',
-        scale='10m',
-        facecolor=land_color,
-        edgecolor='black'
-    )
-
-    ax.add_feature(minor_islands, zorder=3)
-    
-    gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True, linestyle='--', linewidth=0.2, color='k')
-    gl.top_labels = False
-    gl.right_labels = False
-    gl.xlabel_style = {'color': 'k'}
-    gl.ylabel_style = {'color': 'k'}
-
-ax = axes[0]
-ax.set_title('GLORYS')
-
-pcm_g = ax.pcolormesh(vort_g.longitude, vort_g.latitude, vort_g, cmap=vort_cmap, vmin=-0.0001, vmax=0.0001, transform=ccrs.PlateCarree())
-cb_g = plt.colorbar(pcm_g, ax=ax, orientation='vertical')
-ticks = cb_g.get_ticks()
-cb_g.set_ticks(ticks)
-cb_g.set_ticklabels([f'{tick:.1e}' for tick in ticks])
-
-ax = axes[1]
-ax.set_title('CROCO')
-
-pcm_c = ax.pcolormesh(lon.data, lat.data, vort_c, cmap=vort_cmap, vmin=-0.0001, vmax=0.0001, transform=ccrs.PlateCarree())
-cb_c = plt.colorbar(pcm_c, ax=ax, orientation='vertical')
-ticks = cb_c.get_ticks()
-cb_c.set_ticks(ticks)
-cb_c.set_ticklabels([f'{tick:.1e}' for tick in ticks])
-
-plt.tight_layout()
-plt.savefig(f'/home/guilremy/IGE-Stochastic/figures/vorticity_dual_{date}.png', dpi=300, transparent=True)
+fig.tight_layout()
+filename = os.path.join(figures, f"deviation_obs_{year}_deter.png")
+fig.savefig(filename, dpi=300, transparent=True)
 plt.show()
+
+
+
