@@ -17,7 +17,7 @@ figures = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures/Ensembles'
 
 stoens = 'CROCO/SWIOSE_dev/run_swio2_stoens2_gls_2017'
 
-grid = '/lus/store/CT1/c1601279/lweiss/grid/croco_grid_swio2.nc'
+grid = '/lus/work/CT1/c1601279/rguillermin/grid/croco_grid_swio2.nc'
 
 lat_index = [430, 280]
 SWIO = (25, 69, -36, 7)
