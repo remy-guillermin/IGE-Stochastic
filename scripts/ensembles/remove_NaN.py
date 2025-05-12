@@ -9,7 +9,7 @@ import time
 store = '/lus/store/CT1/c1601279/lweiss/run_croco/'
 scratch = '/lus/scratch/CT1/c1601279/rguillermin/CROCO/'
 work = '/lus/work/CT1/c1601279/lweiss/CROCO/'
-stoens = ['run_swio2_stoens30_2017_ini', 'run_swio2_stoens30_2017_CD', 'run_swio2_stoens30_gls_2017']
+stoens = ['run_swio2_stoens30_2017_ini', 'run_swio2_stoens30_2017_CD', 'run_swio2_stoens30_gls_2019']
 grid = '/lus/work/CT1/c1601279/rguillermin/grid/croco_grid_swio2.nc'
 NaN_output = '/lus/work/CT1/c1601279/rguillermin/NaN_CORRECTED'
 

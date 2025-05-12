@@ -108,8 +108,6 @@ print('members : ', len(ensemble_str_datasets), 'time dim : ', len(ensemble_str_
 combined_ini = xr.concat(ensemble_ini_datasets, dim='ensemble')
 combined_str = xr.concat(ensemble_str_datasets, dim='ensemble')
 
-
-
 for i in range(combined_ini.time.size):
     date = combined_ini.time.isel(time=i).data.astype('datetime64[D]')
     print(f"Plotting {date}.")

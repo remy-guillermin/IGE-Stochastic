@@ -6,7 +6,7 @@ import cmocean
 import glob
 import matplotlib
 import matplotlib.colors as mcolors
-import time
+import re
 matplotlib.use('agg')
 
 
@@ -16,12 +16,12 @@ matplotlib.use('agg')
 figures = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures/Ensembles'
 work = '/lus/work/CT1/c1601279/rguillermin/'
 nan_rem = '/lus/work/CT1/c1601279/rguillermin/NaN_CORRECTED/'
-stoens = ['run_swio2_stoens30_2017_ini', 'run_swio2_stoens30_2017_CD']
+stoens = ['run_swio2_stoens30_201*_ini', 'run_swio2_stoens30_201*_CD', 'run_swio2_stoens30_201*_gls']
 obs = '/lus/store/CT1/c1601279/rguillermin/REGRIDDED/OBS'
 grid = os.path.join(work, 'grid/croco_grid_swio2.nc')
 
-ensembles = ['INI', 'STR']
-linestyles = ['solid', 'dashed']
+ensembles = ['INI', 'STR', 'GLS']
+linestyles = ['solid', 'dashed', 'dotted']
 
 # Plot
 boxes = [(48, 60, -4, 3), (41, 47, -15, -8), (36.5, 42.5, -30, -21), (52, 60, -24, -16)]
@@ -34,60 +34,100 @@ box_colors[-1] = mcolors.to_rgba('sandybrown')
 
 
 
-ensemble_ini_files = [os.path.join(nan_rem, stoens[0], f"{i:03d}swiose_avg.nc") for i in range(1, 31)]
-ensemble_str_files = [os.path.join(nan_rem, stoens[1], f"{i:03d}swiose_avg.nc") for i in range(1, 31)]
-
-sss_files = glob.glob(os.path.join(obs, 'SSS*'))
-sss_files.sort()
-
-sst_files = glob.glob(os.path.join(obs, 'SST*'))
-sst_files.sort() 
-
-zeta_files = glob.glob(os.path.join(obs, 'SLA*'))
-zeta_files.sort()
+ensemble_ini_files = sorted(glob.glob(os.path.join(nan_rem, stoens[0], "*swiose_avg.nc")))
+print(f"{len(ensemble_ini_files)} files found for {stoens[0].replace('201*_', '')}.")
+ensemble_str_files = sorted(glob.glob(os.path.join(nan_rem, stoens[1], "*swiose_avg.nc")))
+print(f"{len(ensemble_str_files)} files found for {stoens[1].replace('201*_', '')}.")
+ensemble_gls_files = sorted(glob.glob(os.path.join(nan_rem, stoens[2], "*swiose_avg.nc")))
+print(f"{len(ensemble_gls_files)} files found for {stoens[2].replace('201*_', '')}.")
 
 # GRID
 g = xr.open_dataset(grid)[['lon_rho', 'lat_rho', 'mask_rho']]
 
+pattern = re.compile(r'/(\d{3})swiose_avg.nc$')
+ensemble_ini_dict = {}
+ensemble_str_dict = {}
+ensemble_gls_dict = {}
+
+for path in ensemble_ini_files:
+    match = pattern.search(path)
+    if match:
+        key = match.group(1)
+        if key not in ensemble_ini_dict.keys():
+            ensemble_ini_dict[key] = []
+        ensemble_ini_dict[key].append(path)
+
+for path in ensemble_str_files:
+    match = pattern.search(path)
+    if match:
+        key = match.group(1)
+        if key not in ensemble_str_dict.keys():
+            ensemble_str_dict[key] = []
+        ensemble_str_dict[key].append(path)
+
+for path in ensemble_gls_files:
+    match = pattern.search(path)
+    if match:
+        key = match.group(1)
+        if key not in ensemble_gls_dict.keys():
+            ensemble_gls_dict[key] = []
+        ensemble_gls_dict[key].append(path)
 
 
-
-# OBS DATASET
-# obs_salt = xr.open_dataset(sss_files[0]).sel(time = slice(np.datetime64('2017'), np.datetime64('2020')))
-    
-# obs_temp = xr.open_dataset(sst_files[0]).sel(time = slice(np.datetime64('2017'), np.datetime64('2020'))) - 273.15
-    
-# obs_zeta = xr.open_dataset(zeta_files[0]).sel(time = slice(np.datetime64('2017'), np.datetime64('2020')))
-# obs_ds = xr.merge([obs_zeta, obs_temp, obs_salt])
-
-ensemble_ini_datasets = []
-start = time.time()
-for f in ensemble_ini_files:
-    start = time.time()
-    ds = xr.open_dataset(f)
+ensemble_ini_datasets = []       
+for key, paths in ensemble_ini_dict.items():
+    print(f"Merging member{key} for {stoens[0].replace('201*_', '')}.")
+    ds = xr.Dataset()
+    for path in paths:
+        temp_ds = xr.open_dataset(path)
+        mask = np.full(temp_ds.time.size, True)
+        if ds.variables !=  {}:
+            mask = ~np.isin(temp_ds.time, ds.time)
+        ds = xr.merge([ds, temp_ds.isel(time=mask)])
     ensemble_ini_datasets.append(ds)
 
 print('members : ', len(ensemble_ini_datasets), 'time dim : ', len(ensemble_ini_datasets[0]['time']))
 
-ensemble_str_datasets = []
-for f in ensemble_str_files:
-    start = time.time()
-    ds = xr.open_dataset(f)
+ensemble_str_datasets = []       
+for key, paths in ensemble_str_dict.items():
+    print(f"Merging member{key} for {stoens[1].replace('201*_', '')}.")
+    ds = xr.Dataset()
+    for path in paths:
+        temp_ds = xr.open_dataset(path)
+        mask = np.full(temp_ds.time.size, True)
+        if ds.variables !=  {}:
+            mask = ~np.isin(temp_ds.time, ds.time)
+        ds = xr.merge([ds, temp_ds.isel(time=mask)])
     ensemble_str_datasets.append(ds)
 
 print('members : ', len(ensemble_str_datasets), 'time dim : ', len(ensemble_str_datasets[0]['time']))
 
+ensemble_gls_datasets = []       
+for key, paths in ensemble_gls_dict.items():
+    print(f"Merging member{key} for {stoens[2].replace('201*_', '')}.")
+    ds = xr.Dataset()
+    for path in paths:
+        temp_ds = xr.open_dataset(path)
+        mask = np.full(temp_ds.time.size, True)
+        if ds.variables !=  {}:
+            mask = ~np.isin(temp_ds.time, ds.time)
+        ds = xr.merge([ds, temp_ds.isel(time=mask)])
+    ensemble_gls_datasets.append(ds)
+
+print('members : ', len(ensemble_gls_datasets), 'time dim : ', len(ensemble_gls_datasets[0]['time']))
+
 combined_ini = xr.concat(ensemble_ini_datasets, dim='ensemble')
 combined_str = xr.concat(ensemble_str_datasets, dim='ensemble')
+combined_gls = xr.concat(ensemble_gls_datasets, dim='ensemble')
 
 ensemble_mean2d_ini = combined_ini.mean(dim='ensemble')
 ensemble_mean2d_str = combined_str.mean(dim='ensemble')
+ensemble_mean2d_gls = combined_gls.mean(dim='ensemble')
 print('Ensemble mean computed.')
 
-variables = {'sst': ('temp', 'analysed_sst'), 'sss': ('salt', 'sos'), 'ssh': ('zeta', 'adt')}
+variables = {'sst': 'temp', 'sss': 'salt', 'ssh': 'zeta'}
 fig_types = ['mean_comparison', 'deviation', 'rms_deviation']
 rms_list = {ensemble : {} for ensemble in ensembles}
-rms_uv_list = {}
 
 for (lon1, lon2, lat1, lat2), name in zip(boxes, names):        
     region_mask = g.lon_rho.where((g.lon_rho > lon1) & (g.lon_rho < lon2) & (g.lat_rho > lat1) & (g.lat_rho < lat2), False)
@@ -118,10 +158,22 @@ for (lon1, lon2, lat1, lat2), name in zip(boxes, names):
     
     rms_str = np.sqrt(sq_deviation_str.sum(dim='ensemble') / len(sq_deviation_str))
     rms_list['STR'][name] = rms_str
-       
-    # obs_mean = obs_ds.where(region_mask, drop=True).mean(dim=['eta_rho', 'xi_rho'], skipna=True)
     
-    for var_name, (var, obs_var) in variables.items():
+    member_means2d_gls = combined_gls.where(region_mask, drop=True)
+    member_means_gls = member_means2d_gls.mean(dim=['eta_rho', 'xi_rho'], skipna=True)
+
+    ensemble_mean_region_gls = ensemble_mean2d_gls.where(region_mask, drop=True)
+    ensemble_mean_gls = ensemble_mean_region_gls.mean(dim=['eta_rho', 'xi_rho'], skipna=True)
+    
+    member_deviations2d_gls = (member_means2d_gls - ensemble_mean_region_gls)
+    member_deviations_gls = member_deviations2d_gls.mean(dim=['eta_rho', 'xi_rho'], skipna=True)
+    sq_deviation_gls = (member_deviations2d_gls ** 2).mean(dim=['eta_rho', 'xi_rho'], skipna=True)
+    
+    rms_gls = np.sqrt(sq_deviation_gls.sum(dim='ensemble') / len(sq_deviation_gls))
+    rms_list['GLS'][name] = rms_gls
+       
+    
+    for var_name, var, in variables.items():
         print(name, var_name,var)
         
         # MEAN
@@ -143,10 +195,17 @@ for (lon1, lon2, lat1, lat2), name in zip(boxes, names):
         
         ax.plot(ensemble_mean_str.time, ensemble_mean_str[var], color='royalblue', label='STR - Ensemble mean', linewidth=1)
         
-        # ax.plot(obs_mean.time, obs_mean[obs_var], color='red', label='OBS', linewidth=2)
+        for i in range(member_means_gls.sizes['ensemble']):
+            member = member_means_gls.isel(ensemble=i)
+            ax.plot(member.time, member[var], color='crimson', alpha=0.3, linewidth=0.3)
+            
+        ax.plot(member.time, member[var], color='crimson', alpha=0.3, label='GLS - Member', linewidth=0.3)
+        
+        ax.plot(ensemble_mean_gls.time, ensemble_mean_gls[var], color='crimson', label='GLS - Ensemble mean', linewidth=1)
+        
         
         fig.suptitle(f'Average {var_name.upper()} in the {name} zone')        
-        ax.set_xlim(np.datetime64('2017-01-01'), np.datetime64('2017-12-31'))
+        ax.set_xlim(np.datetime64('2017-01-01'), np.datetime64('2019-12-31'))
         ax.set_ylabel(var_name.upper())
         ax.tick_params("x", rotation=45)
         ax.grid(linewidth=0.3)
@@ -158,14 +217,17 @@ for (lon1, lon2, lat1, lat2), name in zip(boxes, names):
         # DEVIATION
         fig, ax = plt.subplots(figsize=(10, 5))
 
+        std_gls = member_deviations_gls.std(dim='ensemble')
+        ax.fill_between(std_gls.time, - std_gls[var], std_gls[var], color='crimson', alpha=0.5, label='GLS - Member', linewidth=1)
+        
         std_str = member_deviations_str.std(dim='ensemble')
-        ax.fill_between(std_str.time, - std_str[var], std_str[var], color='royalblue', alpha=0.5, label='STR - Member', linewidth=0.5)
+        ax.fill_between(std_str.time, - std_str[var], std_str[var], color='royalblue', alpha=0.5, label='STR - Member', linewidth=1)
 
         std_ini = member_deviations_ini.std(dim='ensemble')
-        ax.fill_between(std_ini.time, - std_ini[var], std_ini[var], color='firebrick', alpha=0.5, label='INI - Member', linewidth=0.5)
+        ax.fill_between(std_ini.time, - std_ini[var], std_ini[var], color='black', alpha=0.5, label='INI - Member', linewidth=1)
         
         fig.suptitle(f'{var_name.upper()} deviation from the ensemble mean in the {name} zone')        
-        ax.set_xlim(np.datetime64('2017-01-01'), np.datetime64('2017-12-31'))
+        ax.set_xlim(np.datetime64('2017-01-01'), np.datetime64('2019-12-31'))
         ax.set_ylim(-np.max(np.abs(ax.get_ylim())), np.max(np.abs(ax.get_ylim())))
         ax.set_ylabel(var_name.upper())
         ax.tick_params("x", rotation=45)
@@ -175,7 +237,7 @@ for (lon1, lon2, lat1, lat2), name in zip(boxes, names):
         plt.savefig(os.path.join(figures, f'all_ens_{name}_{var}_deviation.png'), dpi=300, transparent=True)
         plt.close()
 
-for var_name, (var, obs_var) in variables.items():
+for var_name, var in variables.items():
     fig, ax = plt.subplots(figsize=(10, 5))
     for i, (ensemble, ensemble_rms_list) in enumerate(rms_list.items()):
         for j, (name, rms) in enumerate(ensemble_rms_list.items()):
@@ -183,7 +245,7 @@ for var_name, (var, obs_var) in variables.items():
             
             
     fig.suptitle(f'RMS of {var_name.upper()} deviation from the ensemble mean')
-    ax.set_xlim(np.datetime64('2017-01-01'), np.datetime64('2017-12-31'))
+    ax.set_xlim(np.datetime64('2017-01-01'), np.datetime64('2019-12-31'))
     ax.set_ylabel(f'RMS of {var_name.upper()} deviation')
     ax.tick_params("x", rotation=45)
     ax.legend(loc='upper left')
