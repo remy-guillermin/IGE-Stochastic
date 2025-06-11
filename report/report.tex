@@ -10,7 +10,7 @@ liststotoc, % Uncomment to add the list of figures/tables/etc to the table of co
 %parskip, % Uncomment to add space between paragraphs
 %nohyperref, % Uncomment to not load the hyperref package
 headsepline, % Uncomment to get a line under the header
-%chapterinoneline, % Uncomment to place the chapter title next to the number on one line
+chapterinoneline, % Uncomment to place the chapter title next to the number on one line
 %consistentlayout, % Uncomment to change the layout of the declaration, abstract and acknowledgements pages to match the default layout
 ]{MastersDoctoralThesis} % The class file specifying the document structure
 
@@ -21,14 +21,14 @@ headsepline, % Uncomment to get a line under the header
 \usepackage[utf8]{inputenc} % Required for inputting international characters
 \usepackage[T1]{fontenc} % Output font encoding for international characters
 \usepackage[french]{babel}
-\usepackage[backend=bibtex, style=phys, sorting=nyt]{biblatex}
+\usepackage[backend=bibtex, style=authoryear-comp, sorting=nyt]{biblatex}
 \addbibresource{references.bib}
 \usepackage{wrapfig}
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{hyperref}
 \usepackage{tikz}
-\usepackage{subfigure}
+\usepackage{subcaption}
 \usepackage{gensymb}
 
 %------------------------------------------------------------------------------
@@ -44,6 +44,12 @@ headsepline, % Uncomment to get a line under the header
 \newcommand{\ez}[0]{\mathbf{e_z}}
 \newcommand{\bnabla}[0]{\boldsymbol{\nabla}}
 \newcommand{\bOmega}[0]{\boldsymbol{\Omega}}
+\newcommand{\croco}[0]{\textbf{CROCO}\;}
+
+\let\oldcite\cite
+\renewcommand{\cite}[1]{[\oldcite{#1}]}
+
+\setcounter{tocdepth}{2}
 
 %------------------------------------------------------------------------------
 %	MARGIN SETTINGS
@@ -63,10 +69,10 @@ headsepline, % Uncomment to get a line under the header
 %	THESIS INFORMATION
 %------------------------------------------------------------------------------
 
-\thesistitle{Caractérisation d'incertitudes dans un ensemble de simulations stochastiques de la circulation océanique tourbillonnaire dans l'Océan Indien Sud-Ouest} % Your thesis title, this is used in the title and abstract, print it elsewhere with \ttitle
+\thesistitle{Simulation des incertitudes dans un modèle océanique régional: \\ Application à l’océan Indien sud-ouest} % Your thesis title, this is used in the title and abstract, print it elsewhere with \ttitle
 \supervisor{Pierre \textsc{Brasseur}, \\ Lisa \textsc{Weiss}, \\ Jean-Michel \textsc{Brankart}} % Your supervisor's name, this is used in the title page, print it elsewhere with \supname
 \examiner{} % Your examiner's name, this is not currently used anywhere in the template, print it elsewhere with \examname
-\degree{Master 2 Turbulence, Méthodes et Applications} % Your degree name, this is used in the title page and abstract, print it elsewhere with \degreename
+\degreeyear{Master 2 Turbulence, Méthodes et Applications} % Your degree name, this is used in the title page and abstract, print it elsewhere with \degreename
 \author{Rémy \textsc{Guillermin}} % Your name, this is used in the title page and abstract, print it elsewhere with \authorname
 \addresses{} % Your address, this is not currently used anywhere in the template, print it elsewhere with \addressname
 
@@ -140,9 +146,23 @@ headsepline, % Uncomment to get a line under the header
 %	DECLARATION PAGE
 %------------------------------------------------------------------------------
 
-\begin{declaration}
 \addchaptertocentry{\authorshipname} % Add the declaration to the table of contents
 
+
+\begin{center}
+	{\normalsize \MakeUppercase{\univname} \par}% University name in capitals
+			\bigskip
+	{\huge\textit{Déclaration d'authenticité} \par}
+			\bigskip
+	{\normalsize \facname \par}% Faculty name
+			\bigskip
+	{\normalsize \degreename\par}% Degree name
+			\bigskip
+	{\normalsize\bfseries \ttitle \par}% Thesis title
+			\bigskip
+	{\normalsize \byname{} \authorname \par}% Author name
+			\bigskip
+\end{center}
 
 \begin{itemize} 
 \item Ce travail est le fruit d’un travail personnel et constitue un document original.
@@ -165,15 +185,14 @@ headsepline, % Uncomment to get a line under the header
 \textit{I declare that I have obtained the necessary authorizations for the reproduction of images, extracts, figures or tables borrowed from other works.}\\
 \end{itemize}
 
-\noindent Nom, Prénom: \\
+\noindent Nom, Prénom: Guillermin, Rémy \\
 \rule[0.5em]{25em}{0.5pt} % This prints a line for the name
  
 \noindent Signé:\\
 \rule[0.5em]{25em}{0.5pt} % This prints a line for the signature
  
-\noindent Date:\\
+\noindent Date: \today \\
 \rule[0.5em]{25em}{0.5pt} % This prints a line to write the date
-\end{declaration}
 
 \clearpage
 
@@ -184,7 +203,15 @@ headsepline, % Uncomment to get a line under the header
 \begin{abstract}
 \addchaptertocentry{\abstractname} % Add the abstract to the table of contents
 
-aa
+Les modèles de circulation océanique actuels ne tiennent pas compte de manière explicite des incertitudes induites par les approximations numériques et les choix de paramétrisation destinés à limiter les coûts de calcul. Si la variabilité intrinsèque, liée au caractère chaotique du système océanique, constitue la principale source d’incertitude, d’autres sources, bien que plus subtiles, peuvent jouer un rôle significatif, en particulier dans certaines régions océaniques.
+
+L’océan Indien, connu pour sa forte variabilité saisonnière et sa sensibilité aux perturbations, constitue un cadre idéal pour explorer ces incertitudes. Dans ce contexte, nous utilisons le modèle régional CROCO appliqué au sud-ouest de l’océan Indien afin de caractériser et quantifier différentes sources d’incertitudes affectant la modélisation océanique. Ce travail s’inscrit dans le cadre du projet pluridisciplinaire BRIDGES, en lien avec les objectifs de développement durable des Nations Unies relatifs à la protection des océans. Par ailleurs, les données produites serviront à la calibration des futures missions spatiales du CNES.
+
+Nos résultats mettent en évidence le rôle prépondérant de la variabilité intrinsèque dans la dispersion des ensembles de simulations, tout en montrant que d’autres sources d’incertitudes — comme celles liées au forçage atmosphérique ou au mélange vertical — peuvent localement amplifier la dispersion, selon les conditions dynamiques régionales.
+
+\vfill
+
+
 \end{abstract}
 
 %------------------------------------------------------------------------------
@@ -220,13 +247,14 @@ The acknowledgments and the people to thank go here, don't forget to include you
  \textbf{GEBCO} & \textbf{GE}neral \textbf{B}athymetric \textbf{C}hart (of the) \textbf{O}ceans \\
  \textbf{GLORYS} & \textbf{GL}obal \textbf{O}cean \textbf{R}eanal\textbf{Y}sis (and) \textbf{S}imulation \\ 
 \textbf{GLS} & \textbf{G}eneric \textbf{L}ength \textbf{S}cale \\
-\textbf{LIM3} & \textbf{L}ouvain-la-Neuve \textbf{I}ce \textbf{M}odel (version) \textbf{3}\\
 \textbf{MKE} & \textbf{M}ean \textbf{K}inetic \textbf{E}nergy \\
+\textbf{MLD} & \textbf{M}ixed \textbf{L}ayer \textbf{D}epth \\
 \textbf{MOM} & \textbf{M}odular \textbf{O}cean \textbf{M}odel\\
 \textbf{NEMO} & \textbf{N}ucleus (for) \textbf{E}uropean \textbf{M}odelling (of the) \textbf{O}cean\\
-\textbf{OASIS} & \textbf{O}cean \textbf{A}tmosphere \textbf{S}ea-\textbf{I}ce (and) \textbf{S}oils\\
 \textbf{ROMS} & \textbf{R}egional \textbf{O}cean \textbf{M}odelling \textbf{S}ystem\\
 \textbf{SLA} & \textbf{S}ea \textbf{L}evel \textbf{A}nomaly \\
+\textbf{SMAP} & \textbf{S}oil \textbf{M}oisture \textbf{A}ctive \textbf{P}assive \\
+\textbf{SMOS} & \textbf{S}oil \textbf{M}oisture \textbf{O}cean \textbf{S}alinity \\
 \textbf{SSA} & \textbf{S}ea \textbf{S}alinity \textbf{A}nomaly \\
 \textbf{SSH} & \textbf{S}ea \textbf{S}urface \textbf{H}eight \\
 \textbf{SSS} & \textbf{S}ea \textbf{S}urface \textbf{S}alinity \\
@@ -236,67 +264,64 @@ The acknowledgments and the people to thank go here, don't forget to include you
 
 \end{abbreviations}
 
-\chapter{Constantes physiques et symboles}
-
 % --------------------------------
 % PHYSICAL CONSTANTS
 % --------------------------------
-\begingroup
-\setlength{\LTpre}{0pt}  % Reduce space before the longtable
-\setlength{\LTpost}{0pt} % Reduce space after the longtable
+%\begingroup
+%\setlength{\LTpre}{0pt}  % Reduce space before the longtable
+%\setlength{\LTpost}{0pt} % Reduce space after the longtable
 
-\begin{longtable}{lr@{${}={}$}l}
-\multicolumn{3}{l}{\textbf{Constantes physiques}} \\  
-Accélération de la pesanteur & $g$ & \SI{9.81}{\meter\per\second\squared} \\
-Vitesse angulaire de rotation de la Terre & $\Omega$ & \SI{7.2e-5}{\radian\per\second} \\
-\end{longtable}
+%\begin{longtable}{lr@{${}={}$}l}
+%\multicolumn{3}{l}{\textbf{Constantes physiques}} \\  
+%Accélération de la pesanteur & $g$ & \SI{9.81}{\meter\per\second\squared} \\
+%Vitesse angulaire de rotation de la Terre & $\Omega$ & \SI{7.2e-5}{\radian\per\second} \\
+%\end{longtable}
 
-\vspace{50pt}
+%\vspace{50pt}
 
 % --------------------------------
 % SYMBOLS
 % --------------------------------
 
-\begin{longtable}{lll}
-\multicolumn{3}{l}{\textbf{Symboles}} \\  
-$AKv$ & Coefficient de viscosité turbulente & \si{\meter\squared\per\second} \\
-$AKs$ & Coefficient de diffusion turbulente (salinité) & \si{\meter\squared\per\second} \\
-$AKt$ & Coefficient de diffusion turbulente (température) & \si{\meter\squared\per\second} \\
-$MLD$ & Mixed Layer Depth & \si{\meter} \\
-$k$ & TKE & \si{\meter\squared\per\second\squared} \\
-$Q$ & Flux de chaleur sensible & \si{\joule\per\second\per\meter\squared} \\
-$S$ & Salinité & psu \\
-$T$ & Température & \si{\degreeCelsius} \\
-$\uu$ & Vitesse & \si{\meter\per\second} \\
+%\begin{longtable}{lll}
+%\multicolumn{3}{l}{\textbf{Symboles}} \\  
+%$AKv$ & Coefficient de viscosité turbulente & \si{\meter\squared\per\second} \\
+%$AKs$ & Coefficient de diffusion turbulente (salinité) & \si{\meter\squared\per\second} \\
+%$AKt$ & Coefficient de diffusion turbulente (température) & \si{\meter\squared\per\second} \\
+%$MLD$ & Profondeur de la couche de mélange & \si{\meter} \\
+%$k$ & TKE & \si{\meter\squared\per\second\squared} \\
+%$Q$ & Flux de chaleur sensible & \si{\joule\per\second\per\meter\squared} \\
+%$S$ & Salinité & psu \\
+%$T$ & Température & \si{\degreeCelsius} \\
+%$\uu$ & Vitesse & \si{\meter\per\second} \\
 
-\addlinespace
-\multicolumn{3}{l}{\textit{Symboles grecs}} \\  
-$\rho$ & Masse volumique & \si{\kilogram\per\meter\cubed}\\
-$\phi$ & Pression dynamique & \si{\pascal} (\si{\kilogram\per\meter\per\second\squared}) \\
-$\varphi$ & Latitude & \si{\degree} \\
-$\varepsilon$ & Taux de dissipation d'énergie & \si{\meter\squared\per\second\cubed} \\
+%\addlinespace
+%\multicolumn{3}{l}{\textit{Symboles grecs}} \\  
+%$\rho$ & Masse volumique & \si{\kilogram\per\meter\cubed}\\
+%$\phi$ & Pression dynamique & \si{\pascal} (\si{\kilogram\per\meter\per\second\squared}) \\
+%$\varphi$ & Latitude & \si{\degree} \\
+%$\varepsilon$ & Taux de dissipation d'énergie & \si{\meter\squared\per\second\cubed} \\
 
-\addlinespace
-\multicolumn{3}{l}{\textit{Opérateurs}} \\  
-$\bnabla$ & Gradient & \\
-$\Delta$ & Laplacien & \\
-$\overline{\cdots}$ & Moyenne spatiale & \\
-$\overline{\overline{\cdots}}$ & Moyenne temporelle & \\
-$\langle \cdot \rangle$ & Moyenne d'ensemble & \\
+%\addlinespace
+%\multicolumn{3}{l}{\textit{Opérateurs}} \\  
+%$\bnabla$ & Gradient & \\
+%$\Delta$ & Laplacien & \\
+%$\overline{\cdots}$ & Moyenne spatiale & \\
+%$\overline{\overline{\cdots}}$ & Moyenne temporelle & \\
+%$\langle \cdot \rangle$ & Moyenne d'ensemble & \\
 
-\addlinespace
-\multicolumn{3}{l}{\textit{Indices}} \\  
-$b$ & Restriction à une boite & \\  
-$v$ & Intégration sur la verticale & \\
+%\addlinespace
+%\multicolumn{3}{l}{\textit{Indices}} \\  
+%$b$ & Restriction à une boite & \\
 
-\addlinespace
-\multicolumn{3}{l}{\textit{Exposants}} \\  
-$'$ & Variable turbulente & \\ 
-$^i$ & Variable de membre d'ensemble & \\ 
+%\addlinespace
+%\multicolumn{3}{l}{\textit{Exposants}} \\  
+%$'$ & Variable turbulente & \\ 
+%$^i$ & Variable de membre d'ensemble & \\ 
 
-\end{longtable}
+%\end{longtable}
 
-\endgroup
+%\endgroup
 %------------------------------------------------------------------------------
 %	THESIS CONTENT - CHAPTERS
 %------------------------------------------------------------------------------
@@ -308,11 +333,12 @@ $^i$ & Variable de membre d'ensemble & \\
 % Include the chapters of the thesis as separate files from the Chapters folder
 % Uncomment the lines as you write the chapters
 
+\include{Chapters/Introduction}
 \include{Chapters/Chapter1}
 \include{Chapters/Chapter2}
-%\include{Chapters/Chapter3}
-%\include{Chapters/Chapter4} 
-%\include{Chapters/Chapter5} 
+\include{Chapters/Chapter3}
+\include{Chapters/Discussion} 
+
 
 %------------------------------------------------------------------------------
 %	THESIS CONTENT - APPENDICES
