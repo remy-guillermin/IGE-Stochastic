@@ -16,7 +16,7 @@ matplotlib.use('agg')
 figures = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures/Ensembles'
 work = '/lus/work/CT1/c1601279/rguillermin/'
 nan_rem = '/lus/work/CT1/c1601279/rguillermin/NaN_CORRECTED/'
-stoens = ['run_swio2_stoens30_201*_ini', 'run_swio2_stoens30_201*_CD', 'run_swio2_stoens30_201*_gls']
+stoens = ['run_swio2_stoens30_201*_ini', 'run_swio2_stoens30_201*_str', 'run_swio2_stoens30_201*_gls']
 obs = '/lus/store/CT1/c1601279/rguillermin/REGRIDDED/OBS'
 grid = os.path.join(work, 'grid/croco_grid_swio2.nc')
 
@@ -125,7 +125,7 @@ ensemble_mean2d_str = combined_str.mean(dim='ensemble')
 ensemble_mean2d_gls = combined_gls.mean(dim='ensemble')
 print('Ensemble mean computed.')
 
-variables = {'sst': 'temp', 'sss': 'salt', 'ssh': 'zeta'}
+variables = {'sst': 'temp', 'sss': 'salt'}
 fig_types = ['mean_comparison', 'deviation', 'rms_deviation']
 rms_list = {ensemble : {} for ensemble in ensembles}
 
@@ -218,17 +218,20 @@ for (lon1, lon2, lat1, lat2), name in zip(boxes, names):
         fig, ax = plt.subplots(figsize=(10, 5))
 
         std_gls = member_deviations_gls.std(dim='ensemble')
-        ax.fill_between(std_gls.time, - std_gls[var], std_gls[var], color='crimson', alpha=0.5, label='GLS - Member', linewidth=1)
+        ax.fill_between(std_gls.time, - std_gls[var], std_gls[var], color='crimson', alpha=0.5, label='GLS', linewidth=1)
         
         std_str = member_deviations_str.std(dim='ensemble')
-        ax.fill_between(std_str.time, - std_str[var], std_str[var], color='royalblue', alpha=0.5, label='STR - Member', linewidth=1)
+        ax.fill_between(std_str.time, - std_str[var], std_str[var], color='royalblue', alpha=0.5, label='STR', linewidth=1)
 
         std_ini = member_deviations_ini.std(dim='ensemble')
-        ax.fill_between(std_ini.time, - std_ini[var], std_ini[var], color='black', alpha=0.5, label='INI - Member', linewidth=1)
+        ax.fill_between(std_ini.time, - std_ini[var], std_ini[var], color='black', alpha=0.5, label='INI', linewidth=1)
         
         fig.suptitle(f'{var_name.upper()} deviation from the ensemble mean in the {name} zone')        
         ax.set_xlim(np.datetime64('2017-01-01'), np.datetime64('2019-12-31'))
-        ax.set_ylim(-np.max(np.abs(ax.get_ylim())), np.max(np.abs(ax.get_ylim())))
+        if var == 'salt':
+            ax.set_ylim(-0.06, 0.06)
+        elif var == 'temp':
+            ax.set_ylim(-0.2, 0.2)
         ax.set_ylabel(var_name.upper())
         ax.tick_params("x", rotation=45)
         ax.grid(linewidth=0.3)

@@ -1,109 +1,88 @@
+# LIBRAIRIES
 import numpy as np
 import xarray as xr
+import pandas as pd
+import matplotlib
 import matplotlib.pyplot as plt
-import matplotlib as mpl
+import matplotlib.animation as animation
 import cmocean
 import cartopy.crs as ccrs
-from matplotlib.patches import Rectangle
+import glob
+import os
+from matplotlib.gridspec import GridSpec
+%matplotlib inline
 
-# Load data (same as your existing code)
-data = '/lus/store/CT1/c1601279/lweiss/RUN_CROCO/'
-simu = 'run_swio2_deter_2017_2023_complet/'
+
+
+figures = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures/Ensembles'
+data = '/lus/store/CT1/c1601279/lweiss/run_croco/SWIO/run_swio2_deter2_2017_2023'
 grid = '/lus/store/CT1/c1601279/lweiss/grid/croco_grid_swio2.nc'
-figures = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures/'
+depth_lvl = '/lus/work/CT1/c1601279/rguillermin/grid/croco_depth_level.nc'
 
-g = xr.open_dataset(grid)
-h = g['h'][:, :] # Bathymetry
-lon = g['lon_rho'][:, :]  # Longitude
-lat = g['lat_rho'][:, :]  # Latitude
-angle = g['angle'][:, :]  # Deformation
-msk = g['mask_rho'][:, :]  # Mask
-msk_inv = np.where(msk == 0, msk, np.nan)
+CRIT = 0.03
+lat_index = 280 #430
+
+
+
+g = xr.open_dataset(grid)[['lon_rho', 'lat_rho', 'mask_rho', 'h']]
+lon = g.lon_rho
+lat = g.lat_rho
+eta_rho = g.eta_rho
+xi_rho = g.xi_rho
+h = g.h
+mask_rho = g.mask_rho
 g.close()
 
-### open netcdf file an variables
-ds = xr.open_dataset(data + simu + 'swio_avg_2017.nc') # , engine='h5netcdf')
-temp = ds['temp'][:, :, :, :]
-s_rho = ds['s_rho'][:] # s_rho(s_rho) S-coordinate at RHO-points
-Cs_rho = ds['Cs_rho'][:] # Cs_rho(s_rho) S-coordinate stretching curves at RHO-points
-hc = ds['hc'].values
-ds.close()
+h = h.where(h != 50, 0)
 
-msk_inv = np.where(msk==0, msk, np.nan)
+depth_level = xr.open_dataset(depth_lvl)
 
-def calc_depth(s, Cs, hc, h):
-    N = len(s_rho)
-    M, L = h.shape
-    z0 = np.zeros((N, M, L))
-    depth = np.zeros((N, M, L))
-    for k in range(N):
-        z0[k, :, :] = (hc * s[k] + h * Cs[k]) / (hc + h)
-        depth[k, :, :] = z0[k, :, :] * h ## (hc * s[k] + h * Cs[k])
-    return depth
 
-depth_sigma = calc_depth(s_rho, Cs_rho, hc, h)
 
-lat_index = 249
-lon_index = 195
+fig, axs = plt.subplots(1, 2, figsize=(12,4), gridspec_kw={'width_ratios': [2, 1]})
 
-# along longitude axis
-fig, ax = plt.subplots(1, 2, figsize=(12, 5), gridspec_kw={'width_ratios': [2, 1]})
+levels = depth_level.isel(eta_rho=lat_index)
 
-ax[0].plot(lat[:, lon_index].values, -h[:, lon_index].values, marker='o', linestyle='-', color='k', markersize=1)
-ax[0].fill_between(lat[:, lon_index], -h[:, lon_index].values, y2=min(-h[:, lon_index]), color='lightgrey')
+for ax in axs:
 
-# Ajouter des courbes de niveau
-for k in range(len(s_rho)):
-    ax[0].plot(lat[:, lon_index], depth_sigma[k, :, lon_index], color='grey', linestyle='-', linewidth=0.5)
-ax[0].set_xlim(-16.5, 3)
-ax[0].set_ylim(np.min(-h[:, lon_index].values), 5)
-#ax[0].set_xlabel('Latitudes along ' + str(np.round(lon[lat_index, lon_index].values,2)) + '°E Longitude')
-#ax[0].set_ylabel('Depth h (m)')
-ax[0].set_xlabel('Latitudes le long de la ' + str(np.round(lon[lat_index, lon_index].values,2)) + '°E Longitude')
-ax[0].set_ylabel('Profondeur h (m)')
-ax[0].grid(linestyle='--',linewidth=0.3)
+    land_color = ccrs.cartopy.feature.COLORS['land']
+    
+    for level in levels.depth_level.values:
+        ax.plot(lon[lat_index, :], level, color='gray', linewidth=0.5)
 
-### subplot
-ax[1].plot(lat[:, lon_index].values, -h[:, lon_index].values, marker='o', linestyle='-', color='k',
-        markersize=1)
-ax[1].fill_between(lat[:, lon_index], -h[:, lon_index].values, y2=min(-h[:, lon_index]), color='lightgrey')
+    ax.fill_between(lon[lat_index, :], -h[lat_index, :].values, y2=min(min(-h[lat_index, :]), -5000), color=land_color, label='Land', zorder=2)
+    ax.plot(lon[lat_index, :], -h[lat_index, :].values, color='black', linewidth=0.5)
+    
+ax = axs[0]
+ax.text(49.3, 10, 'Madagascar', ha='center', va='bottom')
+ax.text(43.7, 10, 'Comoros', ha='center', va='bottom')
 
-# Ajouter des courbes de niveau
-for k in range(len(s_rho)):
-    ax[1].plot(lat[:, lon_index], depth_sigma[k, :, lon_index], color='grey', linestyle='-', linewidth=0.5)
-ax[1].set_xlim(-13.5, -12.5)
-ax[1].set_ylim(-400, 1)
-ax[1].grid(linestyle='--',linewidth=0.3)
+ax.set_xlim(40, 65)
+ax.set_ylim(-5000, 0)
 
-plt.savefig(figures + 'transect_zoom_h_lon_' + str(np.round(lon[lat_index, lon_index].values,2)) + '_' + simu[:-1] + '.png', dpi=300, bbox_inches='tight')
+ax.legend(loc='lower left', framealpha=1)
+
+ax = axs[1]
+ax.set_xlim(47, 52)
+ax.set_ylim(-1000, 0)
+
+for ax in axs:
+    ax.set_xlabel('Longitude')
+    ticks = ax.get_xticks()
+    ax.set_xticks(ticks)
+    ax.set_xticklabels([f'{int(tick)}°E' for tick in ticks])
+
+    ax.set_ylabel('Depth')
+    ticks = ax.get_yticks()
+    ax.set_yticks(ticks)
+    ax.set_yticklabels([f'{-int(tick)} m' for tick in ticks])
+
+fig.tight_layout()
+fig.savefig(os.path.join(figures, 'levels_slice.png'), dpi=300, transparent=True)
 plt.show()
 
-# along latitude axis
-fig, ax = plt.subplots(1, 2, figsize=(12, 5), gridspec_kw={'width_ratios': [2, 1]})
-ax[0].plot(lon[lat_index,:].values, -h[lat_index,:].values, marker='o', linestyle='-', color='k', markersize=1)
-ax[0].fill_between(lon[lat_index,:], -h[lat_index,:].values, y2=min(-h[lat_index, :]), color='lightgrey')
-# Ajouter des courbes de niveau
-for k in range(len(s_rho)):
-    ax[0].plot(lon[lat_index, :], depth_sigma[k, lat_index, :], color='grey', linestyle='-', linewidth=0.5)
-ax[0].set_xlim(40, 49)
-ax[0].set_ylim(-4000, 0)
-#ax[0].set_xlabel('Longitudes along ' + str(np.round(lat[lat_index, lon_index].values,2)) + '°S Latitude')
-#ax[0].set_ylabel('Depth (m)')
-ax[0].set_xlabel('Longitudes le long de ' + str(np.round(lat[lat_index, lon_index].values,2)) + '°S Latitude')
-ax[0].set_ylabel('Profondeur h (m)')
-ax[0].grid(linestyle='--',linewidth=0.3)
 
-### subplot
-ax[1].plot(lon[lat_index,:].values, -h[lat_index,:].values, marker='o', linestyle='-', color='k',
-        markersize=1)
-ax[1].fill_between(lon[lat_index,:], -h[lat_index,:].values, y2=min(-h[lat_index, :]), color='lightgrey')
-# Ajouter des courbes de niveau
-for k in range(len(s_rho)):
-    ax[1].plot(lon[lat_index, :], depth_sigma[k, lat_index, :], color='grey', linestyle='-', linewidth=0.5)
-ax[1].set_xlim(46, 47)
-ax[1].set_ylim(-500, 1)
-ax[1].grid(linestyle='--',linewidth=0.3)
 
-plt.savefig(figures + 'transect_zoom_h_lat_' + str(np.round(lat[lat_index, lon_index].values,2)) + '_' + simu[:-1] + '.png', dpi=300, bbox_inches='tight')
-plt.show()
-plt.close()
+
+
+

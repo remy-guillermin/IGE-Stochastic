@@ -25,14 +25,14 @@ msk = g['mask_rho'][:, :]  # Mask
 msk_inv = np.where(msk == 0, msk, np.nan)
 g.close()
 
+SWIO = (25, 69, -36, 7)
+
 # Define zones
 boxes = [(48, 60, -4, 3), (41, 47, -15, -8), (36.5, 42.5, -30, -21), (52, 60, -24, -16)]
 names = ['Equator', 'Islands', 'South-Moz', 'Mascarene']
 cmap = cmocean.cm.tempo_r
 n_colors = 4
-colors = [cmap(i / (n_colors - 1)) for i in range(n_colors)]
-colors[0] = mcolors.to_rgba('palevioletred')
-colors[-1] = mcolors.to_rgba('sandybrown')
+colors = ['sandybrown', 'slateblue', 'lightseagreen', 'red']
 
 # Create figure
 fig = plt.figure(figsize=(8, 6))
@@ -92,6 +92,7 @@ cb.ax.set_yticklabels(colorbaryticks.astype(int), fontsize=10)
 text = cb.ax.yaxis.label
 font = mpl.font_manager.FontProperties(size=10)
 text.set_font_properties(font)
+ax.set_title('SWIO regions')
 
 fig.tight_layout()
 filename = f'{figures}/bathy_zones.png'
