@@ -1,20 +1,16 @@
-\chapter{Modèle d'océan}
+\chapter{Modèle hydrodynamique}
 
-La modélisation numérique de l’océan repose sur la résolution des équations primitives de la circulation océanique, qui décrivent les mouvements des masses d’eau en fonction des forces physiques appliquées. Ces modèles peuvent être couplés à d'autres composantes du système Terre selon le contexte de l'étude : à un modèle atmosphérique pour les études climatiques, ou à un modèle biogéochimique dans le cadre d'analyses écosystémiques. Le réalisme des simulations dépend notamment des conditions aux limites et des configurations adoptées.
+La modélisation numérique de l’océan repose sur la résolution des équations primitives de la circulation océanique, qui décrivent les mouvements des masses d’eau en fonction des forces physiques appliquées. Ces modèles peuvent être couplés à d'autres composantes du système Terre selon le contexte de l'étude : à un modèle atmosphérique pour les études climatiques, ou à un modèle biogéochimique dans le cadre d'analyses écosystémiques. Le réalisme des simulations dépend notamment des forçages et des configurations de grille adoptées.
 
-On distingue principalement deux types de configurations :
-\begin{itemize}
-    \item \textbf{Globale} : elle permet de simuler l’évolution de l’ensemble des océans à l’échelle planétaire ;
-    \item \textbf{Régionale} : centrée sur un bassin spécifique ou une sous-région, elle permet une résolution plus fine des processus à méso-échelle.
-\end{itemize}
+Les configurations globales permettent de simuler l’évolution de l’ensemble des océans à l’échelle planétaire. Les configurations régionales sont elles centrées sur un bassin spécifique ou une sous-région, elle permet une résolution plus fine des processus à méso-échelle.
 
-Dans cette étude, nous utilisons le modèle \croco (\textit{Coastal and Regional Ocean COmmunity model}) \cite{jullien_crocos_2024}, conçu spécifiquement pour la simulation régionale de la circulation océanique. Initialement basé sur le modèle \textbf{ROMS}, \croco a été développé pour faciliter l’intégration de couplages avec des modules biogéochimiques ou atmosphériques, tout en offrant une bonne représentation des dynamiques côtières et des processus physiques à petite échelle.
+Dans cette étude, nous utilisons le modèle \textbf{CROCO} (\textit{Coastal and Regional Ocean COmmunity model}) \cite{jullien_crocos_2024}, conçu spécifiquement pour la simulation régionale et côtière de la circulation océanique avec des effets topographiques importants. \textbf{CROCO} est par exemple appliqué au Sud-Ouest de l'océan Indien, pour étudier la dynamique du Courant des Aiguilles \cite{renault_modulation_2017}, la dispersion larvaire \cite{vogt-vincent_multidecadal_2023} ou encore la formation et migration des tourbillons de méso-échelle dans le canal du Mozambique \cite{halo_eddy_2014, halo_mesoscale_2014}
 
-Ce chapitre présente tout d’abord les équations fondamentales régissant la dynamique océanique, avant de décrire les particularités du modèle \croco et de sa configuration dans le cadre de cette étude.
+Ce chapitre présente tout d’abord les équations fondamentales régissant la dynamique océanique, avant de décrire les particularités du modèle \textbf{CROCO} et de la configuration choisie dans le cadre de cette étude.
 
 \section{Équations primitives}
 
-Le modèle résout un système d'équations aux dérivées partielles non linéaires appelé \textit{équations primitives de l’océan}, sous plusieurs hypothèses classiques détaillées ci-dessous :
+Le modèle résout un système d'équations aux dérivées partielles non linéaires appelé \textit{équations primitives de l'hydrodynamique}, sous plusieurs hypothèses classiques détaillées ci-dessous :
 
 \begin{itemize}
     \item \textbf{Hypothèse hydrostatique} : L'équilibre vertical est supposé dominé par l'équilibre entre la force de gravité et le gradient de pression :
@@ -37,8 +33,7 @@ Le modèle résout un système d'équations aux dérivées partielles non linéa
     \item \textbf{Fermeture turbulente} : Les effets de la turbulence sont paramétrés à travers des modèles de fermeture, exprimant les flux turbulents en fonction des champs résolus à grande échelle.
 \end{itemize}
 
-En appliquant ces hypothèses, on obtient le système d’équations résolu par \croco dans un repère cartésien local :
-
+En appliquant ces hypothèses, on obtient le système d’équations résolu par \textbf{CROCO} dans un repère cartésien local :
 \begin{subequations}
 \begin{align}
     \pd{u}{t} + \bnabla \cdot ( \uu \: u ) - f v &= - \pd{\phi}{x} + \mathcal{F}_u + \mathcal{D}_u \\
@@ -65,19 +60,16 @@ Enfin, la densité $\rho$ est liée à la température $T$, la salinité $S$ et 
     \rho = \rho(T, S, P)
 \end{equation}
 
-Ce système constitue le socle dynamique sur lequel repose le modèle \croco, qui inclut en pratique des traitements numériques spécifiques pour la discrétisation spatiale et temporelle, la paramétrisation de la turbulence, ainsi que des conditions aux limites latérales et de surface.
+Le modèle inclut en pratique des traitements numériques spécifiques pour la discrétisation spatiale et temporelle, la paramétrisation de la turbulence, ainsi que des conditions initiales et aux limites latérales et de surface.
 
-\section{Modèle communautaire CROCO}
-
-Concernant la configuration numérique de \croco, il est intéressant de décrire certaines particularités de ce modèle comparé à d'autres.
+\section{Configuration \textbf{CROCO} du Sud-Ouest de l'océan Indien}
 
 \subsection{Grille}
 \subsubsection{Résolution verticale}
 
-Le modèle \croco n’utilise pas une discrétisation verticale classique en coordonnées cartésiennes $z$, mais repose sur une coordonnée verticale dite \textbf{sigma} ($\sigma$), qui épouse la topographie sous-marine. Cette transformation verticale permet d’optimiser la résolution des processus côtiers et des couches de surface, tout en limitant le nombre de niveaux dans les grandes profondeurs où les gradients sont généralement plus faibles.
+La grille utilisée est basée sur la topographie sous-marine, avec une coordonnée verticale qui la suit appelée coordonnée \textbf{sigma} ($\sigma$).
 
 La coordonnée $\sigma$ est définie comme une fonction de la surface libre, de la bathymétrie et d’un profil d’étirement vertical. La profondeur réelle $z$ est alors calculée à partir de cette coordonnée curviligne selon l'\autoref{eq:sigma}.
-
 \begin{subequations}
 \label{eq:sigma}
 \begin{align}
@@ -94,57 +86,35 @@ où :
     \item $Cs(\sigma)$ est une fonction d’étirement vertical non dimensionnelle, croissante et monotone, contrôlée par plusieurs paramètres.
 \end{itemize}
 
-La fonction $Cs(\sigma)$ dépend des paramètres suivants :
-\begin{itemize}
-    \item $\theta_s$ : paramètre d'étirement de surface, qui contrôle la répartition des niveaux proches de la surface ;
-    \item $\theta_b$ : paramètre d'étirement de fond, influençant la densité des niveaux vers le fond ;
-    \item $N$ : nombre total de niveaux verticaux dans la colonne d’eau.
-\end{itemize}
-
 \begin{figure}[h]
     \centering
     \includegraphics[width=\textwidth]{levels_slice}
-    \caption{Position des niveaux $\sigma$ utilisés dans la simulation}
+    \caption{Discrétisation verticale des niveaux $\sigma$ utilisés dans la grille de la simulation}
     \label{fig:sigma}
 \end{figure}
 
-La \autoref{fig:sigma} met en évidence l’avantage de cette transformation : les zones côtières, caractérisées par une bathymétrie variable et des processus dynamiques intenses, bénéficient d’une résolution verticale plus fine que les zones océaniques profondes, où une telle résolution serait moins critique. Cette approche permet donc un compromis efficace entre précision et coût computationnel. Elle induit néanmoins certaines erreurs numériques notamment pour le calcul du gradient horizontal de pression \autoref{eq:equations}.
+La \autoref{fig:sigma} met en évidence l’avantage de cette transformation : les zones côtières, caractérisées par une bathymétrie variable et des processus dynamiques complexes, bénéficient d’une résolution verticale plus fine que les zones océaniques profondes, où une telle résolution serait moins critique. Cette transformation verticale permet d’optimiser la résolution des processus côtiers et des couches de surface et profonde, tout en limitant le nombre de niveaux dans la colonne d'eau en milieu profond où les gradients sont généralement plus faibles. Cette approche permet donc un compromis efficace entre précision et coût computationnel. Elle induit néanmoins certaines erreurs numériques notamment pour le calcul du gradient horizontal de pression \autoref{eq:equations} \cite{kliem_pressure_1999}.
 
-\subsubsection{Grille horizontale} \label{sec:staggered grid}
+\clearpage
+\subsubsection{Résolution horizontale et bathymétrie} \label{sec:staggered grid}
 
-\begin{wrapfigure}{r}{0.4\textwidth}	
-\centering
-	\begin{tikzpicture}
-	\draw[very thick] (0,0) -- (1,0);
-	\node at (2,0) {$\mathbf{v\boldsymbol{[}i,j\boldsymbol{]}}$};
-	\draw[very thick] (3,0) -- (4,0);
-	
-	\draw[very thick] (0,0) -- (0,0.75);
-	\node at (0,1) {$\mathbf{u\boldsymbol{[}i,j\boldsymbol{]}}$};
-	\draw[very thick] (0,1.25) -- (0,2);
-	
-	\draw[very thick] (0,2) -- (1,2);
-	\node at (2,2) {$\mathbf{v\boldsymbol{[}i,j+1\boldsymbol{]}}$};
-	\draw[very thick] (3,2) -- (4,2);
-	
-	\draw[very thick] (4,0) -- (4,0.75);
-	\node at (4,1) {$\mathbf{u\boldsymbol{[}i+1,j\boldsymbol{]}}$};
-	\draw[very thick] (4,1.25) -- (4,2);
-	
-	\node at (2,1) {$\mathbf{\boldsymbol{\rho} \boldsymbol{[}i,j\boldsymbol{]}}$};
-	\end{tikzpicture}
-	\caption{Décalage des variables sur la grille utilisée par \croco}
+\begin{wrapfigure}{r}{0.6\textwidth}
+	\centering
+	\includegraphics[width=0.6\textwidth]{Figures/bathymetry}
+	\caption{Bathymétrie de la région}
+	\label{fig:bathy}
 \end{wrapfigure}
-La discrétisation au sein de \croco est basée sur une grille décalée (\textit{staggered grid} en anglais). Les données comme la surface libre $\zeta$, la densité $\rho$ ainsi que les traceurs telles que la température $T$ ou la salinité $S$ seront localisés au milieu de chaque cellule alors que les vitesses horizontales $(u,v)$ se trouveront sur les bords des cellules. Nous voyons donc que nous pouvons diviser notre domaine en sous domaines afin de d'utiliser plusieurs processeurs à la fois et de réduire drastiquement le temps de calcul. Pour ce faire, il est nécessaire de diviser notre domaine entier d'une certaine manière: Les premiers sous-domaines, ou boîte, simulés à chaque itération de temps vont être ceux situés en bas à gauche de notre domaine. Le grille utilisée aura une résolution de 1/12\degree \; qui permet de résoudre correctement les tourbillons de méso-échelle, ce qui permettra une bonne gamme d'échelle dans notre domaine avec environ 500 points de grille dans les deux directions.
+
+
+
+Le grille utilisée a une résolution de 1/12\degree \; qui permet de résoudre correctement les tourbillons de méso-échelle, jusqu'à la grande échelle, avec une grille de taille $432 \times 502$. Nous constatons en \autoref{fig:bathy} une bathymétrie complexe, comprenant de nombreux îles et archipels, ainsi qu'un imposant plateau, celui des Mascareignes. 
+
+La discrétisation au sein de \textbf{CROCO} est basée sur une grille décalée (\textit{staggered grid} en anglais). Les données comme la surface libre $\zeta$, la densité $\rho$ ainsi que les traceurs telles que la température $T$ ou la salinité $S$ sont localisés au milieu de chaque cellule alors que les vitesses horizontales $(u,v)$ se trouvent sur les bords des cellules.
 
 
 \subsection{Forçages}
 
-La réalisation d’une simulation régionale réaliste nécessite la prise en compte de plusieurs types de forçages, qui agissent comme entrées dynamiques au système modélisé. Ces forçages incluent notamment les effets des marées et les conditions imposées aux frontières du domaine.
-
-\subsubsection{Marées}
-
-Les marées génèrent des courants intenses et jouent un rôle fondamental dans la dynamique côtière et la structuration des masses d’eau. Afin de reproduire fidèlement leur influence tout en préservant l’efficacité numérique du modèle, seuls les huit principaux constituants harmoniques sont considérés. Cette sélection permet de capturer les composantes dominantes associées aux mouvements orbitaux de la Terre et de la Lune, ainsi qu’à leurs interactions gravitationnelles. Ce compromis garantit une représentation réaliste du signal de marée tout en limitant les coûts computationnels.
+La réalisation d’une simulation régionale réaliste nécessite la prise en compte de plusieurs types de forçages, qui agissent comme entrées dynamiques au système modélisé.
 
 \subsubsection{Forçages et conditions aux frontières}
 
@@ -152,12 +122,13 @@ Dans une configuration régionale, le domaine simulé étant ouvert, il est imp�
 
 Ces échanges permettent d’assurer la conservation de la masse et de l’énergie dans le domaine simulé, en évitant les réflexions artificielles ou les accumulations irréalistes. Le bon choix des jeux de données en entrée est donc essentiel pour que le système reste cohérent avec les conditions océaniques larges, tout en permettant une adaptation aux dynamiques locales.
 
+Dans notre configuration, les données viennent de la réanalyse globale \textbf{GLORYS} \cite{european_union-copernicus_marine_service_global_2018} qui a la même résolution spatiale que notre configuration avec un échantillonnage temporel journalier.
+
 \subsubsection{Forçage atmosphérique}
 
 Le forçage atmosphérique constitue un moteur essentiel de la dynamique océanique. Il contrôle les échanges de quantité de mouvement, de chaleur et d’eau entre la surface de l’océan et l’atmosphère, influençant directement la stratification, les courants de surface et le cycle hydrologique.
 
-Dans cette étude, le forçage atmosphérique est implémenté à l’aide d’une formulation dite \textit{bulk}, qui consiste en une paramétrisation approchée entrainant la présence d'incertitudes dans le systeme, selon les équations présentées en \autoref{eq:bulk flux} \cite{bonino_bulk_2022}. Ce type de paramétrisation repose sur des lois empiriques reliant les flux à des chaleur, de quantité de mouvement et de sel, modulés par des coefficients de transfert aérodynamiques.
-
+Dans cette étude, le forçage atmosphérique est implémenté à l’aide d’une formulation dite \textit{bulk}, qui consiste en une paramétrisation approchée entrainant la présence d'incertitudes dans le système, selon les équations présentées en \autoref{eq:bulk flux} \cite{bonino_bulk_2022}. Ce type de paramétrisation repose sur des lois empiriques reliant les flux de chaleur, de quantité de mouvement et de sel, modulés par des coefficients de transferts aérodynamiques.
 \begin{subequations}
 \label{eq:bulk flux}
 \begin{align}
@@ -168,7 +139,6 @@ Dans cette étude, le forçage atmosphérique est implémenté à l’aide d’u
 \end{align}
 \end{subequations}
 
-Les grandeurs physiques intervenant dans ces équations sont :
 \begin{itemize}
 	\item $\tau$ : le cisaillement du vent (ou stress de vent) appliqué à la surface océanique ;
 	\item $E$ : le flux d'évaporation ;
@@ -182,40 +152,38 @@ Les grandeurs physiques intervenant dans ces équations sont :
 
 Les constantes et coefficients sont :
 \begin{itemize}
-	\item $C_D$, $C_E$, $C_H$ : coefficients de transfert aérodynamique pour le stress du vent, l’évaporation et le flux de chaleur ;
+	\item $C_D$, $C_E$, $C_H$ : coefficients de transfert aérodynamique pour la tension du vent, l’évaporation et le flux de chaleur ;
 	\item $C_p$ : capacité thermique spécifique de l’air humide ;
 	\item $L_v$ : chaleur latente de vaporisation de l’eau ;
 	\item $\rho$ : densité de l’air à la surface.
 \end{itemize}
 
-Cette formulation met en évidence l’importance de coefficients empiriques, qui doivent être soigneusement calibrés pour garantir la représentativité des échanges air-mer. Ces flux atmosphériques de surface jouent un rôle critique dans la dynamique des couches superficielles de l’océan et dans l’évolution du bilan énergétique régional.
+Cette formulation met en évidence l’importance de coefficients empiriques, qui doivent être soigneusement calibrés pour garantir la représentativité des échanges air-mer.
+
+Ici les forçages sont issus de la réanalyse \textbf{ERA5} \cite{hersbach_era5_2020}, qui contiennent des données satellites et \textit{in situ} échantillonnées	 toutes les 12 heures avec une résolution spatiale de 31 km. 
+
+\subsubsection{Marées}
+
+Les marées génèrent des courants intenses et jouent un rôle fondamental dans la dynamique côtière et la structuration des masses d’eau. Afin de reproduire fidèlement leur influence tout en préservant l’efficacité numérique du modèle, seuls les huit principaux constituants harmoniques sont considérés. Cette sélection permet de capturer les composantes dominantes associées aux mouvements orbitaux de la Terre et de la Lune, ainsi qu’à leurs interactions gravitationnelles. Ce compromis garantit une représentation réaliste du signal de marée tout en limitant les coûts computationnels. Dans notre cas nous allons utiliser le modèle harmonique \textbf{FES2014} \cite{carrere_fes_2015}.
 
 \subsection{Paramétrisation}
 
-Dans les simulations numériques à large échelle, il est impossible de représenter explicitement toutes les gammes d’échelles spatiales et temporelles en raison des limitations de résolution. Il est donc indispensable de recourir à des paramétrisations pour représenter les effets des processus sous-maille, c’est-à-dire ceux dont l’échelle est inférieure à la maille du modèle.
-
+La résolution des grilles limite la représentation explicite de toutes les gammes d'échelles spatiales et temporelles dans les simulations numériques. Des paramétrisations permettent donc de représenter les effets des processus sous-maille.
 \subsubsection{Mélange vertical turbulent}
 
-Le mélange vertical joue un rôle fondamental dans la dynamique océanique, notamment dans le transfert de chaleur, de sel et de quantité de mouvement entre les couches. Cependant, ce processus agit à des échelles fines difficilement résolubles numériquement. Plusieurs approches sont donc proposées dans le modèle \textbf{CROCO} pour paramétrer ce mélange :
+Le mélange vertical joue un rôle fondamental dans la dynamique océanique et le mélange des nutritifs, notamment dans le transfert de chaleur, de sel et de quantité de mouvement entre les couches. Cependant, ce processus agit à des échelles fines difficilement résolubles numériquement. Plusieurs approches sont donc proposées dans le modèle \textbf{CROCO} pour paramétrer ce mélange :
 
 \begin{itemize}
 	\item \textbf{Mélange basé sur un profil imposé :} Cette méthode, la plus simple et la moins coûteuse en calcul, consiste à imposer un profil vertical fixe de coefficients de mélange. Bien qu'efficace numériquement, elle reste peu réaliste car elle ne tient pas compte de la variabilité spatio-temporelle des processus turbulents.
 	
 	\item \textbf{Mélange basé sur la fréquence de Brunt-Väisälä :} Cette approche utilise la fréquence de Brunt-Väisälä $N = \sqrt{-{\frac {g}{\rho _{0}}}{\frac {\partial \rho (z)}{\partial z}}}$ pour estimer les coefficients de mélange en fonction de la stratification du milieu. Bien qu’elle intègre des informations physiques sur la stabilité verticale, elle tend à surestimer la diffusivité dans certaines situations.
 
-	\item \textbf{Paramétrisation \textit{k-profile} (KPP) \cite{large_oceanic_1994} :} Très répandue dans la modélisation océanique, cette méthode repose sur des profils semi-empiriques de diffusion verticale, ajustés selon les conditions de surface. Elle offre une représentation réaliste du mélange dans la couche de surface, mais ses performances diminuent en présence de vagues internes.
+	\item \textbf{Paramétrisation \textit{k-profile} (KPP) \cite{large_oceanic_1994} :} Très répandue dans la modélisation océanique, cette méthode repose sur des profils semi-empiriques de diffusion verticale, ajustés selon les conditions de surface. Elle offre une représentation réaliste du mélange dans la couche de surface, mais ses performances diminuent en présence d'ondes internes notamment.
 
-	\item \textbf{Modèle \textit{Generic Length Scale} (GLS) :} Ce modèle de turbulence, largement utilisé en mécanique des fluides, englobe plusieurs formulations classiques. Il permet notamment de représenter les modèles $k$–$\omega$ \cite{kolmogorov_equations_1942} et $k$–$\varepsilon$ \cite{jones_prediction_1972}, dans lesquels :
-	\begin{itemize}
-		\item $k$ est l’énergie cinétique turbulente ;
-		\item $\omega$ est la fréquence de dissipation ;
-		\item $\varepsilon$ est le taux de dissipation de l’énergie turbulente;
-		\item $\psi$ est l'échelle de longueur générique.
-	\end{itemize}
-	Ces modèles fournissent une représentation dynamique de la turbulence en profondeur, adaptée aux environnements fortement stratifiés ou aux zones de cisaillement marqué.
+	\item \textbf{Modèle \textit{Generic Length Scale} (GLS) :} Ce modèle générique de turbulence, largement utilisé en mécanique des fluides, englobe plusieurs formulations classiques. Il permet notamment de représenter les modèles $k$–$\omega$ \cite{kolmogorov_equations_1942} et $k$–$\varepsilon$ \cite{jones_prediction_1972}.
 \end{itemize}
-Dans notre cas, nous avons choisi d’utiliser le modèle \textbf{GLS} (Generic Length Scale), qui permet une grande flexibilité en englobant plusieurs modèles de turbulence selon la formulation choisie. Le système d’équations associé à ce modèle est donné dans l’\autoref{eq:GLS}. En fonction des paramètres numériques sélectionnés, il est possible de représenter différents modèles, comme le modèle $k$–$\omega$ ou $k$–$\varepsilon$.
 
+Dans notre cas, nous avons choisi d’utiliser la paramétrisation \textbf{GLS} (Generic Length Scale), qui permet une grande flexibilité en englobant plusieurs modèles de turbulence selon la formulation choisie. Le système d’équations associé à ce modèle est donné dans l’\autoref{eq:GLS}. En fonction des paramètres numériques sélectionnés, nous pouvons choisir quel modèle de fermeture utiliser.
 \begin{subequations}
 \label{eq:GLS}
 \begin{align}
@@ -227,6 +195,7 @@ Dans notre cas, nous avons choisi d’utiliser le modèle \textbf{GLS} (Generic 
 où :
 \begin{itemize}
 	\item $k$ est l’énergie cinétique turbulente ;
+	\item $\omega$ est la fréquence de dissipation ;
 	\item $\psi$ est une variable générique liée à l’échelle de longueur turbulente ;
 	\item $K_k$ et $K_\psi$ sont les viscosités turbulentes associées à $k$ et $\psi$ respectivement ;
 	\item $P = K_m \left[ \left( \pd{u}{z} \right)^2 + \left( \pd{v}{z} \right)^2 \right]$ est la production turbulente par cisaillement ;
@@ -234,15 +203,13 @@ où :
 	\item $K_m$ et $K_s$ sont la viscosité et la diffusivité turbulentes.
 \end{itemize}
 
-Les variables $\varepsilon$, $\psi$ et la longueur de mélange $l$ sont reliées par les relations suivantes :
+ Les variables $\varepsilon$, $\psi$ et la longueur de mélange $l$ sont reliées par les relations suivantes :
 \begin{equation}
 \varepsilon = \left(c^0_\mu\right)^{\frac{3+p}{n}} k^{\frac{3}{2}+\frac{m}{n}} \psi^{-1/n}, \qquad
 \psi = \left(c^0_\mu\right)^p k^m l^n, \qquad
 l = \left(c^0_\mu\right)^3 k^{3/2} \varepsilon^{-1}
 \end{equation}
-
 Les valeurs des paramètres $(m, n, p, \beta_1, \beta_2, \beta_3)$ déterminent le modèle spécifique implémenté. Celles correspondant aux modèles $k$–$\omega$ et $k$–$\varepsilon$ sont répertoriées dans la \autoref{table:GLS}.
-
 \begin{table}[ht]
 \centering
 \begin{tabular}{|c|c|c|c|c|c|c|}
@@ -266,12 +233,10 @@ Dans notre configuration, nous adoptons la formulation $k$–$\varepsilon$. Le s
 	\pd{\varepsilon}{t} & = \pd{}{z} \left( K_\varepsilon \pd{\varepsilon}{z} \right) + \varepsilon k^{-1} \left( \beta_1 P + B - \beta_2 \varepsilon \right)
 \end{align}
 \end{subequations}
-
 avec la correspondance :
 \begin{equation}
 \varepsilon = \psi, \qquad \psi = \left(c^0_\mu\right)^{-1} k^{3/2} l^{-1}, \qquad l = \left(c^0_\mu\right) k^{3/2} \varepsilon^{-1}
 \end{equation}
-
 Cette formulation permet une représentation dynamique du mélange vertical, adaptée aux régimes de turbulence variables, et constitue un choix robuste pour la simulation régionale utilisée dans cette étude.
 
 \subsubsection{Autres paramétrisations}
@@ -284,37 +249,6 @@ Outre le mélange vertical, d’autres processus physiques sont également param
 
 Ces paramétrisations sont essentielles pour garantir la stabilité numérique du modèle tout en maintenant un réalisme physique suffisant dans la représentation des processus sous-maille.
 
-
-\section{Parallélisation}
-
-\subsection{Plan des simulations}
-
-Dans le cadre de cette étude, nous avons réalisé trois ensembles de simulations, chacun composé de 30 membres, couvrant une période de trois ans. L’objectif est d’analyser l'impact relatif des différentes perturbations appliquées. 
-
-Les simulations reposent sur un ensemble cohérent de données d’entrée issues de produits numériques:
-
-\begin{itemize}
-	\item \textbf{Forçage atmosphérique :} Données issues de la réanalyse \textbf{ERA5}.
-	\item \textbf{Conditions aux limites océaniques :} Données extraites de la réanalyse globale \textbf{GLORYS}.
-	\item \textbf{Marées :} Forçage par marée issu du modèle harmonique \textbf{FES2014}, incluant les huit principales composantes.
-	\item \textbf{Bathymétrie :} Données bathymétriques dérivées du modèle global \textbf{GEBCO}.
-\end{itemize}
-
-Chaque ensemble de simulations se voit attribuer une identification composée d’un nom et d’une couleur, facilitant leur différenciation lors de l’analyse des résultats :
-
-\begin{itemize}
-	\item \textbf{DETER} désigne la simulation déterministe de six ans, utilisée pour les diagnostics préliminaires ainsi que pour la configuration des différents ensembles. Elle constitue la référence du système.
-	
-	\item \textbf{INI} correspond à l’ensemble dédié à l’étude de la variabilité intrinsèque du modèle. Une perturbation temporaire a été appliquée sur le coefficient de stress du vent durant une seule journée afin d’initier la divergence des trajectoires. Par la suite, aucune autre perturbation n’a été introduite, permettant à chaque membre d’évoluer librement. Cet ensemble est représenté par la couleur noire.
-	
-	\item \textbf{STR} représente l’ensemble visant à quantifier la variabilité induite par une perturbation continue sur le coefficient de stress du vent. Une perturbation stochastique a été appliquée avec un écart-type de 0,10. La couleur bleue est associée à cet ensemble.
-	
-	\item \textbf{GLS} est l’ensemble conçu pour évaluer l’impact de la variabilité introduite par le schéma de paramétrisation du mélange vertical turbulent. Une perturbation a été appliquée sur les paramètres du modèle de turbulence, avec un écart-type plus élevé (0,30), ciblant des processus plus localisés et de plus petite échelle. Cet ensemble est représenté en rouge dans les figures.
-\end{itemize}
-
-\subsection{Production des simulations}
-
-Ces simulations seront parallélisées et effectuées sur le cluster du CINES en utilisant 30 nœuds, chacun équipé de 188 cœurs. L'utilisation de la grille décalé présentée en \autoref{sec:staggered grid} permet une implémentation directe de la parallélisation sur supercalculateur.
 
 
 

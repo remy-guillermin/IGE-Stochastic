@@ -1,48 +1,41 @@
-\chapter{Simulations d'ensemble} 
+\chapter{Variabilité de la circulation océanique de surface de l'océan Indien sud-ouest} 
 
-\section{Zones de diagnostic}
-Au cours de cette étude, nous avons choisi de concentrer notre analyse sur quatre zones spécifiques, présentées en \autoref{fig:boxes}.
+\section{Plan des simulations}
 
-\begin{figure}[h]
-\centering
-\includegraphics[width=\textwidth]{Figures/bathy_zones}
-\caption{Zones de diagnostics privilégiées}
-\label{fig:boxes}
-\end{figure}
+Dans le cadre de cette étude, nous avons réalisé trois ensembles de simulations, chacun composé de 30 membres, couvrant une période de trois ans. L’objectif est d’analyser l'impact relatif des différentes perturbations appliquées. 
 
-Ces régions ont été sélectionnées afin d'assurer une couverture représentative de l’océan Indien sud-ouest, en englobant une diversité de régimes dynamiques.
+Chaque ensemble de simulations se voit attribuer une identification composée d’un nom et d’une couleur, facilitant leur différenciation lors de l’analyse des résultats :
 
-La \autoref{fig:boxes} présente aussi la bathymétrie de notre zone d'étude. Nous constatons donc que cette région est parsemée de nombreuses iles, ainsi que d'un fort plateau continental, le plateau des Mascareignes.
-
-La première zone est localisée à l’équateur, où l’influence de la force de Coriolis est négligeable. Cette région est traversée par des courants équatoriaux dont la direction s’inverse entre les deux saisons principales. Elle constitue ainsi un cadre idéal pour étudier les variations saisonnières ainsi que les processus dynamiques non géostrophiques.
-
-La deuxième zone se situe au sud des Mascareignes, potentiellement influencée par la topographie et la présence d'îles (La Réunion, Maurice). Elle est dominée par un jet zonal intense, le courant subtropical sud-équatorial, et est soumise à des vents soutenus pendant une grande partie de l’année. Cette configuration en fait une région pertinente pour évaluer l’impact des perturbations du stress du vent sur la dynamique océanique.
-
-La troisième zone comprend l’archipel des Comores, caractérisée par une bathymétrie complexe et fortement variable à petite échelle. L’étude de cette région vise à mieux comprendre l’effet du relief océanique sur la dynamique côtière..
-
-Enfin, la quatrième zone est située au sud du canal du Mozambique, dans une région partiellement influencée par le courant des Aiguilles. Cette zone est stratégique pour le suivi de l’export de chaleur et de masse vers les latitudes tempérées.
-
+\begin{itemize}
+	\item \textbf{DETER} désigne la simulation déterministe de six ans, utilisée pour les diagnostics préliminaires ainsi que pour la configuration des différents ensembles. Elle constitue la référence du système.
+	
+	\item \textbf{INI} correspond à l’ensemble dédié à l’étude de la variabilité intrinsèque du modèle et est coloré en noir.
+	
+	\item \textbf{STR} représente l’ensemble visant à quantifier la variabilité induite par une perturbation continue sur le coefficient de stress du vent et est associé à la couleur bleue.
+	
+	\item \textbf{GLS} est l’ensemble conçu pour évaluer l’impact de la variabilité introduite par le schéma de paramétrisation du mélange vertical turbulent et est représenté en rouge dans les figures.
+\end{itemize}
 
 \section{Évaluation des écarts simulation–observation}
 
-Dans un premier temps, notre analyse porte sur la simulation déterministe, qui servira de référence pour évaluer la fidélité du modèle par rapport aux observations satellitaires. Les produits utilisés viennent du \textbf{CMEMS} et sont \textbf{OSTIA} pour la température de surface et \textbf{MOG} (Multi Observation Global) pour la salinité. Les données de température proviennent des satellites du projet \textbf{GHRSST}, tandis que celles de salinité sont issues des missions \textbf{SMOS} et \textbf{SMAP}.
+Dans un premier temps, notre analyse porte sur la simulation déterministe, qui servira de référence pour évaluer la fidélité du modèle par rapport aux observations satellitaires. Les produits utilisés viennent du \textbf{CMEMS} \cite{noauthor_accueil_nodate} et sont \textbf{OSTIA}\cite{european_union-copernicus_marine_service_global_2015} pour la température de surface et \textbf{MOG} \cite{european_union-copernicus_marine_service_multi_2020} (Multi Observation Global) pour la salinité. Les données de température proviennent des satellites du projet \textbf{GHRSST }\cite{martin_group_2012, dash_group_2012}, tandis que celles de salinité sont issues des missions \textbf{SMOS} \cite{kerr_smos_2010} et \textbf{SMAP} \cite{oneill_nasa_2010}.
 
 L’évaluation est effectuée en calculant le biais moyen annuel pour l’année 2019, obtenu par la moyenne temporelle de l’écart entre les champs simulés et les observations. Ces biais sont présentés en \autoref{fig:bias}.
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=\textwidth]{Figures/deviation_obs_2019_deter}
-\caption{Biais moyen de la simulation par rapport aux observations}
+\caption{Biais moyen annuel de la simulation \textbf{DETER} par rapport aux observations}
 \label{fig:bias}
 \end{figure}
 
-L’analyse de cette figure révèle deux résultats notables. D’une part, la température présente un biais fortement négatif sur l’ensemble du domaine. Ce comportement peut s’expliquer par le biais négatif bien documenté du forçage atmosphérique \textbf{ERA5} sur la température de l’air. D’autre part, un biais positif marqué sur la salinité apparaît dans le canal du Mozambique, ce qui résulte principalement de l’absence de prise en compte des apports fluviaux dans la configuration actuelle du modèle.
+D'une part, nous constatons un biais négatif de la température sur l’ensemble du domaine. Ce comportement peut s’expliquer par le biais négatif documenté du forçage atmosphérique \textbf{ERA5} sur la température de l’air comparé à \textbf{OSTIA} \cite{lavers_evaluation_2022}. D’autre part, un biais positif marqué sur la salinité apparaît dans le canal du Mozambique, ce qui résulte principalement de l’absence de prise en compte des apports fluviaux dans la configuration actuelle du modèle, important le long de la côte d'Afrique de l'Est.
 
-Ces écarts montrent la nécessité d’une correction des biais structurels avant d’entreprendre des études à visée réaliste. Dans la suite de ce travail, nous allons donc nous concentrer sur une étude de sensibilité du modèle face à différentes sources de perturbation.
+Ces écarts montrent la nécessité d’une correction des biais structurels avant d’entreprendre des études à visée réaliste. La suite de mon travail se concentre sur une étude de sensibilité du modèle face à différentes sources d'incertitudes.
 
 \section{Dispersion des traceurs}
 
-Nous allons maintenant analyser les ensembles de simulation. Une première approche consiste à observer les séries temporelles des traceurs, ce qui permet d’évaluer la cohérence des dynamiques reproduites par chaque ensemble. La \autoref{fig:salt} présente l’évolution de la salinité de surface pour la zone \textit{Islands} en fonction du temps. Ici il s'agit de la valeur de surface moyennée dans l'entièreté de la zone à chaque instant.
+Cette section présente l'analyse des ensembles de simulation. Une première approche consiste à observer les séries temporelles des traceurs, ce qui permet d’évaluer la cohérence des dynamiques reproduites par chaque ensemble. La \autoref{fig:salt} présente l’évolution de la salinité de surface pour la zone \textit{Islands} en fonction du temps. Ici il s'agit de la valeur de surface moyennée dans l'entièreté de la zone à chaque instant.
 
 \begin{figure}[h]
 \centering
@@ -51,9 +44,9 @@ Nous allons maintenant analyser les ensembles de simulation. Une première appro
 \label{fig:salt}
 \end{figure}
 
-L’analyse de cette figure montre que tous les ensembles suivent une dynamique moyenne très similaire. Cela suggère que, malgré les perturbations spécifiques introduites dans chaque configuration, la structure globale de salinité reste robuste. On observe néanmoins quelques divergences ponctuelles, notamment lors de transitions de saison. Par ailleurs, les cycles saisonniers sont bien marqués et reproduits de façon cohérente dans chaque ensemble, ce qui valide le bon comportement du système à grande échelle.
+Cette figure montre que tous les ensembles suivent une dynamique moyenne très similaire. Cela suggère que, malgré les perturbations spécifiques introduites dans chaque configuration, la structure globale de salinité reste robuste. On observe néanmoins quelques divergences ponctuelles, notamment lors de transitions de saison. Par ailleurs, les cycles saisonniers sont bien marqués et reproduits de façon cohérente dans chaque ensemble, ce qui valide le bon comportement du système à grande échelle.
 
-Nous voulons ensuite étudier la dispersion\footnote{Ici le mot dispersion correspond à l'écart-type d'ensemble de la variable} de la salinité dans cette même zone, en \autoref{fig:salt disperion}. Cette figure présente la dispersion des ensembles moyennée sur la boite avec plus ou moins l'écart-type d'ensemble. 
+Nous voulons ensuite étudier la dispersion\footnote{Ici le mot dispersion correspond à l'écart-type d'ensemble de la variable} de la salinité dans cette même zone, en \autoref{fig:salt dispersion}. Cette figure présente la dispersion des ensembles moyennée sur la zone avec plus ou moins l'écart-type d'ensemble. 
 
 \begin{figure}[h]
 \centering
@@ -62,13 +55,13 @@ Nous voulons ensuite étudier la dispersion\footnote{Ici le mot dispersion corre
 \label{fig:salt dispersion}
 \end{figure}
 
-Contrairement à l'analyse précédente portant sur la moyenne, cette fois des différences significatives apparaissent entre les ensembles. La plus notable est la phase transitoire observée sur les 6 premiers mois de simulation, nettement plus courte dans l'ensemble \textbf{STR} que dans les deux autres.
+Contrairement à l'analyse précédente portant sur la moyenne, cette fois des différences significatives apparaissent entre les ensembles. La plus notable est la phase transitoire observée sur les 6 premiers mois de simulation, nettement amplifiée dans l'ensemble \textbf{STR} que dans les deux autres : La différence porte principalement sur l'amplitude de la dispersion : le modèle de mélange vertical semble générer une dispersion plus importante: un écart-type de 0.05 est atteint au bout de 3 mois pour \textbf{STR}, contre 3 mois et demi et 5 respectivement pour \textbf{GLS} et \textbf{INI}.
 
-Un point important à souligner à partir de cette figure est la faible dispersion relative entre les ensembles une fois la phase transitoire terminée. Cela met en évidence le rôle dominant de la variabilité intrinsèque du modèle, qui crée une enveloppe de référence dans laquelle les autres ensembles ne s’écartent que faiblement.
+La dispersion relative entre les ensembles est bien plus faible en régime permanent après saturation. Cela met en évidence le rôle dominant de la variabilité intrinsèque du modèle, qui crée une enveloppe de référence dans laquelle les autres ensembles ne s’écartent que faiblement.
 
 En revanche, on note l'absence de cycle saisonnier marqué pour la salinité dans cette zone. Pour approfondir cette question, nous allons examiner la température dans une autre région, la zone \textit{Equator}, présentée en \autoref{fig:temp disperion}, afin d'identifier d'éventuelles variations régionales dans le comportement des traceurs. Ici encore, nous présentons la dispersion des ensembles de la même manière que précédemment.
 
-Cette fois, les durées des phases transitoires des ensembles \textbf{STR} et \textbf{GLS} sont similaires. La différence porte principalement sur l'amplitude de la dispersion : le modèle de mélange vertical semble générer une dispersion plus importante que celle induite par la perturbation du coefficient de stress du vent dans cette zone.
+Cette fois, les durées des phases transitoires des ensembles \textbf{STR} et \textbf{GLS} sont similaires, mais \textbf{GLS} a une dispersion transitoire deux fois plus grande que \textbf{STR} : $0,2$ contre $0,1$.
 
 \begin{figure}[h]
 \centering
@@ -77,12 +70,9 @@ Cette fois, les durées des phases transitoires des ensembles \textbf{STR} et \t
 \label{fig:temp disperion}
 \end{figure}
 
-Dans cette région équatoriale, nous observons également des cycles saisonniers marqués de la dispersion de la température. Des déphasages apparaissent entre certains ensembles. L'ensemble \textbf{STR} génère une dispersion plus prononcée durant les mois de juin à septembre, tandis que l'ensemble \textbf{GLS} présente une dispersion maximale sur la période de janvier à avril.
+Dans cette région équatoriale, nous observons également des cycles saisonniers marqués de la dispersion de la température. Des déphasages apparaissent entre certains ensembles. L'ensemble \textbf{STR} génère une dispersion plus prononcée , avec une augmentation de $0,03$ \degree C, durant les mois de juin à septembre, tandis que l'ensemble \textbf{GLS} présente une dispersion maximale, avec une augmentation de $0,05$\degree C sur la période de janvier à avril.
 
 Ces comportements sont cohérents avec la configuration des courants présentée en \autoref{fig:currents}. Durant les premiers mois de l'année, le courant de Somalie et le courant côtier d'Afrique de l'Est convergent, formant le courant subéquatorial (\autoref{fig:JFM current}). Cette interaction génère de nombreux tourbillons de méso-échelle, qui influencent fortement le mélange vertical. À l’inverse, durant l’été austral (\autoref{fig:JJA current}), les vents sont renforcés en raison de l’alignement des grands courants, ce qui augmente l’effet des perturbations sur le coefficient de stress du vent.
-
-Ces divergences illustrent clairement l’impact de différentes sources d’incertitude dans la résolution numérique de la circulation océanique. Lorsque la dynamique est dominée par le vent, une perturbation du coefficient de stress induit une variabilité accrue. À l’inverse, en présence de tourbillons de méso-échelle, ce sont les termes de production et de destruction de la turbulence dans la paramétrisation de la \textbf{TKE} (Turbulent Kinetic Energy) qui deviennent prépondérants dans l’amplification de la dispersion.
-
 \begin{figure}[h]
      \centering
      \begin{subfigure}[b]{0.49\textwidth}
@@ -102,11 +92,13 @@ Ces divergences illustrent clairement l’impact de différentes sources d’inc
      \label{fig:currents}
 \end{figure}
 
+Ces divergences illustrent clairement l’impact de différentes sources d’incertitude dans la résolution numérique de la circulation océanique. Lorsque la dynamique est dominée par le vent, une perturbation du coefficient de stress induit une variabilité accrue. À l’inverse, en présence de tourbillons de méso-échelle, ce sont les termes de production et de destruction de la turbulence dans la paramétrisation de la \textbf{TKE} qui deviennent prépondérants dans l’amplification de la dispersion, avec une augmentation de l'ordre de $10\%$.
+
 Après avoir étudié les traceurs tels que la salinité et la température, nous nous intéressons désormais à une variable présentant une forte variabilité spatiale et temporelle : la profondeur de la couche de mélange.
 
 \section{Dispersion de la couche de mélange}
 
-Une variable encore peu diagnostiquée dans des simulations ensemblistes, mais présentant une forte variabilité, est la profondeur de la couche de mélange, appelée \textbf{Mixing Layer Depth} ou \textbf{MLD} en anglais. Nous allons donc détailler la méthode de calcul de cette variable, puis analyser les différents profils et l’évolution temporelle de cette profondeur.
+Une variable encore peu diagnostiquée dans des simulations ensemblistes, mais présentant une forte variabilité et un rôle clé pour la biogéochimie, est la profondeur de la couche de mélange, appelée \textbf{Mixing Layer Depth} (\textbf{MLD}) en anglais. Cette couche de mélange existe du fait de l'interaction avec l'air de l'atmosphère qui mélange les couches proches de la surface, mais aussi par les courants générés par le vent. Nous allons donc détailler la méthode de calcul de cette variable, puis analyser les différents profils et l’évolution temporelle de cette profondeur.
 
 \begin{wrapfigure}{r}{0.5\textwidth}	
 \centering
@@ -117,13 +109,15 @@ Une variable encore peu diagnostiquée dans des simulations ensemblistes, mais p
 
 \subsection{Définition}
 
-La \textbf{MLD} est une variable dépendant directement du profil vertical de densité, comme illustré en \autoref{fig:mld def}, ce qui lui confère une variabilité prononcée. Sa définition repose sur une méthode de seuil : la profondeur considérée correspond au premier niveau $z$ pour lequel la densité $\rho(z)$ dépasse une densité de référence $\rho_{\text{ref}}$ (typiquement mesurée à \SI{10}{\meter}) augmentée d’un seuil $\Delta \rho_{\text{threshold}} = \SI{0.03}{\kilo\gram\per\meter\cubed}$, tel que proposé par \cite{de_boyer_montegut_mixed_2004}.
+La \textbf{MLD} est une variable dépendant directement du profil vertical de densité, comme illustré en \autoref{fig:mld def}, ce qui lui confère une variabilité prononcée. Sa définition repose sur une méthode de seuil : la profondeur considérée correspond au premier niveau $z$ pour lequel la densité $\rho(z)$ dépasse une densité de référence $\rho_{\text{ref}}$ (typiquement mesurée à \SI{10}{\meter}) augmentée d’un seuil $\Delta \rho_{\text{threshold}} = \SI{0.03}{\kilo\gram\per\meter\cubed}$, tel que proposé par \oldcite{de_boyer_montegut_mixed_2004}.
 
 Bien que la profondeur de la couche de mélange ne soit pas une sortie directe du modèle, elle peut être estimée de manière fiable à partir des profils simulés de densité. Pour cela, nous utilisons une interpolation linéaire entre les niveaux verticaux, ce qui permet d’éviter une quantification trop grossière liée à la discrétisation verticale fixe du modèle. 
 
-Il est toutefois important de noter que cette interpolation linéaire reste une approximation : une méthode plus précise consisterait à ajuster une fonction plus réaliste (ex. spline, ajustement polynomial local) à l'évolution verticale de la densité afin de mieux capturer la transition entre la couche de surface homogène et la thermocline. Cette couche de mélange existe du fait de l'interaction avec l'air de l'atmosphère qui mélange les couches proches de la surface, mais aussi par les courants générés par le vent.
+Une méthode plus précise consisterait à ajuster une fonction plus réaliste (ex. spline, ajustement polynomial local) à l'évolution verticale de la densité afin de mieux capturer la transition entre la couche de surface homogène et la thermocline. 
 
-\subsection{Résultats}
+
+\clearpage
+\subsection{Variabilité de la MLD}
 
 \begin{wrapfigure}{r}{0.4\textwidth}	
 \centering
@@ -134,8 +128,7 @@ Il est toutefois important de noter que cette interpolation linéaire reste une 
 
 Dans un premier temps, nous analysons des coupes verticales de la \textbf{MLD}, représentées en \autoref{fig:slice}. Ces coupes permettent d’identifier les zones présentant une variabilité marquée, ainsi que d’obtenir une vision verticale et spatiale de l’évolution de cette variable. Deux transects ont été choisis : l’un à l’équateur, afin d’examiner l’effet de l’absence de composante géostrophique ; l’autre au nord de Madagascar, dans une région de bathymétrie complexe, pour évaluer son impact sur la dispersion.
 
-Sur la \autoref{fig:mld slice}, nous présentons la profondeur moyenne de la couche de mélange pour chaque ensemble en trait gras, ainsi que la valeur de chaque membre en trait fin. La coupe équatoriale montre une dispersion relativement homogène sur l’ensemble du domaine, à l’exception de la frontière ouest, où les membres convergent fortement. Ce comportement s’explique par l’influence du forçage aux frontières, qui impose une contrainte forte sur le profil de densité. On observe également une augmentation de la dispersion à proximité du continent africain, en lien avec la présence du courant de Somalie, lequel intensifie le mélange vertical.
-
+Sur la \autoref{fig:mld slice}, nous présentons la profondeur moyenne de la couche de mélange pour chaque ensemble en trait gras, ainsi que la valeur de chaque membre en trait fin. La coupe équatoriale montre une dispersion relativement homogène sur l’ensemble du domaine. On observe également une augmentation de la dispersion à proximité du continent africain, en lien avec la présence du courant de Somalie, lequel intensifie le mélange vertical.
 \begin{figure}[h]
 \centering
 \includegraphics[width=\textwidth]{Figures/slices_mld_comp_2017-09-09}
@@ -149,12 +142,33 @@ La seconde coupe révèle deux régimes bien distincts :
     \item à l’est de Madagascar, cette dispersion chute aux alentours de \SI{4}{\meter}.
 \end{itemize}
 
-Cette différence reflète l’effet combiné de la bathymétrie complexe et de l’un des jets qui contourne Madagascar sur le développement de la variabilité verticale. Il est également important de noter que l’ensemble \textbf{INI} présente systématiquement une dispersion plus faible que les ensembles \textbf{STR} et \textbf{GLS}, et ce aussi bien dans les deux coupes (S1 et S2) que dans les deux régimes identifiés de la seconde coupe.
+Cette différence reflète l’effet combiné de la bathymétrie complexe et du jet nord du courant subtropical présenté en \autoref{fig:dynamics} sur le développement de la variabilité verticale. Il est également important de noter que l’ensemble \textbf{INI} présente systématiquement une dispersion plus faible que les ensembles \textbf{STR} et \textbf{GLS}, de l'ordre de $10\%$, et ce aussi bien dans les deux coupes (S1 et S2) que dans les deux régimes identifiés de la seconde coupe.
+
+Afin d'étudier la variabilité temporelle de la profondeur de couche de mélange, nous avons choisi de nous intéresser à sa distribution statistique. Pour cela, nous avons choisi de limiter nos comparaisons aux 4 zones choisies et deux jours de la simulation, représentés en \autoref{fig:mld hist 1} pour une période estivale et en \autoref{fig:mld hist 2} pour une période hivernale.
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.85\textwidth]{Figures/hist_ensemble_2018-02-11}
+\caption{Histogramme de la \textbf{MLD} de chaque ensemble dans chaque zone de diagnostic - Période estivale}
+\label{fig:mld hist 1}
+\end{figure}
+
+Nous voyons une forte différence entre ces deux périodes de l'année. Pendant l'été, la couche de mélange se rapproche de la surface pour toutes les zones, entre $10$ et $20$ mètres pour toutes les zones sauf celle du canal du Mozambique qui est plus profonde ($30$-$40$ mètres). De plus, sa dispersion se réduit fortement pour atteindre un ordre de grandeur de $10$ mètres pour tous les ensembles. 
+A contrario, pendant l'hiver, le comportement inverse se produit. La couche de mélange est plus profonde : $50$ mètres pour l'équateur et les îles et $80$ mètres pour le canal du Mozambique et le Mascareignes. Concernant la dispersion, les deux premières zones ont un écart-type de $15$ mètres contre entre $20$ et $30$ mètres pour les deux autres.
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.85\textwidth]{Figures/hist_ensemble_2017-07-21}
+\caption{Histogramme de la \textbf{MLD} de chaque ensemble dans chaque zone de diagnostic - Période hivernale}
+\label{fig:mld hist 2}
+\end{figure}
+
+Ces différences s'expliquent par les configurations saisonnières alternées des courants \cite{phillips_progress_2021}, mais aussi par la stratification des océans pendant les mois de Décembre à Mars \cite{gordon_two_1991}.
 
 \section{Conclusion}
 
 Cette étude a permis d’identifier les impacts différenciés des perturbations introduites dans nos ensembles de simulation. Ces perturbations ne se traduisent pas simplement par une augmentation uniforme de la dispersion, mais peuvent générer des effets localisés, aussi bien spatialement que temporellement, sur la variabilité d’une variable donnée.
 
-Nous avons montré que les incertitudes introduites par les perturbations s’ajoutent à la variabilité intrinsèque du modèle, sans toutefois la dominer. En effet, cette variabilité intrinsèque structure l’enveloppe moyenne de la dispersion et constitue le socle sur lequel les autres sources d’incertitude viennent moduler la réponse du système. Cela est du à la nature chaotique du système qui est bien représenté par la haute résolution utilisée (1/12\degree) ce qui génère une méso-échelle intense.
+Dans un premier temps, nous avons montré qu'après la phase transitoire, les incertitudes introduites par les perturbations se superposent à la variabilité intrinsèque du modèle, sans toutefois la dominer. En effet, cette variabilité intrinsèque structure l’enveloppe moyenne de la dispersion et constitue le socle sur lequel les autres sources d’incertitude viennent moduler la réponse du système. Cela est dû à la nature chaotique du système qui est bien représenté par la résolution utilisée (1/12\degree) ce qui génère une méso-échelle intense.
+
+Pendant la phase transitoire, les perturbations sur la tension du vent et le mélange vertical sont prédominantes, avec, en fonction des variables et régions étudiées, un facteur 10 (pour la région équatoriale) entre la dispersion de ces ensembles comparé à celle de l'ensemble étudiant la variabilité intrinsèque. Ainsi, nous pouvons en conclure que durant les premiers mois de simulation, la variabilité intrinsèque est négligeable par rapport à d'autres sources d'incertitude, dans notre cas la tension du vent et le mélange vertical.
 
 
