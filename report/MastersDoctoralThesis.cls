@@ -216,7 +216,7 @@
 \DeclareDocumentCommand{\author}{m}{\newcommand{\authorname}{#1}\renewcommand{\@author}{#1}}
 \NewDocumentCommand{\supervisor}{m}{\newcommand{\supname}{#1}}
 \NewDocumentCommand{\examiner}{m}{\newcommand{\examname}{#1}}
-\NewDocumentCommand{\degree}{m}{\newcommand{\degreename}{#1}}
+\NewDocumentCommand{\degreeyear}{m}{\newcommand{\degreename}{#1}}
 \NewDocumentCommand{\addresses}{m}{\newcommand{\addressname}{#1}}
 \NewDocumentCommand{\university}{m}{\newcommand{\univname}{#1}}
 \NewDocumentCommand{\group}{m}{\newcommand{\groupname}{#1}}
@@ -350,7 +350,7 @@ KOMA-script documentation for details.}]{fancyhdr}
 		{\chapteralign\normalsize\abstractauthorfont \authorname \par}% Author name
 		\vspace{\baselineskip}
 		{\chapteralign\parbox{.7\linewidth}{\chapteralign\normalsize\itshape\abstracttitlefont\@title}\par}% Thesis title
-		\bigskip\noindent\ignorespaces
+		\noindent\ignorespaces
 	}%
 	{}%end alt-abstract
 }{%
@@ -360,17 +360,7 @@ KOMA-script documentation for details.}]{fancyhdr}
 		#1%added to be able to have abstract more than one page long
 		\thispagestyle{plain}
 		\begin{center}
-			{\normalsize \MakeUppercase{\univname} \par}% University name in capitals
-			\bigskip
 			{\huge\textit{\abstractname} \par}
-			\bigskip
-			{\normalsize \facname \par}% Faculty name
-			\bigskip
-			{\normalsize \degreename\par}% Degree name
-			\bigskip
-			{\normalsize\bfseries \@title \par}% Thesis title
-			\medskip
-			{\normalsize \byname{} \authorname \par}% Author name
 			\bigskip
 		\end{center}
 	}

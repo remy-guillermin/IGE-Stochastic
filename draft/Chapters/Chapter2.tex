@@ -121,7 +121,7 @@ Comme nous étudions une zone spécifique de l'océan indien, nous avons besoin 
 
 \subsection{Paramétrisation}
 \subsubsection{Mélange vertical}
-Dans ce modèle, le mélange vertical peut être géré de différentes manières. Ici, nous allons utiliser une paramétrisation en échelle de longueur caractéristiques (\textbf{GLS}). Plusieurs modèles existent pour cette paramétrisation, notamment le modèle $k-\omega$ et le modèle $k-\varepsilon$, où $k$ représente l'énergie turbulente, $\omega$ la fréquence de dissipation de $k$ et $\varepsilon$ son taux de dissipation. Nous avons choisi d'utiliser le modèle $k-\varepsilon$ \cite{launder_numerical_1974}, qui est le plus simple dans notre cas. En effet, le modèle $k - \omega$ convient davantage aux écoulements en présence de parois, tandis que nous paramétriserons ici également les effets de friction de fond. Ce choix implique l'approximation d'une turbulence isotrope dans l'océan. Dans \textbf{CROCO}, ce modèle est représenté par deux équations : \autoref{eq:dkdt} pour l'énergie cinétique et \autoref{eq:dpsidt} pour l'échelle de longueur caractéristique.
+Dans ce modèle, le mélange vertical peut être géré de différentes manières. Ici, nous allons utiliser une paramétrisation en échelle de longueur caractéristiques (\textbf{GLS}). Plusieurs modèles existent pour cette paramétrisation, notamment le modèle $k-\omega$ et le modèle $k-\varepsilon$, où $k$ représente l'énergie turbulente, $\omega$ la fréquence de dissipation de $k$ et $\varepsilon$ son taux de dissipation. Dans notre cas, CROCO utilise le modèle $k-\varepsilon$ \cite{launder_numerical_1974}, qui est le plus simple dans notre cas. En effet, le modèle $k - \omega$ convient davantage aux écoulements en présence de parois, tandis que nous paramétriserons ici également les effets de friction de fond. Ce choix implique l'approximation d'une turbulence isotrope dans l'océan. Dans \textbf{CROCO}, ce modèle est représenté par deux équations : \autoref{eq:dkdt} pour l'énergie cinétique et \autoref{eq:dpsidt} pour l'échelle de longueur caractéristique.
 \begin{subequations}
 	\begin{align}
 		\pd{k}{t} & = \pd{}{z} \left( K_k \pd{k}{z} \right) + P + B - \varepsilon \label{eq:dkdt} \\
@@ -154,7 +154,10 @@ L'approche primaire afin de transformer un modèle déterministe en un modèle p
 	X^{(i)}_{t+1} = a^{(i)} X^{(i)}_t + b^{(i)} w + c^{(i)}
 \end{equation}
 
-Ici $t$ correspond à l'indice temporel du modèle, $a^{(i)}, b^{(i)}, c^{(i)}$ sont des paramètres qui définissent la moyenne $\mu^{(i)}$, l'écart type $\sigma^{(i)}$ et l'échelle temporelle de correlation $\tau^{(i)}$ de chaque processus.
+Ici $t$ correspond à l'indice temporel du modèle, $a^{(i)}, b^{(i)}, c^{(i)}$ sont des paramètres qui définissent la moyenne $\mu^{(i)}$, l'écart type $\sigma^{(i)}$ et l'échelle temporelle de correlation $\tau^{(i)}$ de chaque processus. $w$ sera la distribution stochastique que nous souhaitons appliquer à la variable, à l'ordre 0 cela correspond à un bruit blanc.
+
+\subsection{Champs d'étude}
+Nous allons étudier différentes sources d'incertitudes du modèle. La première, et la plus importante, est la variabilité du champ de conditions initiales. Ce premier ensemble permettra de quantifier la variabilité intrinsèque du modèle qui sera toujours présente dans les ensembles suivants. D'autres pistes seront étudiées par Lisa notamment la variabilité due au forçage atmosphérique ainsi que celle crée par les conditions aux frontières. Une autre voie d'étude est la variabilité induite par la paramétrisation du mélange vertical. Durant mon stage, je me focaliserai sur l'implémentation d'un ensemble stochastique sur la paramétrisation verticale.
 
 \subsection{Implémentation}
 Ces processus stochastiques sont implémentés dans \textbf{CROCO} sous la forme d'un module Fortran \textsc{STOGEN} couplé au code \textbf{CROCO}. Dans notre cas, nous allons avoir les paramètres suivants
@@ -166,13 +169,12 @@ Les statistiques de $X$ sont supposés constantes dans l'espace (homogénéité)
  
 Nous pouvons donc initialiser $a = \exp{\left(-1/\tau^{(i)} \right)}$ et $b = \sqrt{1 - a^2}$ en donnant comme paramètre d'entrée l'échelle de corrélation temporelle. Nous devons ensuite affiner ces valeurs afin d'obtenir des statistiques cohérentes avec celles des paramètres que nous souhaitons étudier.
 
-\subsection{Champs d'étude}
-Nous allons étudier différentes sources d'incertitudes du modèle. La première, et la plus importante, est la variabilité du champ de conditions initiales. Ce premier ensemble permettra de quantifier la variabilité intrinsèque du modèle qui sera toujours présente dans les ensembles suivants. D'autres pistes seront étudiées par Lisa notamment la variabilité due au forçage atmosphérique ainsi que celle crée par les conditions aux frontières. Une autre voie d'étude est la variabilité induite par la paramétrisation du mélange vertical.
+Concernant l'implémentation de ces processus dans le cadre d'une simulation ensembliste étudiant la paramétrisation verticale, il est intéressant de perturber les termes de production et de destruction de l'\autoref{eq:dkdt} de manière indépendante \cite{juricke_stochastic_2017}, ainsi que de perturber la métrique verticale afin d'étudier l'incertitude sur la position de la maille qui est une incertitude connue des schémas de résolution numérique.
+
 
 \subsection{Méthodes d'analyse}
-\subsubsection{Histogramme de rang} 
-????
-\subsubsection{Autres méthodes ????}
+
+Afin d'étudier les ensembles de simulation, des séries temporelles seront effectuées, notamment afin de voir le spread, ou enveloppe, de l'ensemble ainsi que sa déviation et sa RMSE (\textit{Root Mean Square Error}).
 
 
 

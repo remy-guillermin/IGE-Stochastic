@@ -10,7 +10,7 @@ Il est possible d'afficher les cartes de chacun de ces traceurs qui sont la temp
 	\label{fig:annu SS}
 \end{figure}
 
-On constate une salinité plus faible au niveau de l'embouchure du fleuve Pungue (35°E 20°S environ) due au champ initial qui prend en compte l'injection des eaux fluviales contrairement au modèle qui ne les prend pas en compte sur cette simulation. 
+On constate une salinité plus faible au niveau de l'embouchure du fleuve Pungue (35$\degree$E 20$\degree$S environ) due au champ initial qui prend en compte l'injection des eaux fluviales contrairement au modèle qui ne les prend pas en compte sur cette simulation. 
 \begin{figure}[h]
 	\includegraphics[width=\textwidth]{Figures/sea_anomaly_annual_2019.png}
 	\caption{Cartes des anomalies de surface pour l'année 2019 - De gauche à droite: Salinité, Surface libre, Température}
@@ -48,19 +48,25 @@ Nous pouvons par la suite regarder les champs physiques moyens et turbulents, re
         \label{fig:turb & mean}
 \end{figure}
 
-Ces cartes nous permettent de savoir les zones sujettes à de fortes vitesses moyennes et ainsi permettre une validation rapide par des données issues de la réanalyse GLORYS. Comme ces deux jeux de données ne sont pas sur la même grille nous allons simplement les comparer visuellement avant de d'interpoler CROCO sur la même grille que GLORYS afin d'effectuer des comparaisons plus poussées des divergences du modèles. Des comparaisons à des produits de mesures issues du CMEMS permettront une analyse qualitative du modèle contre des conditions réelles.
+Ces cartes nous permettent de savoir les zones sujettes à de fortes vitesses moyennes et ainsi permettre une validation rapide par des données issues de la réanalyse GLORYS. Comme ces deux jeux de données ne sont pas sur la même grille nous allons simplement les comparer visuellement avant de d'interpoler GLORYS sur la même grille que CROCO afin d'effectuer des comparaisons plus poussées des divergences du modèles. Des comparaisons à des produits de mesures issues du CMEMS permettront une analyse qualitative du modèle contre des conditions réelles.
+
+\subsection{Variables paramétrisées}
+
+Il est possible d'enregistrer les champs spatiaux paramétrisés par le modèle tels que les coefficeints de diffusivité et de viscosité turbulente, ainsi que la longueur de mélange. Ces variables nous permettront d'identifier les structures turbulentes ainsi que d'étudier les caractéristiques propres à différentes zones géographiques.
+
+Ces cartes nous permettent d'identifier les zones sujettes à de fortes vitesses moyennes et ainsi permettre une validation rapide par des données issues de la réanalyse GLORYS. Comme ces deux jeux de données ne sont pas sur la même grille nous allons simplement les comparer visuellement avant de d'interpoler CROCO sur la même grille que GLORYS afin d'effectuer des comparaisons plus poussées des divergences du modèles. Des comparaisons à des produits de mesures issues du CMEMS permettront une analyse qualitative du modèle contre des conditions réelles.
+
+\subsection{Profondeur de la couche de mélange}
+
+Nous allons également regarder la profondeur de la couche de mélange qui est caractérisée par une augmentation de la densité au delà d'un seuil critique, ici 0.03 $\mathrm{kg.m^{-3}}$
+
 
 \section{Zones d'intérêts}
 \subsection{Séries temporelles des traceurs}
 
 Une fois des zones géographiques définies, une bonne méthode de comparaison avec des mesures est d'afficher les séries temporelles de différentes variables, dans notre cas nous allons regarder les traceurs de surface en \autoref{fig:ST Equator deter} ainsi que leur anomalies respectives et les énergies moyennes et turbulentes. 
-\begin{figure}[h]
-	\includegraphics[width=\textwidth]{Figures/Equator_fields_time_series}
-	\caption{Séries temporelles des traceurs de surface pour la région de l'Équateur}
-	\label{fig:ST Equator deter}
-\end{figure}
 
-Nous allons utiliser le CMEMS comme sources de données mesures ce qui nous permettra de vérifier la cohérence de notre modèle avec les mesurées. Pour cela nous pourrons afficher l'erreur sur les mesures, notamment de salinité car celles sur l'altimétrie et sur la température sont trop faible pour être visible sur nos séries, et vérifier que notre modèle se situe dans l'intervalle d'erreur des mesures de salinité. Ces séries temporelles nous permettent également d'estimer la durée de simulation avant laquelle le modèle se met à diverger des mesures, ici un peu moins de 4 ans. Nous pourrons donc produire des ensembles sur les 3 premières années sans problème
+Nous allons utiliser le CMEMS comme sources de données mesures ce qui nous permettra de vérifier la cohérence de notre modèle avec les mesurées. Ces séries temporelles nous permettent également d'estimer la durée de simulation avant laquelle le modèle se met à diverger des mesures, ici un peu moins de 4 ans. Nous pourrons donc produire des ensembles sur les 3 premières années sans problème
 
 \subsection{Séries temporelles d'énergie}
 
@@ -68,19 +74,6 @@ Nous pouvons également étudier les series temporelles d'énergies en \autoref{
 \begin{align} \label{eq:MKE EKE}
 	MKE = \frac{1}{2} \left(u^2 + v^2 + w^2 \right) && EKE = \frac{1}{2} \left(\left(u - \overline{\overline{u}} \right)^2 + \left(v - \overline{\overline{v}} \right)^2 + \left(w - \overline{\overline{w}} \right)^2 \right)
 \end{align}
-\begin{figure}[h]
-	\centering
-    \begin{subfigure}[b]{\textwidth}
-     	\includegraphics[width=\textwidth]{Figures/Mayotte-Comores_energies_time_series}
-     	\caption{Séries temporelles pour la région de Mayotte et des Comores}
-    \end{subfigure}
-	\begin{subfigure}[b]{\textwidth}
-		\includegraphics[width=\textwidth]{Figures/South-Moz_energies_time_series}
-		\caption{Séries temporelles pour la région du Sud du canal du Mozambique}
-	\end{subfigure}
-    \caption{Carte des champs physiques}
-    \label{fig:ST Energy deter}
-\end{figure}
 
 Nous constatons directement un surplus d'énergie dans la zone des îles Mayotte et Comores et un manque d'énergie dans le sud du canal du Mozambique. Il s'agit là d'un problème connu du modèle dans cette zone géographique et nous essayerons de voir si des changements apparaissent lors de la création des ensembles. 
 

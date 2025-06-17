@@ -1,0 +1,32 @@
+\chapter{Simulation probabiliste}
+
+Dans un premier temps nous présenterons le développement de deux ensembles stochastiques sur la parametrisation verticale. Le premier perturbera de manière indépendante les termes de production et de destruction de la TKE à l'aide d'un simple bruit multiplicatif uniforme selon la verticale applique à chaque terme, tandis que l'autre consistera en une perturbation plus fine de chaque terme en modifiant la métrique verticale, ce qui équivaut à supposer une incertitude sur la position verticale de la maille lors des calculs.
+
+Dans un second temps nous ferons une analyse comparative de chaque ensemble afin d'identifier les zones étant perturbées de manières différentes dans chaque ensemble. Pour cela des séries temporelles dans les différentes boites choisis ainsi que des séries temporelles de quelques point stratégiques seront analysées, ainsi que des coupes verticales passant par des zones d'intérêt.
+
+\section{Implémentation de la perturbation}
+\subsection{Perturbation des termes de production-destruction}
+
+Dans un premier temps, nous pouvons perturber les termes $P$ et $B$ de l'\autoref{eq:gls} simplement en les multipliant par un bruit multiplicatif \cite{juricke_stochastic_2017}.
+\begin{subequations}
+	\begin{align}
+		\pd{k}{t} & = \pd{}{z} \left( K_k \pd{k}{z} \right) + P + B - \varepsilon \label{eq:dkdt 2} \\
+		\pd{\psi}{t} & = \pd{}{z} \left( K_\psi \pd{\psi}{z} \right) + \psi k^{-1} \left( \beta_1 P + \beta_3^\pm B - \beta_2 \varepsilon \right) \label{eq:dpsidt 2}
+	\end{align}
+	\label{eq:gls}
+\end{subequations}
+
+Pour faire ça, nous allons utiliser le modules STOGEN que nous devons modifier afin d'implémenter la perturbation des termes qui nous intéressent.
+
+
+\subsection{Perturbation de la métrique verticale}
+
+
+\section{Méthode d'analyse}
+
+Il existe plusieurs manières d'étudier et de comparer des simulation ensemblistes, il est possible de calculer les séries temporelles des différents traceurs pour chaque membre de l'ensemble, mais nous pouvons aussi calculer les RMSE (Root Mean Square Error) \autoref{eq:RMSE}.
+\begin{align}
+	RMSE = \sqrt{\frac{1}{N}\sum_i^N X^i(\eta, \rho,t) - \langle X(\eta, \rho,t) \rangle } \label{eq:RMSE}
+\end{align}
+
+Nous allons effectuer ces séries temporelles pour des points spatiaux, ainsi que moyennées sur les boites présentées en \autoref{fig:bathy}.

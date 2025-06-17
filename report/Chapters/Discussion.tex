@@ -1,0 +1,25 @@
+\chapter{Discussion}
+
+\section{Conclusions scientifiques}
+
+Durant ce stage de six mois au sein de l'\textbf{IGE}, nous avons développé et mis en œuvre un ensemble de simulations permettant d’explorer l’incertitude liée à la paramétrisation du mélange vertical dans le modèle \textbf{CROCO}. Ce travail s’est appuyé sur une revue bibliographique approfondie, qui a conduit à l’implémentation de perturbations ciblant les termes de production et de destruction dans les équations de turbulence.
+
+Cet ensemble a été complété par deux autres jeux de simulations~: l’un représentant l’incertitude sur la tension du vent, et l’autre associé à la variabilité intrinsèque. Ces trois ensembles constituent un socle cohérent pour l’analyse des sources d’incertitude dans un modèle océanique régional.
+
+Nous avons étudié plusieurs variables clés, allant des traceurs classiques comme la salinité et la température, jusqu’à une variable moins fréquemment explorée dans le cadre des simulations ensemblistes~: la profondeur de la couche de mélange (\textbf{MLD}). L’analyse conjointe de ces variables a permis de mettre en évidence des comportements différenciés selon les sources d’incertitude.
+
+Nos résultats montrent que la dispersion des ensembles est, dans la plupart des cas, dominée par la variabilité intrinsèque du système. Cette dernière crée une enveloppe naturelle à l’intérieur de laquelle les autres perturbations induisent des variations plus modestes. Cependant, dans certaines régions ou à certains moments, des divergences significatives entre ensembles apparaissent. Ces écarts sont fortement liés à la dynamique océanique locale.
+
+Par exemple, l’impact du stress du vent se manifeste particulièrement lors de l’alignement des courants majeurs, tandis que les perturbations du mélange vertical deviennent plus influentes lorsque des instabilités de type tourbillonnaire apparaissent, comme dans les zones de convergence des courants. Ces résultats confirment l'importance d'une représentation explicite des incertitudes physiques dans les modèles océaniques, afin de mieux quantifier la confiance dans les simulations et d’améliorer la prévisibilité de certains processus à court terme, où les sources d'incertitudes singulières jouent un rôle prépondérant.
+
+\section{Perspectives futures}
+
+Plusieurs axes d’amélioration et d’extension peuvent être envisagés pour approfondir ce travail.
+
+Un premier développement possible concerne la prise en compte de l’incertitude sur la métrique verticale. En effet, la représentation verticale des gradients, en particulier dans les zones de forte stratification, est une source d’incertitude bien identifiée dans les modèles océaniques. Une mauvaise estimation de la position des interfaces de densité ou de la thermocline peut engendrer des erreurs importantes dans le calcul des termes turbulents. Introduire une perturbation contrôlée sur cette métrique pourrait ainsi offrir une forme de stochasticité plus \textit{naturelle} et potentiellement plus cohérente avec les processus physiques sous-jacents, notamment dans le cadre de la paramétrisation du mélange vertical.
+
+De plus, cumuler les sources d'incertitudes au delà de simplement la combinaison de la variabilité intrinsèque avec une autre source d'incertitude, que ce soit la tension du vent ou le mélange vertical, permettrait d'étudier plus en détail les interactions entre sources d'incertitudes. Un ensemble superposant les trois sources d'incertitude décrites dans ce manuscrit constitue une piste intéressante de combinaison d'incertitude.
+
+Par ailleurs, dans la perspective d’un usage opérationnel de ces ensembles pour l'usage de données satellites afin de produire des inversions 4D, il est impératif de valider la robustesse et la fidélité des simulations. Cela implique, entre autres, de diagnostiquer et corriger les biais présents dans les champs simulés.
+
+Enfin, ces jeux de données pourront être utilisés dans des études lagrangiennes \cite{popov_ensemble_2024} appliquées à la région, avec l’objectif de mieux comprendre les processus de transport de particules, qu’elles soient naturelles (plancton, larves) ou anthropiques (polluants, microplastiques). L’introduction de traceurs lagrangiens dans des simulations ensemblistes permettra non seulement de quantifier les transports moyens, mais aussi d’estimer l’incertitude sur la connectivité entre zones géographiques. Cela soulèvera également de nouvelles problématiques, notamment la prise en compte des incertitudes liées à l’intégration lagrangienne elle-même, qui constitue une future piste de recherche prometteuse.
