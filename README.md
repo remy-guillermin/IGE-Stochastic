@@ -1,26 +1,28 @@
 # IGE-Stochastic
-Repo pour mon stage à l'IGE sur l'étude des sources d'incertitudes associées à un ensemble de simulation stochastiques.
+Repository for my 6 months internship at the IGE on the simulation of uncertainties in an oceanic circulation model. Study focused on the South-West Indian ocean and used the model **CROCO** (*Coastal and Regional Ocean COmmunity model*).
 
-## Structure du repo
-- [bibliography](bibliography/) contient les documents de bilbiographie.
-- [book](book/) contient des rapports journaliers et résumés hebdomadaires de mes avancées.
-- [documentation](documentation/) contient divers notes de codes.
-- [report](report/) contient le nécessaire pour écrire le rapport.
-- [scripts](scripts/) contient les scripts python utilisés.
-- [slides](slides/) contient le nécessaire pour produire les slides.
+We looked into the impact of intrinsic variability, as well as the wind stress and vertical turbulent mixing perturbation. For that we used stochastic processes that acted as the uncertainties on the terms we wanted to study. I personally develop the turbulent mixing scheme perturbation by modifying the Fortran source code of the model and i made some diagnostics.
 
-## Connexion à Adastra
-Pour me connecter à Adastra je fais 
+## Structure of the repo
+- [bibliography](bibliography/) contains documents and main papers used for bibliography.
+- [book](book/) Contains some weekly reports.
+- [documentation](documentation/) contains diverse code notes.
+- [report](report/) contains the report.
+- [scripts](scripts/) contains all the scripts.
+- [slides](slides/) contains the slides.
+
+## ADASTRA login
+To connect to ADASTRA 
 ```bash
 ssh adastra
 ```
 
-Puis je rentre mon mot de passe d'Adastra et je peux activer mon environnement python
+Then I enter the password and activate my python environment.
 ```bash
 source ./python_environment/bin/activate
 ``` 
 
-## Liens
+## Links
 - [Adastra documentation](https://dci.dci-gitlab.cines.fr/webextranet/)
 - [Adastra access documentation](https://dci.dci-gitlab.cines.fr/webextranet/user_support/index.html#adastra-accessing-account-opening)
 - [Croco documentation](https://croco-ocean.gitlabpages.inria.fr/croco_doc/)

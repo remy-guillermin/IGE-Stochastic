@@ -1,8 +1,9 @@
 # Bibliography
-Ce dossier contiendra les articles/livres/conferences utilisés comme sources pour ma bibliographie.
+
+This folder contains the articles/books/conferences used as a source for my bibliography.
 
 ![Bathymétrie de la zone couverte par les simualtions.](bathy_iso_swio2_grid.png)
-*Figure 1: Étendue de la zone étudiée.*
+*Figure 1: Study zone.*
 
 ## [Progress in understanding of Indian Ocean circulation, variability, air-sea exchange, and impacts on biogeochemistry.](os-17-1677-2021.pdf)
 Une review décrivant le contexte physique des processus océaniques de l'Océan Indien. À partir de cette review, il serait intéressant de dégager les processus affectant la circulation dans la partie Sud-Ouest de l'océan Indien et les questions scientifiques qui en découlent.

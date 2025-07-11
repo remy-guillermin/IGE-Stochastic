@@ -1,2 +1,3 @@
 # Draft
-Ce dossier contiendra tout le nécessaire pour l'écriture et la compilation de mon brouillon rapport de stage.
+
+This folder contains everything need the produce the report for my internship.

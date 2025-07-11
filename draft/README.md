@@ -1,2 +1,3 @@
-# Report
-Ce dossier contiendra tout le nécessaire pour l'écriture et la compilation de mon rapport de stage.
+# Draft
+
+This folder contains everything need the produce the draft for my internship report.

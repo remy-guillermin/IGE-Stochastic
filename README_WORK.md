@@ -1,56 +1,57 @@
 # $WORKDIR
-
-Ici on a l'ensemble de mes données après post traitement (retrait des NaN, calcul de la MLD/tension du vent).
+Here are all the data after post-processing (NaN removal, computing of the MLD and wind stress)
 
 ## CROCO
 
-Ce dossier contient le code source `croco` qui a été utilisé juste pour me familiariser avec le modèle.
+This folder contains `croco` source code that has been used to discover the model.
 
 ## CROCO_dev_sto_CD
 
-Ce dossier contient une copie du code `croco` qui a été modifié par Lisa afin d'implémenter une perturbation sur la tension du vent. Je m'en suis servi afin de développer la perturbation du mélange vertical.
+This folder contains a copy of Lisa's `croco` modified code with a perturbation of the wind stress. I used it to develop the vertical turbulent mixing scheme perturbation.
 
 ## CROCO_dev_sto_GLS
 
-Ce dossier contient le code `croco` avec l'implémentation que j'ai fait pour la perturbation du mélange vertical.
+This folder contains the `croco` with the vertical turbulent mixing scheme perturbation.
 
 ## DATASETS
 
-Ce dossier contient les données des simulations après post traitement et contient uniquement des séries temporelles des valeurs moyennées dans chaque zone pour les traceurs (Salinité, Température et Surface Libre)
+This folder contains data from the simulation after post-processing et contains only temporal series of the mean value in each zone for the Salinity, Temperature and Free Surface.
 
-Il y a trois dossiers contenant les valeurs de la simulation, de la réanalyse GLORYS et de différentes sourcesz d'observation.
+There is three folder containing valeus for the simulation, de GLORYS reanalysis and different observation sources.
 
 ## grid 
 
-Ce dossier contient simplement les différents fichiers de grille. 
+This folder contains differents grid files (Horizontal, Vertical)
 
 ## MLD
 
-Ce dossier contient les fichiers `.nc` de données post traitées pour le calcul de la profondeur de la couche de mélange. Il y a aussi bien la valeur interpolée linéairement que la valeur un niveau au dessus.
+This folder contains `.nc` files post-processed for the MLD computing. Both the interpolated value and the above level value are saved.
+
 
 ## MLD_old
 
-Ce dossier contient la première itération de fichiers `.nc` de données post traitées pour le calcul de la profondeur de la couche de mélange. Les valeurs sont faussées à cause de la méthode de calcul qui ne prenaient pas en compte des variations locales de densité à l'origine.
+This folder contains the first iteration of `.nc` files post-processed for the MLD computing. These values are wrong because of a mistake in the processing code that did not take into account the local density variation.
 
 ## NaN_CORRECTED
 
+This folder contains temperature, salinity and free surface field with the NaN value added in place of the placeholder value.
 
 ## NaN_MERGED
 
-Même principe que précédemment sauf qu'ici il y a un fichier par membre qui contient les trois ans. On y retrouve aussi les fichiers de moyenne et d'écart-type d'ensemble.
+Same as before but this time the file are merged for a three year span. There is also ensemble mean and standard deviation files.
 
 ## OBS
 
-Ce dossier contient les observations venant des différents produits du CMEMS traitées pour mes besoins (retrait des variables inutiles ainsi que des zones non utilisées)
+This folder contains observations from diverse products of the CMEMS post-processed for our need (removal of unwanted variables and unwanted regions).
 
 ## RAW
 
-Ce dossier contient les données d'observations brutes.
+This folder contains raw observation data.
 
 ## REGRIDDED
 
-Ce dossier contient les observations interpolées sur la même grille que celle de nos simulations.
+This folder contains interpolated observation on the same grid as the simulation.
 
 # WINDSTR
 
-Ce dossier contient les fichiers `.nc` de données post traitées pour le calcul de la tension du vent. Il y a aussi bien la valeur selon la direction u, que v ainsi que la "norme".
+This folder contains `.nc` files of the post-processed datas for the computing of the wind stress. There is both directional values and the norm of the wind stress.
