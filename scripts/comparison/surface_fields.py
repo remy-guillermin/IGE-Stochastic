@@ -35,7 +35,7 @@ cmap = cmocean.cm.balance
 
 
 
-data_files = glob.glob(os.path.join(data, 'swio_avg_201*.nc'))
+data_files = glob.glob(os.path.join(data, f'swio_avg_{year}.nc'))
 data_files.sort()
 
 sss_files = glob.glob(os.path.join(obs_dir, 'SSS*'))
@@ -55,11 +55,6 @@ obs_ds = xr.merge([obs_temp, obs_salt])
 
 
 data_ds = xr.open_dataset(data_files[0])[['temp', 'salt']].isel(s_rho=-1)
-
-for file in data_files[1:]:
-    ds = xr.open_dataset(file)[['temp', 'salt']].isel(s_rho=-1)
-    data_ds = xr.concat([data_ds, ds], dim='time')
-
 
 
 data_ds['time'] = data_ds.time.astype('datetime64[D]')

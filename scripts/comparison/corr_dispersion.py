@@ -9,7 +9,6 @@ import cartopy.crs as ccrs
 import glob
 import os
 from functools import partial
-%matplotlib inline
 
 
 
@@ -74,11 +73,11 @@ print(f'depth level file opened: {depth_lvl}')
 
 
 
-date = str(ini_mean.time.isel(time=-50).data.astype('datetime64[D]'))
+date = str(ini_mean.time.isel(time=-100).data.astype('datetime64[D]'))
 print(f"Plotting {date}.")
 
 fig, axs = plt.subplots(1, 3, figsize=(20, 6), subplot_kw={'projection': ccrs.PlateCarree()}, sharey=True)
-fig.suptitle(f"Ensemble standard deviation {date}")
+fig.suptitle(f"Ensemble salinity standard deviation {date}")
 
 for ax in axs:
     ax.set_extent(SWIO)

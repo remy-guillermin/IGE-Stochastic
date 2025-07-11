@@ -9,7 +9,6 @@ import cartopy.crs as ccrs
 import glob
 import os
 from functools import partial
-%matplotlib inline
 
 
 
@@ -19,9 +18,8 @@ depth_lvl = '/lus/work/CT1/c1601279/rguillermin/grid/croco_depth_level.nc'
 
 lat_index = [430, 280]
 
-ensembles = ['INI', 'STR', 'GLS']
-ens_colors = ['black', 'royalblue', 'crimson']
-ens_linestyles = ['solid', 'dashed', 'dotted']
+ensembles = ['GLS', 'STR', 'INI']
+ens_colors = ['crimson', 'royalblue', 'black']
 
 box_colors = ['sandybrown', 'slateblue', 'lightseagreen', 'red']
 boxes = [(48, 60, -4, 3), (41, 47, -15, -8), (36.5, 42.5, -30, -21), (52, 60, -24, -16)]
@@ -84,18 +82,20 @@ print(f'depth level file opened: {depth_lvl}')
 rms_list = {ensemble : {} for ensemble in ensembles}
 deviation_list = {name : {} for name in names}
 mean_list = {name : {} for name in names}
+member_mean_list = {name : {} for name in names}
 
 for (lon1, lon2, lat1, lat2), name in zip(boxes, names):
     print(f'├──Working on box {name}.')
     # Box limits
     region_mask = (lon > lon1) & (lon < lon2) & (lat > lat1) & (lat < lat2)
-    for ds_mean, ds_std, ens in zip([ini_mean, gls_mean, str_mean], [ini_std, gls_std, str_std], ensembles):
+    for ds_mean, ds_std, ens in zip([gls_mean, str_mean, ini_mean], [gls_std, str_std, ini_std], ensembles):
         print(f'│   ├──Working on {ens} ensemble.')
         ensemble_mean2d = ds_mean.mld.where(region_mask, drop=True)
         ensemble_std2d = ds_std.mld.where(region_mask, drop=True)
         rms_list[ens][name] = np.sqrt((ensemble_std2d ** 2).mean(dim=['eta_rho', 'xi_rho'], skipna=True))
         deviation_list[name][ens] = ensemble_std2d.mean(dim=['eta_rho', 'xi_rho'], skipna=True)
         mean_list[name][ens] = ensemble_mean2d.mean(dim=['eta_rho', 'xi_rho'], skipna=True)
+        
     print('│   └──Done.')
 print('Finished.')
 
@@ -109,17 +109,20 @@ for i, (box, box_deviation_list) in enumerate(deviation_list.items()):
             box_deviation.time,
             - box_deviation,
             box_deviation,
-            alpha=0.3,
+            alpha=0.5,
             color=ens_colors[j],
             label=ens
         )
         
     ax.set_ylim(-40, 40)
+    ax.set_xlim(np.datetime64('2017-01-01'), np.datetime64('2019-12-31'))
     ax.set_ylabel('MLD deviation (m)')
     ax.legend(loc='upper right')
+    ax.grid(True, linestyle='--', alpha=0.5)
     
     fig.autofmt_xdate()
-    plt.show()
+    fig.savefig(os.path.join(figures, f'mld_std_{box}.png'), dpi=300, transparent=True)
+    plt.close()
 
 
 
@@ -132,7 +135,9 @@ for i, (box, box_mean_list) in enumerate(mean_list.items()):
 
     ax.set_ylabel('MLD mean (m)')
     ax.set_ylim(-120, 0)
+    ax.set_xlim(np.datetime64('2017-01-01'), np.datetime64('2019-12-31'))
     ax.legend(loc='upper right')
     
     fig.autofmt_xdate()
-    plt.show()
+    fig.savefig(os.path.join(figures, f'mld_mean_{box}.png'), dpi=300, transparent=True)
+    plt.close()

@@ -9,7 +9,6 @@ import cartopy.crs as ccrs
 import glob
 import os
 from functools import partial
-%matplotlib inline
 
 
 
