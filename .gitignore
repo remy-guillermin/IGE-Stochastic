@@ -18,6 +18,8 @@ Data
 # Documents
 *.pdf
 !bibliography/*.pdf
+!report/*.pdf
+!slides/*.pdf
 
 # Figures
 figures

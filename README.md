@@ -11,19 +11,14 @@ We looked into the impact of intrinsic variability, as well as the wind stress a
 - [scripts](scripts/) contains all the scripts.
 - [slides](slides/) contains the slides.
 
-## ADASTRA login
-To connect to ADASTRA 
-```bash
-ssh adastra
-```
-
-Then I enter the password and activate my python environment.
-```bash
-source ./python_environment/bin/activate
-``` 
-
 ## Links
 - [Adastra documentation](https://dci.dci-gitlab.cines.fr/webextranet/)
 - [Adastra access documentation](https://dci.dci-gitlab.cines.fr/webextranet/user_support/index.html#adastra-accessing-account-opening)
 - [Croco documentation](https://croco-ocean.gitlabpages.inria.fr/croco_doc/)
-- 
+
+## Contributors 
+- Rémy Guillermin (University Grenoble Alpes) supervised by Pierre Brasseur
+  
+## Other supervisors
+- Lisa Weiss
+- Jean-Michel Brankart
