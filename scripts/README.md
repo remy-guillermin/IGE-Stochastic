@@ -3,13 +3,13 @@ In this folder are the scripts used during the internship.
 
 ## Important folders
 
-- [comparison](comparison/README.md): In this folder are two scripts used to plot comparison between ensemble or with the observation.
-- [copernicus](copernicus/README.md): In this folder are scripts used to work with the copernicus marine python API to download data.
-- [data](data/README.md): In this folder are scripts used to manipulate the large data files.
-- [ensembles](ensembles/README.md): In this folder are scripts used to do some ensemble computations on the data, such as mean, spread or histograms.
-- [grid](grid/README.md): In this folder are scripts used to work with the grid. We have bathymetry plot, vertical level computation and regridding.
-- [MLD](MLD/README.md): In this folder are scripts used to manipulate the Mixing Layer Depth (MLD), mainly computing and plotting.
-- [time_series](time_series/README.md): In this folder are scripts used to plot time series.
+- [comparison](comparison/): In this folder are two scripts used to plot comparison between ensemble or with the observation.
+- [copernicus](copernicus/): In this folder are scripts used to work with the copernicus marine python API to download data.
+- [data](data/): In this folder are scripts used to manipulate the large data files.
+- [ensembles](ensembles/): In this folder are scripts used to do some ensemble computations on the data, such as mean, spread or histograms.
+- [grid](grid/): In this folder are scripts used to work with the grid. We have bathymetry plot, vertical level computation and regridding.
+- [MLD](MLD/): In this folder are scripts used to manipulate the Mixing Layer Depth (MLD), mainly computing and plotting.
+- [time_series](time_series/): In this folder are scripts used to plot time series.
 
 ## Important scripts
 
