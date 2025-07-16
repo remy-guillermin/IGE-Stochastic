@@ -22,7 +22,7 @@ Data
 !slides/*.pdf
 
 # Figures
-figures
+figures/*
 *.png
 !bibliography/*.png
 !book/*.png
@@ -30,8 +30,7 @@ figures
 !draft/figures/*.png
 !report/*.png
 !report/figures/*.png
-!slides/*.png
-!slides/figures/*.png
+!scripts/figures/*.png
 *.jpg
 *.jpeg
 *.mp4
