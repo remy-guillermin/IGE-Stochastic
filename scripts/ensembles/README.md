@@ -1,17 +1,14 @@
-# FILM
+# ensembles
 
-After creating the frames with [film_std.py](film_std.py), one can create the movie associated with 
-```bash
-ffmpeg -framerate 30 -pattern_type glob -i '*.png' -c:v libx264 -pix_fmt yuv420p {name}.mp4
-```
+In this folder are scripts used to make some diagnostics on the ensembles.
 
 ## Scripts
-- [all_ensemble_spread_tracers_boxes.py](./all_ensemble_spread_tracers_boxes.py):
-- [all_ensemble_spread_tracers_points.py](./all_ensemble_spread_tracers_points.py):
-- [compute_mean.py](./compute_mean.py):
-- [ensemble_spread_tracers.py](./ensemble_spread_tracers.py):
-- [film_std_tracers.py](./film_std_tracers.py):
-- [histogram_dispersion.py](./histogram_dispersion.py):
+- [all_ensemble_spread_tracers_boxes.py](./all_ensemble_spread_tracers_boxes.py): This script plot time series of the tracers (Spatial mean, Ensemble dispersion, RMSE) for each sub-region.
+- [all_ensemble_spread_tracers_points.py](./all_ensemble_spread_tracers_points.py): This script plot time series of the tracers (Spatial mean, Ensemble dispersion) for a single point in each sub-region.
+- [ensemble_spread_tracers.py](./ensemble_spread_tracers.py): 
+- [film_std_tracers.py](./film_std_tracers.py): This script use create a [film](https://youtu.be/RAoVWJQzty0) displaying the evolution of the standard deviation for the tracers for any given ensemble. 
+- [histogram_dispersion.py](./histogram_dispersion.py): This script compute the histogram of the dispersion for 4 given time steps : 1 day, 10 days, 90 days and 900 days.
+![](../figures/windstr_mld_histograms.png)
 - [relative_dispersion.py](./relative_dispersion.py): This scripts plots the dispersion of the simulation for each sub-region as a time series, with a normalization corresponding to the dispersion one day after the beginning of the simulation. It also outputs the doubling times, not interpolated.
 
 <table style="width:100%">
@@ -116,5 +113,11 @@ ffmpeg -framerate 30 -pattern_type glob -i '*.png' -c:v libx264 -pix_fmt yuv420p
     </tr>
 </table>
 
-- [remove_NaN.py](./remove_NaN.py): This scripts opens up every average `.nc` file from the simulation, replace the fill_value by NaN and saves those datasets as new files.
-- [merge_NaN.py](./merge_NaN.py): This scripts merges all the files created by [remove_NaN.py](./remove_NaN.py) for each member of each simulation.
+![](../figures/all_ens_Mascarene_salt_relative_dispersion_self.png)
+
+## FILM
+
+After creating the frames with [film_std.py](film_std.py), one can create the movie associated with 
+```bash
+ffmpeg -framerate 30 -pattern_type glob -i '*.png' -c:v libx264 -pix_fmt yuv420p {name}.mp4
+```
