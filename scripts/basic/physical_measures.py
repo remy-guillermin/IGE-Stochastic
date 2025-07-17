@@ -30,18 +30,15 @@ sst_cmap = cmocean.cm.thermal
 sss_cmap = cmocean.cm.haline
 ssh_cmap = cmcrameri.cm.roma_r
 
-
-
 year = np.datetime64(date).astype('datetime64[Y]')
-year
-
-
 
 sss_files = glob.glob(data + f'/SSS*/*{year}*')
 sst_files = glob.glob(data + f'/SST*/*{year}*')
 sla_files = glob.glob(data + f'/SLA*/*{year}*')
 
-
+print(f"SSS files: {len(sss_files)}")
+print(f"SST files: {len(sst_files)}")
+print(f"SLA files: {len(sla_files)}")
 
 def _preprocess(x, lon_bnds, lat_bnds):
     return x.sel(lon=slice(*lon_bnds), lat=slice(*lat_bnds))
@@ -66,6 +63,7 @@ ds = xr.open_mfdataset(sla_files, preprocess=partial_func)[["adt"]]
 zeta = ds.adt
 ds.close()
 
+print("Data loaded successfully.")
 
 
 salt_mean = salt.mean(dim=('time', 'depth'))
@@ -77,13 +75,10 @@ zeta = zeta.sel(time=date)
 temp = temp.sel(time=date)
 
 
-
-
-
 salt = salt.mean(dim='time')
 temp = temp.mean(dim='time')
 
-
+print("Data processed successfully.")
 
 fig, axs = plt.subplots(1, 3, figsize=figsize, subplot_kw={'projection': ccrs.PlateCarree()})
 fig.suptitle(f"MEASURES {date}")
@@ -151,7 +146,7 @@ cb = plt.colorbar(pcm, ax=ax, label=label, orientation='vertical')
 
 fig.tight_layout()
 filename = os.path.join(figures, f"physical_measures_{date}.png")
-fig.savefig(filename, dpi=300, transparent=True)
+fig.savefig(filename, dpi=300)
 print(f'{filename} saved.')
 plt.show()
 
@@ -223,7 +218,7 @@ cb = plt.colorbar(pcm, ax=ax, label=label, orientation='vertical')
 
 fig.tight_layout()
 filename = os.path.join(figures, f'physical_measures_{year}_mean.png')
-fig.savefig(filename, dpi=300, transparent=True)
+fig.savefig(filename, dpi=300)
 print(f'{filename} saved.')
 plt.show()
 
@@ -295,6 +290,6 @@ cb = plt.colorbar(pcm, ax=ax, label=label, orientation='vertical')
 
 fig.tight_layout()
 filename = os.path.join(figures, f"anomalies_measures_{date}.png")
-fig.savefig(filename, dpi=300, transparent=True)
+fig.savefig(filename, dpi=300)
 print(f'{filename} saved.')
 plt.show()

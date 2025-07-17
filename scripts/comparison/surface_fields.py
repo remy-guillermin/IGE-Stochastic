@@ -52,14 +52,13 @@ obs_temp = xr.open_dataset(sst_files[0]).sel(time = slice(np.datetime64('2017'),
     
 obs_ds = xr.merge([obs_temp, obs_salt])
 
-
+print("Observation datasets loaded.")
 
 data_ds = xr.open_dataset(data_files[0])[['temp', 'salt']].isel(s_rho=-1)
 
 
 data_ds['time'] = data_ds.time.astype('datetime64[D]')
 obs_ds['time'] = obs_ds.time.astype('datetime64[D]')
-
 
 
 g = xr.open_dataset(grid)
@@ -74,11 +73,7 @@ angle = g['angle'][:, :]
 g.close()
 print("Grid loaded.")
 
-
-
 data_ds = data_ds.where(msk)
-
-
 
 fig, axs = plt.subplots(1, 2, figsize=figsize, subplot_kw={'projection': ccrs.PlateCarree()})
 fig.suptitle(f"Deviation from Observation {year}")
@@ -129,8 +124,6 @@ cb = plt.colorbar(pcm, ax=ax, label='Temperature deviation [°C]', orientation='
 
 fig.tight_layout()
 filename = os.path.join(figures, f"deviation_obs_{year}_deter.png")
-fig.savefig(filename, dpi=300, transparent=True)
+fig.savefig(filename, dpi=300)
+print(f'{filename} saved.')
 plt.show()
-
-
-

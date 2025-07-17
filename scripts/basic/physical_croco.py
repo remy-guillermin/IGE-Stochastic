@@ -14,8 +14,8 @@ import os
 # Path
 grid = '/lus/store/CT1/c1601279/lweiss/grid/croco_grid_swio2.nc'
 figures = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures'
-simu = '/lus/store/CT1/c1601279/lweiss/run_croco/run_swio2_deter2_2017_2023'
-file = 'swio_avg.nc'
+simu = '/lus/store/CT1/c1601279/lweiss/run_croco/SWIO/run_swio2_deter2_2017_2023/'
+file = 'swio_avg_2018.nc'
 
 # Selection
 date = '2018-06-15'
@@ -137,8 +137,8 @@ cb = plt.colorbar(pcm, ax=ax, label=label, orientation='vertical')
 
 
 fig.tight_layout()
-filename = os.path.join(figures, f"physical_croco_{simu.split('/')[-1]}_{date}.png")
-fig.savefig(filename, dpi=300, transparent=True)
+filename = os.path.join(figures, f"physical_croco_{simu.split('/')[-2]}_{date}.png")
+fig.savefig(filename, dpi=300)
 print(f'{filename} saved.')
 plt.show()
 
@@ -208,7 +208,7 @@ cb = plt.colorbar(pcm, ax=ax, label=label, orientation='vertical')
 
 fig.tight_layout()
 filename = os.path.join(figures, f'physical_croco_{year}_mean.png')
-fig.savefig(filename, dpi=300, transparent=True)
+fig.savefig(filename, dpi=300)
 print(f'{filename} saved.')
 plt.show()
 
@@ -277,7 +277,7 @@ cb = plt.colorbar(pcm, ax=ax, label=label, orientation='vertical')
 
 
 fig.tight_layout()
-filename = os.path.join(figures, f"anomalies_croco_{simu.split('/')[-1]}_{date}.png")
-fig.savefig(filename, dpi=300, transparent=True)
+filename = os.path.join(figures, f"anomalies_croco_{simu.split('/')[-2]}_{date}.png")
+fig.savefig(filename, dpi=300)
 print(f'{filename} saved.')
 plt.show()
