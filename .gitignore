@@ -11,10 +11,6 @@ Icon?
 *.nc
 *.csv
 
-# Data folder
-data/*
-Data
-
 # Documents
 *.pdf
 !bibliography/*.pdf
@@ -58,10 +54,6 @@ figures/*
 *.snm
 *.lof
 *.lot
-
-# Modules files
-modules/*egg-info/*
-modules/*/__pycache__/*
 
 # Fortran files
 *.f90
