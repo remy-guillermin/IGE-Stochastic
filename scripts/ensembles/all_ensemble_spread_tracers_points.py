@@ -172,7 +172,7 @@ for (ilon, ilat), name in zip(points, points_names):
         ax.grid(linewidth=0.3)
         ax.legend(loc='upper right')
         fig.tight_layout()
-        plt.savefig(os.path.join(figures, f'all_ens_{name}_point_{var}.png'), dpi=300, transparent=True)
+        plt.savefig(os.path.join(figures, f'all_ens_{name}_point_{var}.png'), dpi=300)
         plt.close()
         
         # DEVIATION
@@ -192,5 +192,5 @@ for (ilon, ilat), name in zip(points, points_names):
         ax.grid(linewidth=0.3)
         ax.legend(loc='upper right')
         fig.tight_layout()
-        plt.savefig(os.path.join(figures, f'all_ens_{name}_point_{var}_deviation.png'), dpi=300, transparent=True)
+        plt.savefig(os.path.join(figures, f'all_ens_{name}_point_{var}_deviation.png'), dpi=300)
         plt.close()

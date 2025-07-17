@@ -211,7 +211,7 @@ for (lon1, lon2, lat1, lat2), name in zip(boxes, names):
         ax.grid(linewidth=0.3)
         ax.legend(loc='upper right')
         fig.tight_layout()
-        plt.savefig(os.path.join(figures, f'all_ens_{name}_{var}.png'), dpi=300, transparent=True)
+        plt.savefig(os.path.join(figures, f'all_ens_{name}_{var}.png'), dpi=300)
         plt.close()
         
         # DEVIATION
@@ -237,7 +237,7 @@ for (lon1, lon2, lat1, lat2), name in zip(boxes, names):
         ax.grid(linewidth=0.3)
         ax.legend(loc='upper right')
         fig.tight_layout()
-        plt.savefig(os.path.join(figures, f'all_ens_{name}_{var}_deviation.png'), dpi=300, transparent=True)
+        plt.savefig(os.path.join(figures, f'all_ens_{name}_{var}_deviation.png'), dpi=300)
         plt.close()
 
 for var_name, var in variables.items():
@@ -254,7 +254,7 @@ for var_name, var in variables.items():
     ax.legend(loc='upper left')
     ax.grid(linewidth=0.3)
     fig.tight_layout()
-    plt.savefig(os.path.join(figures, f'all_ens_{var_name}_rms.png'), dpi=300, transparent=True)
+    plt.savefig(os.path.join(figures, f'all_ens_{var_name}_rms.png'), dpi=300)
     plt.close()
 
 

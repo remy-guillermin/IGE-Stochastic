@@ -9,7 +9,6 @@ import cartopy.crs as ccrs
 import glob
 import os
 import re
-matplotlib.use('agg')
 
 
 
@@ -17,7 +16,7 @@ matplotlib.use('agg')
 figures = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures/Ensembles/Frames'
 work = '/lus/work/CT1/c1601279/rguillermin'
 grid = os.path.join(work, 'grid/croco_grid_swio2.nc')
-sto_ens = ['run_swio2_stoens30_201*_ini', 'run_swio2_stoens30_201*_CD']
+sto_ens = ['run_swio2_stoens30_201*_ini', 'run_swio2_stoens30_201*_str']
 
 # PLOT OPTIONS
 gridline_style = {'draw_labels': True, 'linestyle': '--', 'linewidth': 0.5}
@@ -50,10 +49,12 @@ print("Grid loaded.")
 
 
 # DATASET
-ensemble_ini_files = sorted(glob.glob(os.path.join(work, 'NaN_CORRECTED', sto_ens[0], '*')))
+ensemble_ini_files = sorted(glob.glob(os.path.join(work, 'NaN_CORRECTED', 'trac', sto_ens[0], '*')))
 print(f"{len(ensemble_ini_files)} files found for {sto_ens[0].replace('201*_', '')}.")
-ensemble_str_files = sorted(glob.glob(os.path.join(work, 'NaN_CORRECTED', sto_ens[1], '*')))
+ensemble_str_files = sorted(glob.glob(os.path.join(work, 'NaN_CORRECTED', 'trac', sto_ens[1], '*')))
 print(f"{len(ensemble_str_files)} files found for {sto_ens[1].replace('201*_', '')}.")
+
+
 
 pattern = re.compile(r'/(\d{3})swiose_avg.nc$')
 ensemble_ini_dict = {}
@@ -142,7 +143,7 @@ for i in range(combined_ini.time.size):
     ensemble = combined_ini.isel(time=i)
     std = ensemble.std(dim='ensemble')
     
-    # Salinity
+    
     ax = axs[0]
     ax.set_title("Salinity")
     norm = mcolors.Normalize(vmin=0, vmax=0.3)
@@ -150,7 +151,7 @@ for i in range(combined_ini.time.size):
     pcm = ax.pcolormesh(lon, lat, std.salt, cmap=cmocean.cm.dense, transform=ccrs.PlateCarree(), norm=norm)
     cb = plt.colorbar(pcm, ax=ax, label='Salinity standard deviation [psu]', orientation='vertical')
 
-    # Free surface
+    
     ax = axs[1]
     ax.set_title("Free Surface")
     norm = mcolors.Normalize(vmin=0, vmax=0.25)
@@ -158,7 +159,7 @@ for i in range(combined_ini.time.size):
     pcm = ax.pcolormesh(lon, lat, std.zeta, cmap=cmocean.cm.dense, transform=ccrs.PlateCarree(), norm=norm)
     cb = plt.colorbar(pcm, ax=ax, label='Free surface standard deviation [m]', orientation='vertical')
 
-    # Temperature
+    
     ax = axs[2]
     ax.set_title("Temperature")
     norm = mcolors.Normalize(vmin=0, vmax=1.0)

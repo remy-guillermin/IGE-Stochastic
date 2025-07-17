@@ -7,14 +7,12 @@ import glob
 import sys
 import matplotlib.colors as mcolors
 
-
 # PARAMETERS
 # Path
 figures = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures/Ensembles'
-store = '/lus/store/CT1/c1601279/lweiss/run_croco/'
-scratch = '/lus/scratch/CT1/c1601279/lweiss/CROCO/SWIOSE_dev/'
-work = '/lus/work/CT1/c1601279/lweiss/CROCO/'
-stoens = 'run_swio2_stoens30_2017_ini'
+store = '/lus/store/CT1/c1601279/rguillermin/'
+work = '/lus/work/CT1/c1601279/rguillermin/'
+stoens = 'run_lisa/run_swio2_stoens30_2017_ini'
 ref = 'run_swio2_deter2_2017_2023'
 obs = '/lus/store/CT1/c1601279/rguillermin/REGRIDDED/OBS'
 grid = '/lus/store/CT1/c1601279/lweiss/grid/croco_grid_swio2.nc'
@@ -33,7 +31,7 @@ roll = 9
 
 
 
-ensemble_files = [os.path.join(scratch, stoens, f"{i:03d}swiose_avg.nc") for i in range(1, 31)]
+ensemble_files = [os.path.join(store, stoens, f"{i:03d}swiose_avg.nc") for i in range(1, 31)]
 deterministic_file = os.path.join(store, ref, 'swio_avg_2017.nc')
 
 sss_files = glob.glob(os.path.join(obs, 'SSS*'))
@@ -126,7 +124,7 @@ for (lon1, lon2, lat1, lat2), name in zip(boxes, names):
         ax.grid(linewidth=0.3)
         ax.legend(loc='best')
         fig.tight_layout()
-        plt.savefig(os.path.join(figures, f'{stoens}_{name}_{var}.png'), dpi=300, transparent=True)
+        plt.savefig(os.path.join(figures, f'{stoens}_{name}_{var}.png'), dpi=300)
         plt.close()
         
         # DEVIATION     
@@ -146,7 +144,7 @@ for (lon1, lon2, lat1, lat2), name in zip(boxes, names):
         ax.grid(linewidth=0.3)
         ax.legend(loc='best')
         fig.tight_layout()
-        plt.savefig(os.path.join(figures, f'{stoens}_{name}_{var}_deviation.png'), dpi=300, transparent=True)
+        plt.savefig(os.path.join(figures, f'{stoens}_{name}_{var}_deviation.png'), dpi=300)
         plt.close()
 
 
@@ -163,5 +161,5 @@ for var_name, (var, obs_var) in variables.items():
     ax.legend(loc='upper left')
     ax.grid(linewidth=0.3)
     fig.tight_layout()
-    plt.savefig(os.path.join(figures, f'{stoens}_{var_name}_rms.png'), dpi=300, transparent=True)
+    plt.savefig(os.path.join(figures, f'{stoens}_{var_name}_rms.png'), dpi=300)
     plt.close()

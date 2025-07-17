@@ -24,71 +24,46 @@ ensembles = ['INI', 'STR', 'GLS']
 ens_colors = ['black', 'royalblue', 'crimson']
 ens_linestyles = ['solid', 'dashed', 'dotted']
 
-
-ini_mean_file = glob.glob(os.path.join('/lus/work/CT1/c1601279/rguillermin/MLD/run_swio2_stoens30_ini', 'mean*.nc'))[0]
-print(f'ini mld mean file found: {ini_mean_file}')
 ini_std_file = glob.glob(os.path.join('/lus/work/CT1/c1601279/rguillermin/MLD/run_swio2_stoens30_ini', 'std*.nc'))[0]
 print(f'ini mld std file found: {ini_std_file}')
 
-str_mean_file = glob.glob(os.path.join('/lus/work/CT1/c1601279/rguillermin/MLD/run_swio2_stoens30_str', 'mean*.nc'))[0]
-print(f'str mld mean file found: {str_mean_file}')
 str_std_file = glob.glob(os.path.join('/lus/work/CT1/c1601279/rguillermin/MLD/run_swio2_stoens30_str', 'std*.nc'))[0]
 print(f'str mld std file found: {str_std_file}')
 
-gls_mean_file = glob.glob(os.path.join('/lus/work/CT1/c1601279/rguillermin/MLD/run_swio2_stoens30_gls', 'mean*.nc'))[0]
-print(f'gls mld mean file found: {gls_mean_file}')
 gls_std_file = glob.glob(os.path.join('/lus/work/CT1/c1601279/rguillermin/MLD/run_swio2_stoens30_gls', 'std*.nc'))[0]
 print(f'gls mld std file found: {gls_std_file}')
 
-ini_mean_str_file = glob.glob(os.path.join('/lus/work/CT1/c1601279/rguillermin/WINDSTR/run_swio2_stoens30_ini', 'mean*str.nc'))[0]
-print(f'ini str mean file found: {ini_mean_str_file}')
 ini_std_str_file = glob.glob(os.path.join('/lus/work/CT1/c1601279/rguillermin/WINDSTR/run_swio2_stoens30_ini', 'std*str.nc'))[0]
 print(f'ini str std file found: {ini_std_str_file}')
 
-str_mean_str_file = glob.glob(os.path.join('/lus/work/CT1/c1601279/rguillermin/WINDSTR/run_swio2_stoens30_str', 'mean*str.nc'))[0]
-print(f'str str mean file found: {str_mean_str_file}')
 str_std_str_file = glob.glob(os.path.join('/lus/work/CT1/c1601279/rguillermin/WINDSTR/run_swio2_stoens30_str', 'std*str.nc'))[0]
 print(f'str str std file found: {str_std_str_file}')
 
-gls_mean_str_file = glob.glob(os.path.join('/lus/work/CT1/c1601279/rguillermin/WINDSTR/run_swio2_stoens30_gls', 'mean*str.nc'))[0]
-print(f'gls str mean file found: {gls_mean_str_file}')
 gls_std_str_file = glob.glob(os.path.join('/lus/work/CT1/c1601279/rguillermin/WINDSTR/run_swio2_stoens30_gls', 'std*str.nc'))[0]
 print(f'gls str std file found: {gls_std_str_file}')
 
-ini_mean = xr.open_dataset(ini_mean_file).sortby('time')
 ini_std = xr.open_dataset(ini_std_file).sortby('time')
 
-ini_mean = ini_mean.drop_duplicates(dim='time', keep='last')
 ini_std = ini_std.drop_duplicates(dim='time', keep='last')
 
-str_mean = xr.open_dataset(str_mean_file).sortby('time')
 str_std = xr.open_dataset(str_std_file).sortby('time')
 
-str_mean = str_mean.drop_duplicates(dim='time', keep='last')
 str_std = str_std.drop_duplicates(dim='time', keep='last')
 
-gls_mean = xr.open_dataset(gls_mean_file).sortby('time')
 gls_std = xr.open_dataset(gls_std_file).sortby('time')
 
-gls_mean = gls_mean.drop_duplicates(dim='time', keep='last')
 gls_std = gls_std.drop_duplicates(dim='time', keep='last')
 
-ini_str_mean = xr.open_dataset(ini_mean_str_file).sortby('time')
 ini_str_std = xr.open_dataset(ini_std_str_file).sortby('time')
 
-ini_str_mean = ini_str_mean.drop_duplicates(dim='time', keep='last')
 ini_str_std = ini_str_std.drop_duplicates(dim='time', keep='last')
 
-str_str_mean = xr.open_dataset(str_mean_str_file).sortby('time')
 str_str_std = xr.open_dataset(str_std_str_file).sortby('time')
 
-str_str_mean = str_str_mean.drop_duplicates(dim='time', keep='last')
 str_str_std = str_str_std.drop_duplicates(dim='time', keep='last')
 
-gls_str_mean = xr.open_dataset(gls_mean_str_file).sortby('time')
 gls_str_std = xr.open_dataset(gls_std_str_file).sortby('time')
 
-gls_str_mean = gls_str_mean.drop_duplicates(dim='time', keep='last')
 gls_str_std = gls_str_std.drop_duplicates(dim='time', keep='last')
 
 g = xr.open_dataset(grid)
@@ -126,15 +101,6 @@ for ax, index in zip(axes[0,:], [1, 10, 90, 900]):
         lw=1, alpha=0.5, 
         edgecolor='black'
     ) 
-    
-    ini_kde = sts.gaussian_kde(datas[0][~np.isnan(datas[0])])
-    ax.plot(x, ini_kde.pdf(x), c=ens_colors[0], lw=2, label='INI')
-    
-    str_kde = sts.gaussian_kde(datas[1][~np.isnan(datas[1])])
-    ax.plot(x, str_kde.pdf(x), c=ens_colors[1], lw=2, label='STR')
-    
-    gls_kde = sts.gaussian_kde(datas[2][~np.isnan(datas[2])])
-    ax.plot(x, gls_kde.pdf(x), c=ens_colors[2], lw=2, label='GLS')   
     
     ini_text = AnchoredText(f'INI\nmean = {np.nanmean(datas[0])*1000:.1f}\nstd = {np.nanstd(datas[0])*1000:.1f}', 1, frameon=True)
     ini_text.patch.set_boxstyle("round,pad=0.3,rounding_size=0.2")
@@ -179,14 +145,14 @@ for ax, index in zip(axes[1,:], [1, 10, 90, 900]):
         edgecolor='black'
     )
     
-    ini_kde = sts.gaussian_kde(datas[0][~np.isnan(datas[0])])
-    ax.plot(x, ini_kde.pdf(x), c=ens_colors[0], lw=2, label='INI')
+    # ini_kde = sts.gaussian_kde(datas[0][~np.isnan(datas[0])])
+    # ax.plot(x, ini_kde.pdf(x), c=ens_colors[0], lw=2, label='INI')
     
-    str_kde = sts.gaussian_kde(datas[1][~np.isnan(datas[1])])
-    ax.plot(x, str_kde.pdf(x), c=ens_colors[1], lw=2, label='STR')
+    # str_kde = sts.gaussian_kde(datas[1][~np.isnan(datas[1])])
+    # ax.plot(x, str_kde.pdf(x), c=ens_colors[1], lw=2, label='STR')
     
-    gls_kde = sts.gaussian_kde(datas[2][~np.isnan(datas[2])])
-    ax.plot(x, gls_kde.pdf(x), c=ens_colors[2], lw=2, label='GLS')
+    # gls_kde = sts.gaussian_kde(datas[2][~np.isnan(datas[2])])
+    # ax.plot(x, gls_kde.pdf(x), c=ens_colors[2], lw=2, label='GLS')
     
     ini_text = AnchoredText(f'INI\nmean = {np.nanmean(datas[0]):.1f}\nstd = {np.nanstd(datas[0]):.1f}', 1, frameon=True)
     ini_text.patch.set_boxstyle("round,pad=0.3,rounding_size=0.2")
@@ -219,5 +185,5 @@ for ax in axes[1,:]:
     ax.set_ylim(0.0, 1.5)
 
 fig.tight_layout()
-fig.savefig(os.path.join(figures, 'windstr_mld_histograms.png'), dpi=300, transparent=True)
+fig.savefig(os.path.join(figures, 'windstr_mld_histograms.png'), dpi=300)
 plt.show()  

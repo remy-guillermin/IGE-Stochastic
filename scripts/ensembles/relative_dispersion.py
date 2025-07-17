@@ -67,9 +67,9 @@ print(f'str str mean file found: {str_mean_str_file}')
 str_std_str_file = glob.glob(os.path.join('/lus/work/CT1/c1601279/rguillermin/WINDSTR/run_swio2_stoens30_str', 'std*.nc'))[0]
 print(f'str str std file found: {str_std_str_file}')
 
-gls_mean_str_file = glob.glob(os.path.join('/lus/work/CT1/c1601279/rguillermin/MLD/run_swio2_stoens30_gls', 'mean*.nc'))[0]
+gls_mean_str_file = glob.glob(os.path.join('/lus/work/CT1/c1601279/rguillermin/WINDSTR/run_swio2_stoens30_gls', 'mean*.nc'))[0]
 print(f'gls str mean file found: {gls_mean_str_file}')
-gls_std_str_file = glob.glob(os.path.join('/lus/work/CT1/c1601279/rguillermin/MLD/run_swio2_stoens30_gls', 'std*.nc'))[0]
+gls_std_str_file = glob.glob(os.path.join('/lus/work/CT1/c1601279/rguillermin/WINDSTR/run_swio2_stoens30_gls', 'std*.nc'))[0]
 print(f'gls str std file found: {gls_std_str_file}')
 
 ini_mean = xr.open_dataset(ini_mean_file).sortby('time').isel(xi_rho=slice(0, 431), eta_rho=slice(0, 501))
@@ -209,8 +209,8 @@ for (lon1, lon2, lat1, lat2), name in zip(boxes, names):
     ax_str.legend(loc='upper right')
     fig_str.tight_layout()
     
-    fig_temp.savefig(os.path.join(figures, f'all_ens_{name}_temp_relative_dispersion_self.png'), dpi=300, transparent=True)
-    fig_salt.savefig(os.path.join(figures, f'all_ens_{name}_salt_relative_dispersion_self.png'), dpi=300, transparent=True)
-    fig_mld.savefig(os.path.join(figures, f'all_ens_{name}_mld_relative_dispersion_self.png'), dpi=300, transparent=True)
-    fig_str.savefig(os.path.join(figures, f'all_ens_{name}_str_relative_dispersion_self.png'), dpi=300, transparent=True)
+    fig_temp.savefig(os.path.join(figures, f'all_ens_{name}_temp_relative_dispersion_self.png'), dpi=300)
+    fig_salt.savefig(os.path.join(figures, f'all_ens_{name}_salt_relative_dispersion_self.png'), dpi=300)
+    fig_mld.savefig(os.path.join(figures, f'all_ens_{name}_mld_relative_dispersion_self.png'), dpi=300)
+    fig_str.savefig(os.path.join(figures, f'all_ens_{name}_str_relative_dispersion_self.png'), dpi=300)
     plt.show()
