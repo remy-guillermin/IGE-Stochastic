@@ -23,8 +23,7 @@ Host adastra
 ```bash
 ssh adastra
 ```
-We need IGE's password as well as ADASTRA's one
-Vous aurez besoin du mot de passe de l'IGE ainsi que de celui d'Adastra.
+We need IGE's password as well as ADASTRA's one.
 
 #### `SSH` configuration to connect to IGE computer with a key.
 1. Generate a SSH key:
