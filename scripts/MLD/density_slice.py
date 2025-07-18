@@ -86,13 +86,3 @@ ax.legend(loc='upper right', framealpha=1)
 fig.tight_layout()
 fig.savefig(os.path.join(figures, 'density_slice.png'), dpi=300, transparent=True)
 plt.show()
-
-
-
-mld.isel(s_rho = -2).mean().data, mld.isel(s_rho = -2).min().data, mld.isel(s_rho = -2).max().data
-
-
-
-
-
-

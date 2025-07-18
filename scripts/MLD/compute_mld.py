@@ -10,12 +10,11 @@ import os
 from matplotlib.gridspec import GridSpec
 matplotlib.use('Agg')
 
-scratch = '/lus/scratch/CT1/c1601279/rguillermin'
 work = '/lus/work/CT1/c1601279/rguillermin'
 store = '/lus/store/CT1/c1601279/rguillermin'
 figures = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures/Ensembles'
 
-stoens = 'CROCO/SWIOSE_dev/run_swio2_stoens2_gls_2017'
+stoens = 'run_croco/run_swio2_stoens30_gls_2017'
 
 grid = '/lus/work/CT1/c1601279/rguillermin/grid/croco_grid_swio2.nc'
 
@@ -58,7 +57,8 @@ def calc_depth(
         depth[k, :, :] = z0[k, :, :] * h
     return depth
 
-ensemble_path = glob.glob(os.path.join(scratch, stoens, '*avg.nc'))
+ensemble_path = glob.glob(os.path.join(store, stoens, '*avg.nc'))
+print(f"{len(ensemble_path)} files found for {stoens}.")
 ds = xr.open_dataset(ensemble_path[0])
 
 g = xr.open_dataset(grid)[['lon_rho', 'lat_rho', 'mask_rho', 'h']]

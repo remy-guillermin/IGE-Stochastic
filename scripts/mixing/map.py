@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 import numpy as np
 import xarray as xr
-import croco_plot as cplot
 import os
 
 SWIO = (25, 69, -36, 7)
@@ -35,7 +34,14 @@ grid_path = '/lus/store/CT1/c1601279/lweiss/grid/croco_grid_swio2.nc'
 figures = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures'
 data_path = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/data/swio_his.nc'
 
-lon, lat, _, _, msk, msk_inv, _, h = cplot.utils.load_grid(grid_path)
+g = xr.open_dataset(grid_path)
+h = g['h'][:, :]
+lon = g['lon_rho'][:, :] # Longitude
+lat = g['lat_rho'][:, :] # Latitude
+angle = g['angle'][:, :] # Deformation
+msk = g['mask_rho'][:, :] # Mask
+msk_inv = np.where(msk == 0, msk, np.nan)
+g.close()
 
 ds = xr.open_dataset(data_path)
 AKv = ds.AKv
@@ -124,6 +130,6 @@ for ax in axes:
 fig.tight_layout()
 
 filename = f'{figures}/coefficients_{date}.png'
-fig.savefig(filename, dpi=300, transparent=True)
+fig.savefig(filename, dpi=300)
 print(f'Saved in {filename}')
 plt.show()

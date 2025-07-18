@@ -14,10 +14,10 @@ matplotlib.use('Agg')
 # PARAMETERS
 # Path
 work = '/lus/work/CT1/c1601279/rguillermin'
-sto_ens = ['run_swio2_stoens30_ini', 'run_swio2_stoens30_CD', 'run_swio2_stoens30_gls']
-grid = '/lus/work/CT1/c1601279/rguillermin/grid/croco_grid_swio2.nc'
-sim = '/lus/work/CT1/c1601279/rguillermin/grid/swio_avg.nc'
+sto_ens = ['run_swio2_stoens30_ini', 'run_swio2_stoens30_str', 'run_swio2_stoens30_gls']
+grid = '/lus/store/CT1/c1601279/lweiss/grid/croco_grid_swio2.nc'
 figures = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures/Ensembles'
+depth_lvl = '/lus/work/CT1/c1601279/rguillermin/grid/croco_depth_level.nc'
 
 lat_index = [430, 280]
 SWIO = (25, 69, -36, 7)
@@ -80,22 +80,10 @@ xi_rho = g.xi_rho
 h = g.h
 g.close()
 
-ds = xr.open_dataset(sim)[['s_rho', 'Cs_rho', 'hc', 'eta_rho', 'xi_rho']]
-depth_sigma = calc_depth(ds.s_rho, ds.Cs_rho, ds.hc, h)
-
-depth_level = xr.Dataset(
-    data_vars=dict(
-        depth_level=(['s_rho', 'eta_rho', 'xi_rho'], depth_sigma),
-    ),
-    coords=dict(
-        eta_rho=ds.eta_rho,
-        xi_rho=ds.xi_rho,
-        s_rho=ds.s_rho,
-    )
-)
-
 h = h.where((h != 50), 0)
-ds.close()
+
+depth_level = xr.open_dataset(depth_lvl)
+print(f'depth level file opened: {depth_lvl}')
 
 
 
@@ -216,7 +204,7 @@ for ax in axs.flatten():
     ax.set_xticklabels([f'{int(tick)}°E' for tick in ticks])
 
 fig.tight_layout()
-fig.savefig(f'{figures}/slices_mld_comp_{date}.png', dpi=300, transparent=True)
+fig.savefig(f'{figures}/slices_mld_comp_{date}.png', dpi=300)
 plt.close()
 
 
@@ -299,7 +287,7 @@ for ax in axs:
 
 
 fig.tight_layout()
-fig.savefig(f'{figures}/slices_mld_comp_sup_{date}.png', dpi=300, transparent=True)
+fig.savefig(f'{figures}/slices_mld_comp_sup_{date}.png', dpi=300)
 plt.close()
 
 
@@ -335,8 +323,5 @@ for ax in axs:
     ax.grid(alpha=0.5)
     
 fig.tight_layout()
-fig.savefig(f'{figures}/slices_bathy.png', dpi=300, transparent=True)
+fig.savefig(f'{figures}/slices_bathy.png', dpi=300)
 plt.close()
-
-
-

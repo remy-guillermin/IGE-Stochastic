@@ -14,7 +14,7 @@ matplotlib.use('Agg')
 # PARAMETERS
 # Path
 work = '/lus/work/CT1/c1601279/rguillermin'
-sto_ens = ['run_swio2_stoens30_ini', 'run_swio2_stoens30_CD']
+sto_ens = ['run_swio2_stoens30_ini', 'run_swio2_stoens30_str']
 grid = '/lus/work/CT1/c1601279/rguillermin/grid/croco_grid_swio2.nc'
 figures = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures/Ensembles'
 
@@ -56,7 +56,7 @@ xi_rho = g.xi_rho
 h = g.h
 g.close()
 
-
+h = h.where((h != 50), 0)
 
 # norm = mcolors.Normalize(vmin=0, vmax=0.3)
 
@@ -116,7 +116,7 @@ cb = plt.colorbar(pcm, ax=ax, label='MLD standard deviation [m]', orientation='v
 
 
 fig.tight_layout()
-fig.savefig(os.path.join(figures, f'mld_std_comp_{date}'), dpi=300, transparent=True)
+fig.savefig(os.path.join(figures, f'mld_std_comp_{date}'), dpi=300)
 plt.close()
 
 
@@ -167,11 +167,5 @@ cb = plt.colorbar(pcm, ax=ax, label='MLD [m]', orientation='vertical')
 
 
 fig.tight_layout()
-fig.savefig(os.path.join(figures, f'mld_mean_comp_{date}'), dpi=300, transparent=True)
+fig.savefig(os.path.join(figures, f'mld_mean_comp_{date}'), dpi=300)
 plt.close()
-
-
-
-
-
-
