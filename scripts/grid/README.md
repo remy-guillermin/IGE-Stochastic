@@ -14,5 +14,5 @@ This folder contains scripts related to the grid.
 ![](../figures/bathy_slices.png)
 - [bathy_vertical.py](./bathy_vertical.py): This script plot a slice to display the vertical levels.
 ![](../figures/bathy_levels_slice.png)
-- [compute_depth.py](./compute_depth.py): This script create a new `.nc` file containg the 3D grid.
+- [compute_depth.py](./compute_depth.py): This script create a new `.nc` file containing the 3D grid.
 - [regrid.py](./regrid.py): This script allows for the regridding of the observation data to the same grid as the simulation.
