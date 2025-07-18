@@ -26,8 +26,8 @@ colors = [cmap(i / (n_colors - 1)) for i in range(n_colors)]
 colors[0] = mcolors.to_rgba('palevioletred')
 colors[-1] = mcolors.to_rgba('sandybrown')
 
-lat_index = (172, 280, 430)
-lon_index = (160, 335)
+lat_index = (430, 280, 172)
+lon_index = (335, 160)
 
 visc_cmap = cmocean.cm.amp
 diff_cmap = cmocean.cm.tempo
@@ -37,11 +37,16 @@ diff_cmap = cmocean.cm.tempo
 # figures = '/home/guilremy/IGE-Stochastic/figures'
 
 # CLUSTER
-grid_path = '/lus/store/CT1/c1601279/lweiss/grid/croco_grid_swio2.nc'
+grid = '/lus/store/CT1/c1601279/lweiss/grid/croco_grid_swio2.nc'
 figures = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures'
 
-lon, lat, _, _, msk, msk_inv, _, h = cplot.utils.load_grid(grid_path)
-
+g = xr.open_dataset(grid)[['lon_rho', 'lat_rho', 'mask_rho', 'h']]
+lon = g.lon_rho
+lat = g.lat_rho
+eta_rho = g.eta_rho
+xi_rho = g.xi_rho
+h = g.h
+g.close()
 
 # Create figure
 fig = plt.figure(figsize=(8, 6))
@@ -80,10 +85,10 @@ gl.xlabel_style = {'size': 10, 'color': 'k'}
 gl.ylabel_style = {'size': 10, 'color': 'k'}
 
 # Add rectangles and labels
-for (xmin, xmax, ymin, ymax), name, color in zip(boxes, names, colors):
-    ax.add_patch(Rectangle((xmin, ymin), xmax - xmin, ymax - ymin,
-                           linewidth=2, edgecolor=color, facecolor='none', transform=ccrs.PlateCarree()))
-    ax.text((xmin + xmax) / 2, ymax + 0.5, name, color=color, fontsize=10, ha='center', va='bottom', transform=ccrs.PlateCarree())
+# for (xmin, xmax, ymin, ymax), name, color in zip(boxes, names, colors):
+#     ax.add_patch(Rectangle((xmin, ymin), xmax - xmin, ymax - ymin,
+#                            linewidth=2, edgecolor=color, facecolor='none', transform=ccrs.PlateCarree()))
+#     ax.text((xmin + xmax) / 2, ymax + 0.5, name, color=color, fontsize=10, ha='center', va='bottom', transform=ccrs.PlateCarree())
 
 # Add bathymetry colorbar
 cb = fig.colorbar(pcm, ax=ax, label='Bathymetry (m)')
@@ -97,12 +102,17 @@ text = cb.ax.yaxis.label
 font = mpl.font_manager.FontProperties(size=10)
 text.set_font_properties(font)
 
-for index in lon_index:
-    ax.plot(lon[:, index], lat[:, index], 'r-')
-    
+i = 1
 for index in lat_index:
     ax.plot(lon[index, :], lat[index, :], 'r-')
+    ax.text(lon[index, -1] + 0.5, lat[index, -1], f'S{i}', color='red', ha='left', va='center')
+    i += 1
 
+for index in lon_index:
+    ax.plot(lon[:, index], lat[:, index], 'r-')
+    ax.text(lon[0, index] , lat[0, index] - 0.5, f'S{i}', color='red', ha='center', va='top')
+    i += 1
+    
 fig.tight_layout()
-fig.savefig(f'{figures}/bathy_slices.png', dpi=300, transparent=True)
+fig.savefig(f'{figures}/bathy_slices.png', dpi=300)
 plt.show()

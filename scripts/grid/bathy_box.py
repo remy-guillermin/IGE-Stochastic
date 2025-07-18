@@ -96,6 +96,6 @@ ax.set_title('SWIO regions')
 
 fig.tight_layout()
 filename = f'{figures}/bathy_zones.png'
-fig.savefig(filename, dpi=300, transparent=True)
+fig.savefig(filename, dpi=300)
 print(f'{filename} saved.')
 plt.show()

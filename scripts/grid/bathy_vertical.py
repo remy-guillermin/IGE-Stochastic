@@ -10,9 +10,6 @@ import cartopy.crs as ccrs
 import glob
 import os
 from matplotlib.gridspec import GridSpec
-%matplotlib inline
-
-
 
 figures = '/lus/home/CT1/c1601279/rguillermin/IGE-Stochastic/figures/Ensembles'
 data = '/lus/store/CT1/c1601279/lweiss/run_croco/SWIO/run_swio2_deter2_2017_2023'
@@ -21,8 +18,6 @@ depth_lvl = '/lus/work/CT1/c1601279/rguillermin/grid/croco_depth_level.nc'
 
 CRIT = 0.03
 lat_index = 280 #430
-
-
 
 g = xr.open_dataset(grid)[['lon_rho', 'lat_rho', 'mask_rho', 'h']]
 lon = g.lon_rho
@@ -36,8 +31,6 @@ g.close()
 h = h.where(h != 50, 0)
 
 depth_level = xr.open_dataset(depth_lvl)
-
-
 
 fig, axs = plt.subplots(1, 2, figsize=(12,4), gridspec_kw={'width_ratios': [2, 1]})
 
@@ -78,11 +71,5 @@ for ax in axs:
     ax.set_yticklabels([f'{-int(tick)} m' for tick in ticks])
 
 fig.tight_layout()
-fig.savefig(os.path.join(figures, 'levels_slice.png'), dpi=300, transparent=True)
+fig.savefig(os.path.join(figures, 'levels_slice.png'), dpi=300)
 plt.show()
-
-
-
-
-
-

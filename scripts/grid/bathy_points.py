@@ -125,17 +125,17 @@ gl.xlabel_style = {'size': 10, 'color': 'k'}
 gl.ylabel_style = {'size': 10, 'color': 'k'}
 
 # Add rectangles and labels
-for (xmin, xmax, ymin, ymax), name, color in zip(boxes, names, box_colors):
-    if name == 'Equator'or name == 'Islands':
-        ax.add_patch(Rectangle((xmin, ymin), xmax - xmin, ymax - ymin,
-                            linewidth=2, edgecolor=color, facecolor='none', transform=ccrs.PlateCarree()))
-        ax.text((xmin + xmax) / 2, ymax + 0.5, name, color=color, fontsize=10, ha='center', va='bottom', transform=ccrs.PlateCarree())
+# for (xmin, xmax, ymin, ymax), name, color in zip(boxes, names, box_colors):
+#     if name == 'Equator'or name == 'Islands':
+#         ax.add_patch(Rectangle((xmin, ymin), xmax - xmin, ymax - ymin,
+#                             linewidth=2, edgecolor=color, facecolor='none', transform=ccrs.PlateCarree()))
+#         ax.text((xmin + xmax) / 2, ymax + 0.5, name, color=color, fontsize=10, ha='center', va='bottom', transform=ccrs.PlateCarree())
 
-i = 1
-for index in lat_index:
-    ax.plot(lon[index, :], lat[index, :], 'r-',)
-    ax.text(lon[index, -1] + 0.5, lat[index, -1], f'S{i}', color='red', ha='left', va='center')
-    i += 1
+# i = 1
+# for index in lat_index:
+#     ax.plot(lon[index, :], lat[index, :], 'r-',)
+#     ax.text(lon[index, -1] + 0.5, lat[index, -1], f'S{i}', color='red', ha='left', va='center')
+#     i += 1
 
 
 for k, (i, j) in enumerate(points):
@@ -143,5 +143,5 @@ for k, (i, j) in enumerate(points):
     ax.text(lon[i, j], lat[i, j] - 0.5, points_names[k], color='red', ha='center', va='top')
 
 fig.tight_layout()
-fig.savefig(f'{figures}/bathy_slices.png', dpi=300, transparent=True)
+fig.savefig(f'{figures}/bathy_points.png', dpi=300)
 plt.show()
