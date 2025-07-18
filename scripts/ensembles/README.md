@@ -5,7 +5,10 @@ In this folder are scripts used to make some diagnostics on the ensembles.
 ## Scripts
 - [all_ensemble_spread_tracers_boxes.py](./all_ensemble_spread_tracers_boxes.py): This script plot time series of the tracers (Spatial mean, Ensemble dispersion, RMSE) for each sub-region.
 - [all_ensemble_spread_tracers_points.py](./all_ensemble_spread_tracers_points.py): This script plot time series of the tracers (Spatial mean, Ensemble dispersion) for a single point in each sub-region.
-- [ensemble_spread_tracers.py](./ensemble_spread_tracers.py): 
+- [ensemble_spread_tracers.py](./ensemble_spread_tracers.py): This script plots the mean value for each member of an ensemble for a given year in each sub-region. It also plots the member deviation the same way and the RMSE for each sub-region.
+![](../figures/Equator_temp_deviation.png)
+![](../figures/Equator_temp.png)
+![](../figures/ssh_rms.png)
 - [film_std_tracers.py](./film_std_tracers.py): This script use create a [film](https://youtu.be/RAoVWJQzty0) displaying the evolution of the standard deviation for the tracers for any given ensemble. 
 - [histogram_dispersion.py](./histogram_dispersion.py): This script compute the histogram of the dispersion for 4 given time steps : 1 day, 10 days, 90 days and 900 days.
 ![](../figures/windstr_mld_histograms.png)
